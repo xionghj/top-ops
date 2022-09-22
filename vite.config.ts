@@ -13,4 +13,14 @@ export default defineConfig({
       cache: false,
     }),
   ],
+  //反向代理配置 - 可解决跨域问题
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://192.168.253.207:8000/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 })

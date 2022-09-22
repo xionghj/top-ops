@@ -2,7 +2,7 @@
   <a-dropdown :trigger="['hover']">
     <div class="ant-dropdown-link nav-active" @click.prevent>
       <span class="nav-active__header" />
-      <span>个人中心</span>
+      <span>{{ name }}</span>
     </div>
     <template #overlay>
       <a-menu>
@@ -13,7 +13,11 @@
 </template>
 <script setup lang="ts">
   import { useRouter } from 'vue-router';
+  import { useUserStore } from '@/store/modules/user';
+  import { storeToRefs } from 'pinia';
   const router = useRouter();
+  const userStore = useUserStore();
+  const { name } = storeToRefs(userStore);
   function signOut() {
     localStorage.clear();
     router.push({ name: 'login' });

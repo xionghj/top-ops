@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import router from './router';
+import { setupStore } from '@/store';
 
 import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
@@ -8,4 +9,8 @@ import 'ant-design-vue/dist/antd.css';
 import './styles/index.less';
 import App from './App.vue';
 
-createApp(App).use(Antd).use(router).mount('#app');
+const app = createApp(App);
+setupStore(app);
+app.use(Antd);
+app.use(router);
+app.mount('#app');

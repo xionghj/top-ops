@@ -60,20 +60,6 @@ module.exports = {
     ],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/member-delimiter-style': [
-      'error',
-      {
-        multiline: {
-          delimiter: 'semi',
-          requireLast: true,
-        },
-        singleline: {
-          delimiter: 'semi',
-          requireLast: true,
-        },
-        multilineDetection: 'brackets',
-      },
-    ],
     '@typescript-eslint/no-empty-function': 0,
     '@typescript-eslint/semi': ['error', 'always'],
     // vue
@@ -126,6 +112,11 @@ module.exports = {
         },
       },
     ],
+    'linebreak-style': ["off", "windows"],
+    "vue/html-closing-bracket-newline": ["error", {
+      "singleline": "never",
+      "multiline": "never"
+    }],
   },
   // https://github.com/vuejs/eslint-plugin-vue/issues/1355
   overrides: [

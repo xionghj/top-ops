@@ -1,10 +1,10 @@
 <template>
   <div class="login-box">
     <div class="login-content">
-      <div class="login-title">Ops</div>
-      <a-form :model="formState" name="basic" autocomplete="off" @finish="onFinish">
+      <div class="login-title">DevOps</div>
+      <a-form :model="state.formInline" name="basic" autocomplete="off" @finish="handleSubmit">
         <a-form-item name="username" :rules="[{ required: true, message: '请输入账号!' }]">
-          <a-input v-model:value="formState.username" size="large">
+          <a-input v-model:value="state.formInline.username" size="large">
             <template #prefix>
               <UserOutlined class="site-form-item-icon" />
             </template>
@@ -12,7 +12,7 @@
         </a-form-item>
 
         <a-form-item name="password" :rules="[{ required: true, message: '请输入密码!' }]">
-          <a-input-password v-model:value="formState.password" size="large">
+          <a-input-password v-model:value="state.formInline.password" size="large">
             <template #prefix>
               <LockOutlined class="site-form-item-icon" />
             </template>
@@ -29,16 +29,40 @@
 <script setup lang="ts">
   import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
   import { reactive } from 'vue';
-  interface FormState {
-    username: string;
-    password: string;
-  }
-  const formState = reactive<FormState>({
-    username: '',
-    password: '',
+  import { useRoute, useRouter } from 'vue-router';
+  import { message, Modal } from 'ant-design-vue';
+  import { useUserStore } from '@/store/modules/user';
+  import { to } from '@/utils/awaitTo';
+
+  const route = useRoute();
+  const router = useRouter();
+  const userStore = useUserStore();
+  const state = reactive({
+    loading: false,
+    captcha: '',
+    formInline: {
+      username: '',
+      password: '',
+    },
   });
-  const onFinish = (values: any) => {
-    console.log('Success:', values);
+
+  const handleSubmit = async () => {
+    message.loading('登录中...', 0);
+    state.loading = true;
+    // params.password = md5(password)
+
+    const [err] = await to(userStore.login(state.formInline));
+    if (err) {
+      Modal.error({
+        title: () => '提示',
+        content: () => err.message,
+      });
+    } else {
+      message.success('登录成功！');
+      setTimeout(() => router.replace((route.query.redirect as string) ?? '/'));
+    }
+    state.loading = false;
+    message.destroy();
   };
 </script>
 <style lang="less" scoped>
