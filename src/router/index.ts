@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { message as $message } from 'ant-design-vue';
 import Common from './modules/common';
 
 const routes = [...Common];
@@ -17,10 +18,11 @@ router.beforeEach((to, from, next) => {
     next();
   } else {
     // 获取 token
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('ACCESS_TOKEN_KEY');
     // token 不存在
     if (token === null || token === '') {
-      next();
+      $message.error('您还没有登录，请先登录');
+      next('/home');
     } else {
       next();
     }

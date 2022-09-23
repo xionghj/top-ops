@@ -22,11 +22,14 @@
         </template>
       </a-menu>
     </a-layout-sider>
+    <div class="menu-fold" @click="collapsed = !collapsed">
+      <component :is="collapsed ? MenuUnfoldOutlined : MenuFoldOutlined" />
+    </div>
   </div>
 </template>
 <script setup lang="ts">
   import { ref, watch } from 'vue';
-  import { ChromeOutlined } from '@ant-design/icons-vue';
+  import { ChromeOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
   import subMenuGroup from './sub-menu-group.vue';
   import type { MenuProps } from 'ant-design-vue';
   const selectedKeys = ref<string[]>(['1']);
@@ -78,5 +81,14 @@
     z-index: 1;
     overflow: auto;
     overflow-x: hidden;
+    ::v-deep .ant-layout-sider-trigger {
+      display: none;
+    }
+    .menu-fold {
+      position: absolute;
+      bottom: 10px;
+      left: 20px;
+      cursor: pointer;
+    }
   }
 </style>
