@@ -1,33 +1,29 @@
 <template>
-  <div class="login-box bg-red-100">
-    <div class="login-content">
-      <div class="login-title">DevOps</div>
+  <div class="login-box">
+    <div class="bg-overlay" />
+    <div class="flex flex-col bg-white z-[1] w-80 rounded p-8 md:w-[28rem]">
+      <div class="flex flex-col items-center">
+        <div class="text-lg font-medium mb-2 text-[#405189]">Welcome Back !</div>
+        <div class="mb-6 text-[#878a99]">Sign in to continue to DevOps.</div>
+      </div>
       <a-form :model="state.formInline" name="basic" autocomplete="off" @finish="handleSubmit">
-        <a-form-item name="username" :rules="[{ required: true, message: '请输入账号!' }]">
-          <a-input v-model:value="state.formInline.username" size="large">
-            <template #prefix>
-              <UserOutlined class="site-form-item-icon" />
-            </template>
-          </a-input>
+        <div class="mb-2 text-[#212529] font-medium">Username</div>
+        <a-form-item name="username" :rules="[{ required: true, message: 'Enter username!' }]">
+          <a-input v-model:value="state.formInline.username" size="large" placeholder="Enter username" />
         </a-form-item>
-
-        <a-form-item name="password" :rules="[{ required: true, message: '请输入密码!' }]">
-          <a-input-password v-model:value="state.formInline.password" size="large">
-            <template #prefix>
-              <LockOutlined class="site-form-item-icon" />
-            </template>
-          </a-input-password>
+        <div class="mb-2 text-[#212529] font-medium">Password</div>
+        <a-form-item name="password" :rules="[{ required: true, message: 'Enter password!' }]">
+          <a-input-password v-model:value="state.formInline.password" size="large" placeholder="Enter password" />
         </a-form-item>
 
         <a-form-item>
-          <a-button class="login-button" type="primary" html-type="submit" size="large">登录</a-button>
+          <a-button class="w-full mt-4" type="primary" html-type="submit" size="large">登录</a-button>
         </a-form-item>
       </a-form>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-  import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
   import { reactive } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { message, Modal } from 'ant-design-vue';
@@ -71,33 +67,27 @@
     display: flex;
     width: 100vw;
     height: 100vh;
-    padding-top: 240px;
+    padding-top: 200px;
     background-size: 100%;
     flex-direction: column;
     align-items: center;
+    background: linear-gradient(-45deg, #0d6efd 50%, #198754);
+    // background: linear-gradient(-45deg, #4791ff 50%, #4a47f7);
     // background-image: linear-gradient(to right, #fbc2eb, #a6c1ee);
 
-    .login-content {
-      display: flex;
-      flex-direction: column;
-      background-color: #fff;
-      width: 460px;
-      border-radius: 12px;
-      padding: 20px 50px;
-
-      .login-title {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 30px;
-      }
-
-      .login-button {
-        width: 100%;
-        margin-top: 10px;
-      }
+    .bg-overlay {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      top: 0;
+      background-image: url(@/assets/images/cover-pattern.png);
+      background-position: 50%;
+      background-size: cover;
+      opacity: 1;
+      background-color: transparent;
     }
   }
 </style>
