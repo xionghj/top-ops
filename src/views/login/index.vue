@@ -1,5 +1,5 @@
 <template>
-  <div class="login-box">
+  <div class="login-box bg-red-100">
     <div class="login-content">
       <div class="login-title">DevOps</div>
       <a-form :model="state.formInline" name="basic" autocomplete="off" @finish="handleSubmit">
@@ -65,6 +65,7 @@
     message.destroy();
   };
 </script>
+<style lang="postcss" scoped></style>
 <style lang="less" scoped>
   .login-box {
     display: flex;

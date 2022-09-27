@@ -1,6 +1,6 @@
 <template>
   <div class="sidebar-container">
-    <a-layout-sider v-model:collapsed="collapsed" collapsible theme="light">
+    <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible theme="light" collapsed-width="70">
       <a-menu
         v-model:openKeys="openKeys"
         v-model:selectedKeys="selectedKeys"
@@ -81,9 +81,6 @@
     z-index: 1;
     overflow: auto;
     overflow-x: hidden;
-    ::v-deep .ant-layout-sider-trigger {
-      display: none;
-    }
     .menu-fold {
       position: absolute;
       bottom: 10px;
