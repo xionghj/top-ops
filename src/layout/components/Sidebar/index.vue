@@ -1,30 +1,34 @@
 <template>
   <div class="sidebar-container">
-    <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible theme="light" collapsed-width="70">
-      <a-menu
-        v-model:openKeys="openKeys"
-        v-model:selectedKeys="selectedKeys"
-        mode="inline"
-        class="sidebar-menu"
-        @click="handleClick">
-        <template v-for="item in list" :key="item.key">
-          <template v-if="!item.children">
-            <a-menu-item :key="item.key">
-              <template #icon>
-                <ChromeOutlined />
-              </template>
-              {{ item.title }}
-            </a-menu-item>
+    <div class="sidebar-container-fixed-stuff" :style="{ width: collapsed ? '70px' : '200px' }" />
+    <a-layout-sider
+      v-model:collapsed="collapsed"
+      class="sidebar-mune"
+      :trigger="null"
+      collapsible
+      theme="light"
+      collapsed-width="70">
+      <div style="flex: 1 1 0%; overflow: hidden auto">
+        <a-menu v-model:openKeys="openKeys" v-model:selectedKeys="selectedKeys" mode="inline" @click="handleClick">
+          <template v-for="item in list" :key="item.key">
+            <template v-if="!item.children">
+              <a-menu-item :key="item.key">
+                <template #icon>
+                  <ChromeOutlined />
+                </template>
+                {{ item.title }}
+              </a-menu-item>
+            </template>
+            <template v-else>
+              <sub-menu-group :key="item.key" :menu-info="item" :collapsed="collapsed" />
+            </template>
           </template>
-          <template v-else>
-            <sub-menu-group :key="item.key" :menu-info="item" :collapsed="collapsed" />
-          </template>
-        </template>
-      </a-menu>
+        </a-menu>
+      </div>
+      <div class="menu-fold" @click="collapsed = !collapsed">
+        <component :is="collapsed ? MenuUnfoldOutlined : MenuFoldOutlined" />
+      </div>
     </a-layout-sider>
-    <div class="menu-fold" @click="collapsed = !collapsed">
-      <component :is="collapsed ? MenuUnfoldOutlined : MenuFoldOutlined" />
-    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -59,7 +63,7 @@
       children: [
         {
           key: '2.1',
-          title: '资源管理1',
+          title: '资源管理',
           children: [
             {
               key: '2.1.1',
@@ -78,13 +82,35 @@
 </script>
 <style lang="less" scoped>
   .sidebar-container {
+    display: flex;
+    flex-direction: column;
     z-index: 1;
     overflow: auto;
     overflow-x: hidden;
+    .sidebar-container-fixed-stuff {
+      flex-shrink: 0;
+      transition: width 0.2s;
+    }
+    .sidebar-mune {
+      position: fixed;
+      top: 50px;
+      left: 0;
+      z-index: 10;
+      height: calc(100% - 50px);
+    }
+    ::v-deep .ant-layout-sider-children {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
     .menu-fold {
-      position: absolute;
-      bottom: 10px;
-      left: 20px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+      padding: 0 16px;
+      overflow: hidden;
+      height: 40px;
+      line-height: 40px;
+      border-top: 1px solid #f0f0f0;
       cursor: pointer;
     }
   }
