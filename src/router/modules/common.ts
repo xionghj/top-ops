@@ -6,16 +6,23 @@ const home = {
   meta: {
     title: '首页',
   },
-  redirect: {
-    name: 'home',
-  },
+  code: 'ca6f0d4316645473',
   children: [
+    {
+      path: '/home',
+      name: 'home',
+      code: 'c24fc7a5d5d91db9',
+      component: () => import('@/views/home/index.vue'),
+      meta: {
+        title: '首页',
+      },
+    },
     {
       path: '/home',
       name: 'home',
       component: () => import('@/views/home/index.vue'),
       meta: {
-        title: '首页',
+        title: '首页1',
       },
     },
   ],

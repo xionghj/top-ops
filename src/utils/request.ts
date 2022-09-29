@@ -14,7 +14,8 @@ export interface RequestOptions {
 
 const UNKNOWN_ERROR = '未知错误，请重试';
 /** 真实请求的路径前缀 */
-const baseApiUrl = 'http://192.168.253.207:8000/';
+// const baseApiUrl = 'http://192.168.253.207:8000/';
+const baseApiUrl = 'api/';
 
 const service = axios.create({
   // baseURL: baseApiUrl,
@@ -26,7 +27,7 @@ service.interceptors.request.use(
     const token = localStorage.getItem('ACCESS_TOKEN_KEY') || '';
     if (token && config.headers) {
       // 请求头token信息，请根据实际情况进行修改
-      config.headers['Authorization'] = token;
+      config.headers['Authorization'] = 'Bearer ' + token;
     }
     return config;
   },
@@ -66,7 +67,7 @@ export type BaseResponse<T = any> = Promise<Response<T>>;
  */
 export const request = async <T = any>(config: AxiosRequestConfig, options: RequestOptions = {}): Promise<T> => {
   try {
-    const { successMsg, errorMsg, isGetDataDirectly = true } = options;
+    const { successMsg, errorMsg, isGetDataDirectly = false } = options;
     const fullUrl = `${baseApiUrl + config.url}`;
     config.url = uniqueSlash(fullUrl);
     const res = await service.request(config);

@@ -17,12 +17,12 @@ export default defineConfig({
   server: {
     host: "192.168.247.26",
     port: 8888,
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://192.168.253.207:8000/',
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/^\/api/, ''),
-    //   },
-    // },
+    proxy: {
+      '/api': {
+        target: 'http://192.168.253.207:8000/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   },
 })

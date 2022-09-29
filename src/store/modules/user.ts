@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import jwtDecode from 'jwt-decode';
-import { login } from '@/api/login';
+import { login, permmenu } from '@/api/login';
+import { routes } from '@/router';
+import { generatorDynamicRouter } from '@/router/generator-router';
 
 interface UserState {
   token: string;
@@ -52,6 +54,18 @@ export const useUserStore = defineStore({
       try {
         const result = await login(params);
         this.setToken(result.access, result.refresh);
+        this.afterLogin();
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+    /** 登录成功之后, 获取用户信息以及生成权限路由 */
+    async afterLogin() {
+      try {
+        const result = await permmenu();
+        // 生成路由
+        const generatorResult = generatorDynamicRouter(result, routes);
+        console.log('获取得菜单数据', result, routes, generatorResult);
       } catch (error) {
         return Promise.reject(error);
       }

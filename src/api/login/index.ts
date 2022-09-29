@@ -18,3 +18,9 @@ export function login(data: API.LoginParams) {
     },
   );
 }
+export function permmenu() {
+  return request<API.PermMenu>({
+    url: 'permission/menu/tree/',
+    method: 'get',
+  });
+}

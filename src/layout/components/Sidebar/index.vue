@@ -35,11 +35,14 @@
   import { ref, watch } from 'vue';
   import { ChromeOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
   import subMenuGroup from './sub-menu-group.vue';
+  import { useRouter } from 'vue-router';
   import type { MenuProps } from 'ant-design-vue';
+  const router = useRouter();
   const selectedKeys = ref<string[]>(['1']);
   const openKeys = ref<string[]>(['sub1']);
   const handleClick: MenuProps['onClick'] = (e) => {
     console.log('click', e);
+    router.push({ name: e.key });
   };
   const collapsed = ref<boolean>(false);
   watch(
@@ -53,8 +56,8 @@
       key: '1',
       title: '系统管理',
       children: [
-        { key: '1.1.1', title: '用户管理' },
-        { key: '1.1.2', title: '权限管理' },
+        { key: 'home', title: '用户管理' },
+        { key: '404', title: '权限管理' },
       ],
     },
     {
@@ -97,8 +100,11 @@
       left: 0;
       z-index: 10;
       height: calc(100% - 50px);
+      :deep(.ant-menu-item:after) {
+        border-right: none;
+      }
     }
-    ::v-deep .ant-layout-sider-children {
+    :deep(.ant-layout-sider-children) {
       display: flex;
       flex-direction: column;
       height: 100%;

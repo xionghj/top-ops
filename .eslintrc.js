@@ -24,7 +24,7 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-unused-vars': 1,
-    'no-undef': 1,
+    'no-undef': 'off',
     'no-var': 'error',
     'no-trailing-spaces': 2, // 禁用行尾空白
     'comma-style': ['error', 'last'],
