@@ -1,12 +1,11 @@
-import Layout from '@/layout/index.vue';
-
-export default {
-  path: '/error',
-  name: 'error/404',
-  component: Layout,
+export const notFound = {
+  path: '/:pathMatch(.*)*',
+  name: 'NotFound',
+  component: () => import('@/layout/index.vue'),
   meta: {
     title: '错误页',
   },
+  redirect: '/error/404',
   children: [
     {
       path: '404',
@@ -18,3 +17,4 @@ export default {
     },
   ],
 };
+export default [notFound];

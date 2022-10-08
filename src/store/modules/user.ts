@@ -64,7 +64,7 @@ export const useUserStore = defineStore({
       try {
         const result = await permmenu();
         // 生成路由
-        const generatorResult = generatorDynamicRouter(result, routes);
+        const generatorResult = generatorDynamicRouter(result);
         console.log('获取得菜单数据', result, routes, generatorResult);
       } catch (error) {
         return Promise.reject(error);

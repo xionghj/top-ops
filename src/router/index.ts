@@ -1,15 +1,45 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { message as $message } from 'ant-design-vue';
-import Common from './modules/common';
-import Error from './modules/error';
+import Layout from '@/layout/index.vue';
+import Common from './staticModules/index';
 import { useUserStore } from '@/store/modules/user';
 import { to as _to } from '@/utils/awaitTo';
 import NProgress from 'nprogress'; // progress bar
 import 'nprogress/nprogress.css'; // progress bar style
 
 NProgress.configure({ showSpinner: false }); // NProgress Configuration
-export const routes = [Error, ...Common];
-
+export const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/',
+    name: 'Layout',
+    component: Layout,
+    meta: {
+      title: '首页',
+    },
+    code: 'ca6f0d43166454736',
+    children: [
+      {
+        path: '/home',
+        name: 'home',
+        code: 'c24fc7a5d5d91db9',
+        component: () => import('@/views/home/index.vue'),
+        meta: {
+          title: '首页',
+        },
+      },
+      {
+        path: '/home',
+        name: 'home',
+        component: () => import('@/views/home/index.vue'),
+        meta: {
+          title: '首页1',
+        },
+      },
+    ],
+  },
+  // Layout之外的路由
+  ...Common,
+];
 const router = createRouter({
   history: createWebHistory(),
   routes,
