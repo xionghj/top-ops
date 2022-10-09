@@ -20,7 +20,7 @@
   const { name } = storeToRefs(userStore);
   function signOut() {
     localStorage.clear();
-    router.push({ name: 'login' });
+    router.replace({ name: 'login' });
   }
 </script>
 <style lang="less" scoped>

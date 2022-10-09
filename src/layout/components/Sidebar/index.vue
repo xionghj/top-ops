@@ -10,17 +10,17 @@
       collapsed-width="70">
       <div style="flex: 1 1 0%; overflow: hidden auto">
         <a-menu v-model:openKeys="openKeys" v-model:selectedKeys="selectedKeys" mode="inline" @click="handleClick">
-          <template v-for="item in list" :key="item.key">
+          <template v-for="item in menus" :key="item.name">
             <template v-if="!item.children">
-              <a-menu-item :key="item.key">
+              <a-menu-item :key="item.name">
                 <template #icon>
                   <ChromeOutlined />
                 </template>
-                {{ item.title }}
+                {{ item.meta && item.meta.title }}
               </a-menu-item>
             </template>
             <template v-else>
-              <sub-menu-group :key="item.key" :menu-info="item" :collapsed="collapsed" />
+              <sub-menu-group :key="item.name" :menu-info="item" :collapsed="collapsed" />
             </template>
           </template>
         </a-menu>
@@ -32,16 +32,19 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { ref, watch } from 'vue';
+  import { ref, watch, computed } from 'vue';
   import { ChromeOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
   import subMenuGroup from './sub-menu-group.vue';
   import { useRouter } from 'vue-router';
   import type { MenuProps } from 'ant-design-vue';
+  import { useUserStore } from '@/store/modules/user';
   const router = useRouter();
-  const selectedKeys = ref<string[]>(['1']);
-  const openKeys = ref<string[]>(['sub1']);
+  const userStore = useUserStore();
+  const selectedKeys = ref<string[]>([]);
+  const openKeys = ref<string[]>([]);
   const handleClick: MenuProps['onClick'] = (e) => {
-    console.log('click', e);
+    console.log('click', e, selectedKeys.value, openKeys.value);
+    // router.push({ name: e.key });
     router.push({ name: e.key });
   };
   const collapsed = ref<boolean>(false);
@@ -51,6 +54,13 @@
       console.log('openKeys', val);
     },
   );
+  const menus = computed(() => {
+    return [...userStore.menus].filter((n) => !n.meta?.hideInMenu);
+  });
+  // const oriMenus = computed(() => {
+  //   return userStore.oriMenus;
+  // });
+  // console.log('menus菜单', menus, menusFilter.value);
   const list = [
     {
       key: '1',

@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import jwtDecode from 'jwt-decode';
 import { login, permmenu } from '@/api/login';
-import { routes } from '@/router';
 import { generatorDynamicRouter } from '@/router/generator-router';
 
 interface UserState {
@@ -10,6 +9,7 @@ interface UserState {
   name: string;
   avatar: string;
   menus: [];
+  oriMenus: [];
   userInfo: object;
 }
 
@@ -21,6 +21,7 @@ export const useUserStore = defineStore({
     name: 'amdin',
     avatar: '',
     menus: [],
+    oriMenus: [],
     userInfo: {},
   }),
   getters: {
@@ -64,8 +65,10 @@ export const useUserStore = defineStore({
       try {
         const result = await permmenu();
         // 生成路由
-        const generatorResult = generatorDynamicRouter(result);
-        console.log('获取得菜单数据', result, routes, generatorResult);
+        const generatorResult = await generatorDynamicRouter(result);
+        this.menus = generatorResult.menus.filter((item: any) => !item.meta?.hideInMenu);
+        this.oriMenus = result;
+        console.log('获取得菜单数据', this.menus, result);
       } catch (error) {
         return Promise.reject(error);
       }

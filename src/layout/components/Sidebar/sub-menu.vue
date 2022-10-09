@@ -1,18 +1,18 @@
 <template>
-  <a-sub-menu :key="menuInfo.key">
+  <a-sub-menu :key="menuInfo.name">
     <template #icon><ChromeOutlined /></template>
-    <template #title>{{ menuInfo.title }}</template>
-    <template v-for="item in menuInfo.children" :key="item.key">
+    <template #title>{{ menuInfo.meta && menuInfo.meta.title }}</template>
+    <template v-for="item in menuInfo.children" :key="item.name">
       <template v-if="!item.children">
-        <a-menu-item :key="item.key">
+        <a-menu-item :key="item.name">
           <template #icon>
             <ChromeOutlined />
           </template>
-          {{ item.title }}
+          {{ item.meta && item.meta.title }}
         </a-menu-item>
       </template>
       <template v-else>
-        <sub-menu :key="item.key" :menu-info="item" />
+        <sub-menu :key="item.name" :menu-info="item" />
       </template>
     </template>
   </a-sub-menu>

@@ -15,7 +15,7 @@ export interface RequestOptions {
 const UNKNOWN_ERROR = '未知错误，请重试';
 /** 真实请求的路径前缀 */
 // const baseApiUrl = 'http://192.168.253.207:8000/';
-const baseApiUrl = 'api/';
+const baseApiUrl = '/api/';
 
 const service = axios.create({
   // baseURL: baseApiUrl,

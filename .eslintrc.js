@@ -62,6 +62,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-empty-function': 0,
     '@typescript-eslint/semi': ['error', 'always'],
+    '@typescript-eslint/no-non-null-assertion': 'off',
     // vue
     'vue/no-v-html': 'off',
     'vue/multi-word-component-names': 0,
