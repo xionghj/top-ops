@@ -3,7 +3,7 @@ import outsideLayout from './outsideLayout';
 import Common from './staticModules/index';
 import router, { routes } from '@/router';
 // 获取后台返回的菜单列表，和本地异步路由进行匹配
-export const filterAsyncRoute = (menu: any, asyncRouterMap: any) => {
+export const filterAsyncRoute = (menu: API.Menu[], asyncRouterMap: any) => {
   if (menu) {
     const accessedRouters: any = [];
     Array.from(menu).forEach((item: any) => {
