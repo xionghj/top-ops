@@ -1,60 +1,48 @@
-//样式入口文件
-
+@import "tailwindcss.less";
+@import "preflight.less";
 // 公共样式
-@import 'public/index';
+@import 'public.less';
+@import 'color.less';
 
-// 组件样式
-@import 'component/index';
-
-// 页面业务样式
-@import 'views/index';
+// antdv样式
+@import 'ant/index';
 
 
-// body {
-// 	height: 100%;
-// 	-moz-osx-font-smoothing: grayscale;
-// 	-webkit-font-smoothing: antialiased;
-// 	text-rendering: optimizeLegibility;
-// 	font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
-// 	Microsoft YaHei, Arial, sans-serif;
-// 	margin: 0;
-// }
-// body {
-// 	margin: 0;
-// 	font-family: "Poppins",sans-serif;
-// 	font-size: .8125rem;
-// 	font-weight: 400;
-// 	line-height: 1.5;
-// 	color: #212529;
-// 	// background-color: #f3f3f9;
-// 	-webkit-text-size-adjust: 100%;
-// 	-webkit-tap-highlight-color: rgba(0,0,0,0);
-// }
-*, *::before, *::after {
-    box-sizing: border-box;
+input:-webkit-autofill {
+  box-shadow: 0 0 0 1000px white inset !important;
 }
 
-label {
-	font-weight: 700;
+:-webkit-autofill {
+  transition: background-color 5000s ease-in-out 0s !important;
 }
 
 html {
-	height: 100%;
-	box-sizing: border-box;
+  overflow: hidden;
+  text-size-adjust: 100%;
 }
 
-#app {
-	height: 100%;
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  overflow-x: hidden;
+
+  &.color-weak {
+    filter: invert(80%);
+  }
+
+  &.gray-mode {
+    filter: grayscale(100%);
+    filter: progid:dximagetransform.microsoft.basicimage(grayscale=1);
+  }
 }
+
 a:focus,
-a:active {
+a:active,
+button,
+div,
+svg,
+span {
   outline: none;
-}
-
-a,
-a:focus,
-a:hover {
-  cursor: pointer;
-  color: inherit;
-  text-decoration: none;
 }

@@ -13,4 +13,16 @@ export default defineConfig({
       cache: false,
     }),
   ],
+  //反向代理配置 - 可解决跨域问题
+  server: {
+    // host: "192.168.247.26",
+    port: 8888,
+    proxy: {
+      '/api': {
+        target: 'http://192.168.253.207:8000/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 })

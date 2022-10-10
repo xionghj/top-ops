@@ -24,7 +24,7 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-unused-vars': 1,
-    'no-undef': 1,
+    'no-undef': 'off',
     'no-var': 'error',
     'no-trailing-spaces': 2, // 禁用行尾空白
     'comma-style': ['error', 'last'],
@@ -60,22 +60,9 @@ module.exports = {
     ],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/member-delimiter-style': [
-      'error',
-      {
-        multiline: {
-          delimiter: 'semi',
-          requireLast: true,
-        },
-        singleline: {
-          delimiter: 'semi',
-          requireLast: true,
-        },
-        multilineDetection: 'brackets',
-      },
-    ],
     '@typescript-eslint/no-empty-function': 0,
     '@typescript-eslint/semi': ['error', 'always'],
+    '@typescript-eslint/no-non-null-assertion': 'off',
     // vue
     'vue/no-v-html': 'off',
     'vue/multi-word-component-names': 0,
@@ -126,6 +113,11 @@ module.exports = {
         },
       },
     ],
+    'linebreak-style': ["off", "windows"],
+    "vue/html-closing-bracket-newline": ["error", {
+      "singleline": "never",
+      "multiline": "never"
+    }],
   },
   // https://github.com/vuejs/eslint-plugin-vue/issues/1355
   overrides: [

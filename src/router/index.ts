@@ -1,30 +1,35 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Common from './modules/common';
+import Layout from '@/layout/index.vue';
+import outsideLayout from './outsideLayout';
+import { createRouterGuards } from './router-guards';
+import type { RouteRecordRaw } from 'vue-router';
 
-const routes = [...Common];
-
+export const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/',
+    name: 'Layout',
+    component: Layout,
+    meta: {
+      title: '',
+    },
+    children: [],
+  },
+  // Layout之外的路由
+  ...outsideLayout,
+];
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
 
-/**
- * 全局前置路由守卫，每一次路由跳转前都进入这个 beforeEach 函数
- */
-router.beforeEach((to, from, next) => {
-  if (to.path == '/home') {
-    // 登录或者注册才可以往下进行
-    next();
-  } else {
-    // 获取 token
-    const token = localStorage.getItem('token');
-    // token 不存在
-    if (token === null || token === '') {
-      next();
-    } else {
-      next();
-    }
-  }
-});
+export async function setupRouter(app: any) {
+  // 创建路由守卫
+  createRouterGuards(router);
+
+  app.use(router);
+
+  // 路由准备就绪后挂载APP实例
+  await router.isReady();
+}
 
 export default router;

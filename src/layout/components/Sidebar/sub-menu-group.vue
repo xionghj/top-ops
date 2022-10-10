@@ -1,20 +1,20 @@
 <template>
-  <a-menu-item-group :key="menuInfo.key">
+  <a-menu-item-group :key="menuInfo.name">
     <template #title>
       <span v-if="collapsed" class="sub-mene-group-title"><EllipsisOutlined /></span>
-      <span v-else>{{ menuInfo.title }}</span>
+      <span v-else>{{ menuInfo.meta && menuInfo.meta.title }}</span>
     </template>
-    <template v-for="item in menuInfo.children" :key="item.key">
+    <template v-for="item in menuInfo.children" :key="item.name">
       <template v-if="!item.children">
-        <a-menu-item :key="item.key">
+        <a-menu-item :key="item.name">
           <template #icon>
             <ChromeOutlined />
           </template>
-          {{ item.title }}
+          {{ item.meta && item.meta.title }}
         </a-menu-item>
       </template>
       <template v-else>
-        <sub-menu :key="item.key" :menu-info="item" />
+        <sub-menu :key="item.name" :menu-info="item" />
       </template>
     </template>
   </a-menu-item-group>
