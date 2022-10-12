@@ -1,6 +1,6 @@
 <template>
   <div class="relative flex items-center ml-2 h-full" @mouseenter="onFocus" @mouseleave="onBlur">
-    <div class="cursor-pointer hover:text-blue-400">全部功能<downOutlined class="ml-1 text-xs" /></div>
+    <div class="cursor-pointer text-xs hover:text-blue-400">全部功能<down-outlined class="ml-1 text-xs" /></div>
     <div v-if="focusing" class="menus-overlay">
       <div class="nav-dropdown-box">
         <div class="product-panel">
@@ -10,10 +10,10 @@
               <div class="menus-list">
                 <div v-for="(item, index) in quickAccess" :key="index" class="menus-block">
                   <div class="flex items-center">
-                    <holderOutlined class="menus-icon-drop" />
+                    <holder-outlined class="menus-icon-drop" />
                     <span class="mx-1">{{ item.name }}</span>
                   </div>
-                  <closeCircleOutlined class="menus-icon-dismiss" />
+                  <close-circle-outlined class="menus-icon-dismiss" />
                 </div>
               </div>
             </div>
@@ -25,12 +25,22 @@
             </div>
             <div class="product-panel-body">
               <div class="menus-grid">
-                <div class="menus-grid-item">
-                  <div class="menus-grid-item__label">标题</div>
-                  <div class="menus-list">
-                    <div class="menus-list-item">123456</div>
-                    <div class="menus-list-item">123456</div>
-                    <div class="menus-list-item">123456</div>
+                <div v-for="item in menus" :key="item.code" class="menus-grid-item">
+                  <div class="menus-grid-item__label">
+                    <sketch-outlined />
+                    <span class="ml-2">{{ item.meta && item.meta.title }}</span>
+                  </div>
+                  <div
+                    v-for="(subItem, index) in item.children"
+                    :key="index"
+                    class="menus-list"
+                    @click="clickMenus(item)">
+                    <div class="menus-list-item">
+                      <heart-outlined class="collect-icon" />
+                      <span class="ml-2 cursor-pointer menus-list-item__text">
+                        {{ subItem.meta && subItem.meta.title }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -42,15 +52,136 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { ref } from 'vue';
-  import { DownOutlined, HolderOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
+  import { ref, computed } from 'vue';
+  import {
+    DownOutlined,
+    HolderOutlined,
+    CloseCircleOutlined,
+    HeartOutlined,
+    SketchOutlined,
+  } from '@ant-design/icons-vue';
+  import { useRouter } from 'vue-router';
+  import { useUserStore } from '@/store/modules/user';
+  const userStore = useUserStore();
+  const router = useRouter();
+  const oriMenus = computed(() => {
+    return userStore.oriMenus;
+  });
+  const menus = computed(() => {
+    return [...userStore.menus].filter((n) => !n.meta?.hideInMenu);
+  });
+  function clickMenus(item: any) {
+    userStore.subMenus = item;
+    const routerPath = childrenRecursion(item.children);
+    router.push({ name: routerPath.name });
+    focusing.value = false;
+  }
+  function childrenRecursion(arr: any): any {
+    if (arr[0].children && arr[0].children.length > 0) {
+      return childrenRecursion(arr[0].children);
+    } else {
+      return arr[0];
+    }
+  }
+  const oriMenus1 = [
+    {
+      name: '研发效能',
+      code: '1',
+      children: [
+        {
+          name: '持续集成',
+          code: '1-1',
+        },
+        {
+          name: '持续集成1',
+          code: '1-2',
+        },
+        {
+          name: '持续集成1',
+          code: '1-2',
+        },
+        {
+          name: '持续集成1',
+          code: '1-2',
+        },
+      ],
+    },
+    {
+      name: '研发效能',
+      code: '1',
+      children: [
+        {
+          name: '持续集成',
+          code: '1-1',
+        },
+        {
+          name: '持续集成1',
+          code: '1-2',
+        },
+      ],
+    },
+    {
+      name: '研发效能',
+      code: '1',
+      children: [
+        {
+          name: '持续集成',
+          code: '1-1',
+        },
+        {
+          name: '持续集成1',
+          code: '1-2',
+        },
+      ],
+    },
+    {
+      name: '研发效能',
+      code: '1',
+      children: [
+        {
+          name: '持续集成',
+          code: '1-1',
+        },
+        {
+          name: '持续集成1',
+          code: '1-2',
+        },
+      ],
+    },
+    {
+      name: '研发效能',
+      code: '1',
+      children: [
+        {
+          name: '持续集成',
+          code: '1-1',
+        },
+        {
+          name: '持续集成1',
+          code: '1-2',
+        },
+      ],
+    },
+    {
+      name: '研发效能',
+      code: '1',
+      children: [
+        {
+          name: '持续集成',
+          code: '1-1',
+        },
+        {
+          name: '持续集成1',
+          code: '1-2',
+        },
+      ],
+    },
+  ];
   const focusing = ref(false);
   function onFocus() {
-    console.log('移入');
     focusing.value = true;
   }
   function onBlur() {
-    console.log('移出');
     focusing.value = false;
   }
   const quickAccess = [
@@ -150,7 +281,7 @@
           .product-panel-header {
             display: flex;
             align-items: center;
-            margin-bottom: 28px;
+            margin-bottom: 12px;
             .product-panel-header__label {
               font-size: 14px;
               color: #888;
@@ -164,27 +295,42 @@
           }
           .product-panel-body {
             .menus-grid {
-              display: grid;
-              grid-template-columns: 1fr 1fr 1fr 1fr;
+              display: flex;
+              flex-wrap: wrap;
               .menus-grid-item {
+                margin: 10px;
+                width: calc(100% / 4 - 20px);
                 .menus-grid-item__label {
                   font-size: 14px;
                   color: #888;
                   font-weight: 400;
                   display: inline-flex;
                   align-items: center;
+                  margin-bottom: 12px;
                 }
                 .menus-list {
                   .menus-list-item {
                     display: flex;
                     align-items: center;
                     position: relative;
-                    padding-left: 24px;
+                    padding-left: 2px;
                     font-size: 12px;
                     color: rgba(0, 0, 0, 0.9);
                     line-height: 1.5;
                     margin-bottom: 8px;
                     box-sizing: border-box;
+                    &:hover {
+                      .collect-icon {
+                        opacity: 1;
+                      }
+                      .menus-list-item__text {
+                        color: #006eff;
+                      }
+                    }
+                    .collect-icon {
+                      opacity: 0;
+                      cursor: pointer;
+                    }
                   }
                 }
               }

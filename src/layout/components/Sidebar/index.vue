@@ -10,7 +10,7 @@
       collapsed-width="70">
       <div style="flex: 1 1 0%; overflow: hidden auto">
         <a-menu v-model:openKeys="openKeys" v-model:selectedKeys="selectedKeys" mode="inline" @click="handleClick">
-          <template v-for="item in menus" :key="item.name">
+          <template v-for="item in [subMenus]" :key="item.name">
             <template v-if="!item.children">
               <a-menu-item :key="item.name">
                 <template #icon>
@@ -38,9 +38,11 @@
   import { useRouter } from 'vue-router';
   import type { MenuProps } from 'ant-design-vue';
   import { useUserStore } from '@/store/modules/user';
+  import { storeToRefs } from 'pinia';
   const router = useRouter();
   const userStore = useUserStore();
-  const selectedKeys = ref<string[]>([]);
+  const { subMenus } = storeToRefs(userStore);
+  const selectedKeys = ref<string[]>(['businessTree']);
   const openKeys = ref<string[]>([]);
   const handleClick: MenuProps['onClick'] = (e) => {
     console.log('click', e, selectedKeys.value, openKeys.value);
@@ -57,6 +59,7 @@
   const menus = computed(() => {
     return [...userStore.menus].filter((n) => !n.meta?.hideInMenu);
   });
+  console.log('获取的二级菜单123', subMenus);
   // const oriMenus = computed(() => {
   //   return userStore.oriMenus;
   // });

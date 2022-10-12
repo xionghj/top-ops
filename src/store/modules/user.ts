@@ -10,6 +10,7 @@ interface UserState {
   name: string;
   avatar: string;
   menus: [];
+  subMenus: [];
   oriMenus: [];
   userInfo: object;
 }
@@ -23,6 +24,7 @@ export const useUserStore = defineStore({
     avatar: '',
     menus: [],
     oriMenus: [],
+    subMenus: [],
     userInfo: {},
   }),
   getters: {
