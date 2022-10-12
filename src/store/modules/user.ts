@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import jwtDecode from 'jwt-decode';
 import { login, permmenu } from '@/api/login';
 import { generatorDynamicRouter } from '@/router/generator-router';
+import { usePermissionStore } from '@/store/modules/permission';
 
 interface UserState {
   token: string;
@@ -68,7 +69,9 @@ export const useUserStore = defineStore({
         const generatorResult = await generatorDynamicRouter(result);
         this.menus = generatorResult.menus.filter((item: any) => !item.meta?.hideInMenu);
         this.oriMenus = result;
-        console.log('获取得菜单数据', this.menus, result);
+        const permissionStore = usePermissionStore();
+        const routes = await permissionStore.buildRoutesAction();
+        console.log('获取得菜单数据', this.menus, result, routes);
       } catch (error) {
         return Promise.reject(error);
       }
