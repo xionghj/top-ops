@@ -58,7 +58,7 @@ export const useUserStore = defineStore({
       try {
         const result = await login(params);
         this.setToken(result.access, result.refresh);
-        this.afterLogin();
+        // this.afterLogin();
       } catch (error) {
         return Promise.reject(error);
       }
@@ -73,7 +73,7 @@ export const useUserStore = defineStore({
         this.oriMenus = result;
         const permissionStore = usePermissionStore();
         const routes = await permissionStore.buildRoutesAction();
-        console.log('获取得菜单数据', this.menus, result, routes);
+        console.log('获取得菜单数据', routes);
       } catch (error) {
         return Promise.reject(error);
       }

@@ -62,18 +62,23 @@
   } from '@ant-design/icons-vue';
   import { useRouter } from 'vue-router';
   import { useUserStore } from '@/store/modules/user';
+  import { usePermissionStore } from '@/store/modules/permission';
   const userStore = useUserStore();
+  const userPermissionStore = usePermissionStore();
   const router = useRouter();
   const oriMenus = computed(() => {
     return userStore.oriMenus;
   });
+  // const menus = computed(() => {
+  //   return [...userStore.menus].filter((n) => !n.meta?.hideInMenu);
+  // });
   const menus = computed(() => {
-    return [...userStore.menus].filter((n) => !n.meta?.hideInMenu);
+    return [...userPermissionStore.backMenuList].filter((n) => !n.hideInMenu);
   });
   function clickMenus(item: any) {
     userStore.subMenus = item;
-    const routerPath = childrenRecursion(item.children);
-    router.push({ name: routerPath.name });
+    // const routerPath = childrenRecursion(item.children);
+    // router.push({ name: routerPath.name });
     focusing.value = false;
   }
   function childrenRecursion(arr: any): any {
@@ -303,7 +308,7 @@
                 .menus-grid-item__label {
                   font-size: 14px;
                   color: #888;
-                  font-weight: 400;
+                  font-weight: 500;
                   display: inline-flex;
                   align-items: center;
                   margin-bottom: 12px;
@@ -314,7 +319,7 @@
                     align-items: center;
                     position: relative;
                     padding-left: 2px;
-                    font-size: 12px;
+                    font-size: 13px;
                     color: rgba(0, 0, 0, 0.9);
                     line-height: 1.5;
                     margin-bottom: 8px;

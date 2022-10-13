@@ -1,6 +1,9 @@
-import type { AppRouteRecordRaw, Menu } from '/@/router/types';
+import type { AppRouteRecordRaw, Menu } from '@/router/types';
 
-import { transformObjToRoute } from '@/router/helper/routeHelper';
+import { transformObjToRoute, flatMultiLevelRoutes } from '@/router/helper/routeHelper';
+import { transformRouteToMenu } from '@/router/helper/menuHelper';
+
+import { filter } from '@/utils/helper/treeHelper';
 
 import { defineStore } from 'pinia';
 import { permmenu } from '@/api/login';
@@ -13,7 +16,6 @@ interface PermissionState {
   lastBuildMenuTime: number;
   // Backstage menu list
   backMenuList: Menu[];
-  frontMenuList: Menu[];
 }
 const menusList = [
   {
@@ -251,8 +253,6 @@ export const usePermissionStore = defineStore({
     lastBuildMenuTime: 0,
     // Backstage menu list
     backMenuList: [],
-    // menu List
-    frontMenuList: [],
   }),
   getters: {
     getPermCodeList(): string[] | number[] {
@@ -260,9 +260,6 @@ export const usePermissionStore = defineStore({
     },
     getBackMenuList(): Menu[] {
       return this.backMenuList;
-    },
-    getFrontMenuList(): Menu[] {
-      return this.frontMenuList;
     },
     getLastBuildMenuTime(): number {
       return this.lastBuildMenuTime;
@@ -281,10 +278,6 @@ export const usePermissionStore = defineStore({
       list?.length > 0 && this.setLastBuildMenuTime();
     },
 
-    setFrontMenuList(list: Menu[]) {
-      this.frontMenuList = list;
-    },
-
     setLastBuildMenuTime() {
       this.lastBuildMenuTime = new Date().getTime();
     },
@@ -299,8 +292,12 @@ export const usePermissionStore = defineStore({
       this.lastBuildMenuTime = 0;
     },
     async buildRoutesAction(): Promise<AppRouteRecordRaw[]> {
-      const routes: AppRouteRecordRaw[] = [];
-
+      let routes: AppRouteRecordRaw[] = [];
+      const routeRemoveIgnoreFilter = (route: AppRouteRecordRaw) => {
+        const { meta } = route;
+        const { ignoreRoute } = meta || {};
+        return !ignoreRoute;
+      };
       // !Simulate to obtain permission codes from the background,
       // this function may only need to be executed once, and the actual project can be put at the right time by itself
       let routeList: AppRouteRecordRaw[] = [];
@@ -312,18 +309,16 @@ export const usePermissionStore = defineStore({
       }
 
       // // Dynamically introduce components
-      routeList = transformObjToRoute(menusList);
-      console.log('获取菜单路由', routeList);
-      // //  Background routing to menu structure
-      // const backMenuList = transformRouteToMenu(routeList);
-      // this.setBackMenuList(backMenuList);
-      // console.log('获取菜单1', routeList, backMenuList);
+      routeList = transformObjToRoute(routeList);
+      //  Background routing to menu structure
+      const backMenuList = transformRouteToMenu(routeList);
+      console.log('获取', backMenuList);
+      this.setBackMenuList(backMenuList);
       // // remove meta.ignoreRoute item
-      // routeList = filter(routeList, routeRemoveIgnoreFilter);
-      // routeList = routeList.filter(routeRemoveIgnoreFilter);
-      // console.log('获取菜单2', routeList);
-      // routeList = flatMultiLevelRoutes(routeList);
-      // routes = [PAGE_NOT_FOUND_ROUTE, ...routeList];
+      routeList = filter(routeList, routeRemoveIgnoreFilter);
+      routeList = routeList.filter(routeRemoveIgnoreFilter);
+      routeList = flatMultiLevelRoutes(routeList);
+      routes = [...routeList];
 
       return routes;
     },
