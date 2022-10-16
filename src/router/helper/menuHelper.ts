@@ -1,7 +1,7 @@
-import { AppRouteModule } from '@/router/types';
-import type { MenuModule, Menu, AppRouteRecordRaw } from '@/router/types';
-import { treeMap } from '@/utils/helper/treeHelper';
 import { cloneDeep } from 'lodash-es';
+import type { MenuModule, Menu, AppRouteRecordRaw } from '@/router/types';
+import { AppRouteModule } from '@/router/types';
+import { treeMap } from '@/utils/helper/treeHelper';
 import { isUrl } from '@/utils/is';
 
 function joinParentPath(menus: Menu[], parentPath = '') {
@@ -51,10 +51,10 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
       return {
         ...(node.meta || {}),
         meta: {
-          title: title,
-          display: display,
+          title,
+          display,
         },
-        name: name,
+        name,
         path: node.path,
         ...(node.redirect ? { redirect: node.redirect } : {}),
       };

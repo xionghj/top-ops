@@ -1,9 +1,9 @@
-import type { AppRouteModule, AppRouteRecordRaw } from '@/router/types';
 import { createRouter, createWebHashHistory } from 'vue-router';
+import { cloneDeep, omit } from 'lodash-es';
+import type { AppRouteModule, AppRouteRecordRaw } from '@/router/types';
 import type { Router, RouteRecordNormalized } from 'vue-router';
 
 import { getParentLayout, LAYOUT, EXCEPTION_COMPONENT } from '@/router/constant';
-import { cloneDeep, omit } from 'lodash-es';
 import { warn } from '@/utils/log';
 
 export type LayoutMapKey = 'LAYOUT';
@@ -38,7 +38,10 @@ function asyncImportRoute(routes: AppRouteRecordRaw[] | undefined) {
   });
 }
 
-function dynamicImport(dynamicViewsModules: Record<string, () => Promise<Recordable>>, component: string) {
+function dynamicImport(
+  dynamicViewsModules: Record<string, () => Promise<Recordable>>,
+  component: string,
+) {
   const keys = Object.keys(dynamicViewsModules);
   const matchKeys = keys.filter((key) => {
     const k = key.replace('../../views', '');
@@ -57,7 +60,7 @@ function dynamicImport(dynamicViewsModules: Record<string, () => Promise<Recorda
     );
     return;
   } else {
-    warn('在src/views/下找不到`' + component + '.vue` 或 `' + component + '.tsx`, 请自行创建!');
+    warn(`在src/views/下找不到\`${component}.vue\` 或 \`${component}.tsx\`, 请自行创建!`);
     return EXCEPTION_COMPONENT;
   }
 }
@@ -83,7 +86,7 @@ export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModul
         route.meta = meta;
       }
     } else {
-      warn('请正确配置路由：' + route?.name + '的component属性');
+      warn(`请正确配置路由：${route?.name}的component属性`);
     }
     route.children && asyncImportRoute(route.children);
   });
@@ -137,7 +140,11 @@ function promoteRouteLevel(routeModule: AppRouteModule) {
   routeModule.children = routeModule.children?.map((item) => omit(item, 'children'));
 }
 // Add all sub-routes to the secondary route
-function addToChildren(routes: RouteRecordNormalized[], children: AppRouteRecordRaw[], routeModule: AppRouteModule) {
+function addToChildren(
+  routes: RouteRecordNormalized[],
+  children: AppRouteRecordRaw[],
+  routeModule: AppRouteModule,
+) {
   for (let index = 0; index < children.length; index++) {
     const child = children[index];
     const route = routes.find((item) => item.name === child.name);

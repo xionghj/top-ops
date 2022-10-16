@@ -1,6 +1,8 @@
 <template>
   <div class="relative flex items-center ml-2 h-full" @mouseenter="onFocus" @mouseleave="onBlur">
-    <div class="cursor-pointer text-xs hover:text-blue-400">全部功能<down-outlined class="ml-1 text-xs" /></div>
+    <div class="cursor-pointer text-xs hover:text-blue-400"
+      >全部功能<down-outlined class="ml-1 text-xs"
+    /></div>
     <div v-if="focusing" class="menus-overlay">
       <div class="nav-dropdown-box">
         <div class="product-panel">
@@ -34,7 +36,8 @@
                     v-for="(subItem, index) in item.children"
                     :key="index"
                     class="menus-list"
-                    @click="clickMenus(item.children, subItem)">
+                    @click="clickMenus(item.children, subItem)"
+                  >
                     <div class="menus-list-item">
                       <heart-outlined class="collect-icon" />
                       <span class="ml-2 cursor-pointer menus-list-item__text">

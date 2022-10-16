@@ -27,7 +27,7 @@ service.interceptors.request.use(
     const token = localStorage.getItem('ACCESS_TOKEN_KEY') || '';
     if (token && config.headers) {
       // 请求头token信息，请根据实际情况进行修改
-      config.headers['Authorization'] = 'Bearer ' + token;
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
@@ -65,7 +65,10 @@ export type BaseResponse<T = any> = Promise<Response<T>>;
  * @param url - request url
  * @param data - request data or params
  */
-export const request = async <T = any>(config: AxiosRequestConfig, options: RequestOptions = {}): Promise<T> => {
+export const request = async <T = any>(
+  config: AxiosRequestConfig,
+  options: RequestOptions = {},
+): Promise<T> => {
   try {
     const { successMsg, errorMsg, isGetDataDirectly = false } = options;
     const fullUrl = `${baseApiUrl + config.url}`;

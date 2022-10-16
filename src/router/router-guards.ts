@@ -1,8 +1,8 @@
+import NProgress from 'nprogress'; // progress bar
 import { message as $message } from 'ant-design-vue';
 import type { Router } from 'vue-router';
 import { to as _to } from '@/utils/awaitTo';
 import { useUserStore } from '@/store/modules/user';
-import NProgress from 'nprogress'; // progress bar
 import 'nprogress/nprogress.css'; // progress bar style
 
 NProgress.configure({ showSpinner: false }); // NProgress Configuration

@@ -13,10 +13,10 @@
 </template>
 <script setup lang="ts">
   import { useRouter } from 'vue-router';
-  import { useUserStore } from '@/store/modules/user';
   import { storeToRefs } from 'pinia';
-  import { message, Modal } from 'ant-design-vue';
   import { QuestionCircleOutlined } from '@ant-design/icons-vue';
+  import { message, Modal } from 'ant-design-vue';
+  import { useUserStore } from '@/store/modules/user';
   const router = useRouter();
   const userStore = useUserStore();
   const { name } = storeToRefs(userStore);

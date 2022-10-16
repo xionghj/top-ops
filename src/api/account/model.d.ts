@@ -15,5 +15,4 @@ declare namespace API {
     keepalive: boolean;
     isShow: boolean;
   };
-
 }

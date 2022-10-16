@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Layout from '@/layout/index.vue';
 import outsideLayout from './outsideLayout';
 import { createRouterGuards } from './router-guards';
 import type { RouteRecordRaw } from 'vue-router';
+import Layout from '@/layout/index.vue';
 
 export const routes: Array<RouteRecordRaw> = [
   {

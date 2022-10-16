@@ -9,15 +9,25 @@
       <a-form :model="state.formInline" name="basic" autocomplete="off" @finish="handleSubmit">
         <div class="mb-2 text-[#212529] font-medium">Username</div>
         <a-form-item name="username" :rules="[{ required: true, message: 'Enter username!' }]">
-          <a-input v-model:value="state.formInline.username" size="large" placeholder="Enter username" />
+          <a-input
+            v-model:value="state.formInline.username"
+            size="large"
+            placeholder="Enter username"
+          />
         </a-form-item>
         <div class="mb-2 text-[#212529] font-medium">Password</div>
         <a-form-item name="password" :rules="[{ required: true, message: 'Enter password!' }]">
-          <a-input-password v-model:value="state.formInline.password" size="large" placeholder="Enter password" />
+          <a-input-password
+            v-model:value="state.formInline.password"
+            size="large"
+            placeholder="Enter password"
+          />
         </a-form-item>
 
         <a-form-item>
-          <a-button class="w-full mt-4" type="primary" html-type="submit" size="large">登录</a-button>
+          <a-button class="w-full mt-4" type="primary" html-type="submit" size="large"
+            >登录</a-button
+          >
         </a-form-item>
       </a-form>
     </div>

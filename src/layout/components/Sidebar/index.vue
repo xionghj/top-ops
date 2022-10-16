@@ -7,13 +7,15 @@
       :trigger="null"
       collapsible
       theme="light"
-      collapsed-width="70">
+      collapsed-width="70"
+    >
       <div style="flex: 1 1 0%; overflow: hidden auto">
         <a-menu
           v-model:openKeys="state.openKeys"
           v-model:selectedKeys="state.selectedKeys"
           mode="inline"
-          @click="handleClick">
+          @click="handleClick"
+        >
           <template v-for="item in subMenus" :key="item.name">
             <template v-if="!item.children">
               <a-menu-item :key="item.name">
@@ -38,11 +40,11 @@
 <script setup lang="ts">
   import { ref, watch, reactive, computed } from 'vue';
   import { ChromeOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
-  import subMenuGroup from './sub-menu-group.vue';
   import { useRoute, useRouter } from 'vue-router';
+  import { storeToRefs } from 'pinia';
+  import subMenuGroup from './sub-menu-group.vue';
   import type { MenuProps } from 'ant-design-vue';
   import { useUserStore } from '@/store/modules/user';
-  import { storeToRefs } from 'pinia';
   // 当前路由
   const currentRoute = useRoute();
   const router = useRouter();

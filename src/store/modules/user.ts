@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 import jwtDecode from 'jwt-decode';
+import { RouteRecordRaw } from 'vue-router';
 import { login, permmenu } from '@/api/login';
 import { generatorDynamicRouter } from '@/router/generator-router';
 import { usePermissionStore } from '@/store/modules/permission';
-import { RouteRecordRaw } from 'vue-router';
 import router from '@/router';
 
 interface UserState {

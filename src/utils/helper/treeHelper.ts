@@ -11,7 +11,11 @@ const DEFAULT_CONFIG: TreeHelperConfig = {
 
 const getConfig = (config: Partial<TreeHelperConfig>) => Object.assign({}, DEFAULT_CONFIG, config);
 
-export function filter<T = any>(tree: T[], func: (n: T) => boolean, config: Partial<TreeHelperConfig> = {}): T[] {
+export function filter<T = any>(
+  tree: T[],
+  func: (n: T) => boolean,
+  config: Partial<TreeHelperConfig> = {},
+): T[] {
   config = getConfig(config);
   const children = config.children as string;
   function listFilter(list: T[]) {
@@ -33,7 +37,10 @@ export function treeMap<T = any>(treeData: T[], opt: { children?: string; conver
 /**
  * @description: Extract tree specified structure
  */
-export function treeMapEach(data: any, { children = 'children', conversion }: { children?: string; conversion: Fn }) {
+export function treeMapEach(
+  data: any,
+  { children = 'children', conversion }: { children?: string; conversion: Fn },
+) {
   const haveChildren = Array.isArray(data[children]) && data[children].length > 0;
   const conversionData = conversion(data) || {};
   if (haveChildren) {

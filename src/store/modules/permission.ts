@@ -1,3 +1,4 @@
+import { defineStore } from 'pinia';
 import type { AppRouteRecordRaw, Menu } from '@/router/types';
 import Common from '@/router/staticModules/index';
 
@@ -6,7 +7,6 @@ import { transformRouteToMenu } from '@/router/helper/menuHelper';
 
 import { filter } from '@/utils/helper/treeHelper';
 
-import { defineStore } from 'pinia';
 import { permmenu } from '@/api/login';
 interface PermissionState {
   // Permission code list
