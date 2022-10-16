@@ -23,11 +23,13 @@ export function createRouterGuards(router: Router) {
           next({ path: '/login' });
         } else {
           const hasRoute = router.hasRoute(to.name!);
+          console.log('获取菜单', userStore.menus);
           if (userStore.menus.length === 0) {
             // 从后台获取菜单
             const [err] = await _to(userStore.afterLogin());
             if (err) {
               userStore.resetToken();
+              console.log('获取token', token, err);
               return next({ name: 'login' });
             }
             if (!hasRoute) {

@@ -9,8 +9,12 @@
       theme="light"
       collapsed-width="70">
       <div style="flex: 1 1 0%; overflow: hidden auto">
-        <a-menu v-model:openKeys="openKeys" v-model:selectedKeys="selectedKeys" mode="inline" @click="handleClick">
-          <template v-for="item in [subMenus]" :key="item.name">
+        <a-menu
+          v-model:openKeys="state.openKeys"
+          v-model:selectedKeys="state.selectedKeys"
+          mode="inline"
+          @click="handleClick">
+          <template v-for="item in subMenus" :key="item.name">
             <template v-if="!item.children">
               <a-menu-item :key="item.name">
                 <template #icon>
@@ -32,38 +36,50 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { ref, watch, computed } from 'vue';
+  import { ref, watch, reactive, computed } from 'vue';
   import { ChromeOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
   import subMenuGroup from './sub-menu-group.vue';
-  import { useRouter } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import type { MenuProps } from 'ant-design-vue';
   import { useUserStore } from '@/store/modules/user';
   import { storeToRefs } from 'pinia';
+  // 当前路由
+  const currentRoute = useRoute();
   const router = useRouter();
   const userStore = useUserStore();
   const { subMenus } = storeToRefs(userStore);
-  const selectedKeys = ref<string[]>(['businessTree']);
-  const openKeys = ref<string[]>([]);
+  const state = reactive({
+    openKeys: [] as string[],
+    selectedKeys: [currentRoute.name] as string[],
+  });
   const handleClick: MenuProps['onClick'] = (e) => {
-    console.log('click', e, selectedKeys.value, openKeys.value);
+    console.log('click', e, state.selectedKeys, state.openKeys);
     // router.push({ name: e.key });
     router.push({ name: e.key });
   };
   const collapsed = ref<boolean>(false);
   watch(
-    () => openKeys,
+    () => state.openKeys,
     (val) => {
       console.log('openKeys', val);
     },
   );
-  const menus = computed(() => {
-    return [...userStore.menus].filter((n) => !n.meta?.hideInMenu);
-  });
-  console.log('获取的二级菜单123', subMenus);
-  // const oriMenus = computed(() => {
-  //   return userStore.oriMenus;
-  // });
-  // console.log('menus菜单', menus, menusFilter.value);
+  // 跟随页面路由变化，切换菜单选中状态
+  watch(
+    () => currentRoute.fullPath,
+    () => {
+      // state.openKeys = getOpenKeys();
+      const meta = currentRoute.meta;
+      state.selectedKeys = [currentRoute.meta?.activeMenu ?? currentRoute.name] as string[];
+    },
+    {
+      immediate: true,
+    },
+  );
+  // 根据activeMenu获取指定的menu
+  const getTargetMenuByActiveMenuName = (activeMenu: string) => {
+    return router.getRoutes().find((n) => [n.name, n.path].includes(activeMenu));
+  };
   const list = [
     {
       key: '1',

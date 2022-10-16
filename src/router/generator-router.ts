@@ -66,3 +66,33 @@ export const generatorDynamicRouter = (asyncMenus: API.Menu[]) => {
     return Promise.reject(`生成路由时出错: ${error}`);
   }
 };
+
+export const generatorDynamicRouter1 = (asyncMenus: API.Menu[]) => {
+  try {
+    const routeList = asyncMenus;
+    const layout = routes.find((item: any) => item.name == 'Layout')!;
+    // console.log(routeList, '根据后端返回的权限路由生成', router.getRoutes());
+    // const menus = [...Common, ...routeList];
+    const menus = [...routeList];
+    layout.children = menus;
+    const removeRoute = router.addRoute(layout);
+    console.log('生成路由', router.getRoutes(), asyncMenus);
+    // 获取所有没有包含children的路由，上面addRoute的时候，vue-router已经帮我们拍平了所有路由
+    const filterRoutes = router.getRoutes().filter((item: any) => {
+      const isOutsideLayout = !outsideLayout.some((n) => n.name === item.name);
+      return (!item.children.length || Object.is(item.meta?.hideChildrenInMenu, true)) && isOutsideLayout;
+    });
+    // 清空所有路由
+    removeRoute();
+    layout.children = [...filterRoutes];
+    // 重新添加拍平后的路由
+    router.addRoute(layout);
+    console.log('生成路由1', router.getRoutes());
+    return Promise.resolve({
+      menus,
+    });
+  } catch (error) {
+    console.error('生成路由时出错', error);
+    return Promise.reject(`生成路由时出错: ${error}`);
+  }
+};

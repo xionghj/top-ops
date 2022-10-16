@@ -15,6 +15,8 @@
   import { useRouter } from 'vue-router';
   import { useUserStore } from '@/store/modules/user';
   import { storeToRefs } from 'pinia';
+  import { message, Modal } from 'ant-design-vue';
+  import { QuestionCircleOutlined } from '@ant-design/icons-vue';
   const router = useRouter();
   const userStore = useUserStore();
   const { name } = storeToRefs(userStore);
@@ -22,6 +24,19 @@
     localStorage.clear();
     router.replace({ name: 'login' });
   }
+  // 退出登录
+  const doLogout = () => {
+    Modal.confirm({
+      title: '您确定要退出登录吗？',
+      centered: true,
+      onOk: async () => {
+        await userStore.logout();
+        localStorage.clear();
+        message.success('成功退出登录');
+        router.replace({ name: 'login' });
+      },
+    });
+  };
 </script>
 <style lang="less" scoped>
   .nav-active {

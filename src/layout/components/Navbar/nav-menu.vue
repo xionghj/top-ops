@@ -34,7 +34,7 @@
                     v-for="(subItem, index) in item.children"
                     :key="index"
                     class="menus-list"
-                    @click="clickMenus(item)">
+                    @click="clickMenus(item.children, subItem)">
                     <div class="menus-list-item">
                       <heart-outlined class="collect-icon" />
                       <span class="ml-2 cursor-pointer menus-list-item__text">
@@ -66,19 +66,13 @@
   const userStore = useUserStore();
   const userPermissionStore = usePermissionStore();
   const router = useRouter();
-  const oriMenus = computed(() => {
-    return userStore.oriMenus;
-  });
-  // const menus = computed(() => {
-  //   return [...userStore.menus].filter((n) => !n.meta?.hideInMenu);
-  // });
   const menus = computed(() => {
     return [...userPermissionStore.backMenuList].filter((n) => !n.hideInMenu);
   });
-  function clickMenus(item: any) {
-    userStore.subMenus = item;
-    // const routerPath = childrenRecursion(item.children);
-    // router.push({ name: routerPath.name });
+  function clickMenus(item: any, subItem: any) {
+    userStore.subMenus = [...item];
+    const routerPath = childrenRecursion([subItem]);
+    router.push({ name: routerPath.name });
     focusing.value = false;
   }
   function childrenRecursion(arr: any): any {
@@ -88,100 +82,6 @@
       return arr[0];
     }
   }
-  const oriMenus1 = [
-    {
-      name: '研发效能',
-      code: '1',
-      children: [
-        {
-          name: '持续集成',
-          code: '1-1',
-        },
-        {
-          name: '持续集成1',
-          code: '1-2',
-        },
-        {
-          name: '持续集成1',
-          code: '1-2',
-        },
-        {
-          name: '持续集成1',
-          code: '1-2',
-        },
-      ],
-    },
-    {
-      name: '研发效能',
-      code: '1',
-      children: [
-        {
-          name: '持续集成',
-          code: '1-1',
-        },
-        {
-          name: '持续集成1',
-          code: '1-2',
-        },
-      ],
-    },
-    {
-      name: '研发效能',
-      code: '1',
-      children: [
-        {
-          name: '持续集成',
-          code: '1-1',
-        },
-        {
-          name: '持续集成1',
-          code: '1-2',
-        },
-      ],
-    },
-    {
-      name: '研发效能',
-      code: '1',
-      children: [
-        {
-          name: '持续集成',
-          code: '1-1',
-        },
-        {
-          name: '持续集成1',
-          code: '1-2',
-        },
-      ],
-    },
-    {
-      name: '研发效能',
-      code: '1',
-      children: [
-        {
-          name: '持续集成',
-          code: '1-1',
-        },
-        {
-          name: '持续集成1',
-          code: '1-2',
-        },
-      ],
-    },
-    {
-      name: '研发效能',
-      code: '1',
-      children: [
-        {
-          name: '持续集成',
-          code: '1-1',
-        },
-        {
-          name: '持续集成1',
-          code: '1-2',
-        },
-      ],
-    },
-  ];
   const focusing = ref(false);
   function onFocus() {
     focusing.value = true;

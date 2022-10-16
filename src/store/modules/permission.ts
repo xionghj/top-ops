@@ -1,4 +1,5 @@
 import type { AppRouteRecordRaw, Menu } from '@/router/types';
+import Common from '@/router/staticModules/index';
 
 import { transformObjToRoute, flatMultiLevelRoutes } from '@/router/helper/routeHelper';
 import { transformRouteToMenu } from '@/router/helper/menuHelper';
@@ -17,6 +18,196 @@ interface PermissionState {
   // Backstage menu list
   backMenuList: Menu[];
 }
+const menusList1 = [
+  {
+    id: 428473020705734100,
+    created_at: '2022-10-05T05:37:02.041893+08:00',
+    updated_at: '2022-10-05T05:37:02.051269+08:00',
+    title: '资源管理',
+    name: 'test1',
+    kind: 'directory',
+    display: true,
+    priority: '1',
+    icon: '',
+    code: '53f7b830cdee4568',
+    path: '/home/index',
+    component: 'LAYOUT',
+    parent: null,
+    children: [
+      {
+        id: 428474974546755000,
+        created_at: '2022-10-05T05:56:26.630799+08:00',
+        updated_at: '2022-10-05T05:59:05.665520+08:00',
+        title: '应用资源',
+        name: 'test2',
+        kind: 'directory',
+        display: true,
+        priority: '1.1',
+        icon: '',
+        code: 'c35928fa6dcf26b9',
+        path: '/hoem/index12451',
+        component: 'LAYOUT',
+        parent: 428473020705734100,
+        children: [
+          {
+            id: 428475468585434560,
+            created_at: '2022-10-05T06:01:21.090827+08:00',
+            updated_at: '2022-10-05T06:01:21.099168+08:00',
+            title: '业务树',
+            name: 'home3',
+            kind: 'menu',
+            display: true,
+            priority: '1.1.1',
+            icon: '',
+            code: '1cd98a1443958a40',
+            path: '/home/index',
+            component: '/home/index',
+            parent: 428474974546755000,
+          },
+          // {
+          //   id: 428475501955317200,
+          //   created_at: '2022-10-05T06:01:40.980920+08:00',
+          //   updated_at: '2022-10-05T06:01:40.988211+08:00',
+          //   title: '业务管理',
+          //   name: 'welcome4',
+          //   kind: 'menu',
+          //   display: true,
+          //   priority: '1.1.2',
+          //   icon: '',
+          //   code: 'b91834be7861e93c',
+          //   path: '/welcome/index',
+          //   component: '/welcome/index',
+          //   parent: 428474974546755000,
+          // },
+        ],
+      },
+      // {
+      //   id: 428474162395282900,
+      //   created_at: '2022-10-05T05:48:22.540784+08:00',
+      //   updated_at: '2022-10-05T05:48:22.548156+08:00',
+      //   title: '基础设施',
+      //   name: 'test',
+      //   kind: 'directory',
+      //   display: true,
+      //   priority: '1.2',
+      //   icon: '',
+      //   code: 'd2eb72dddea853a5',
+      //   path: '',
+      //   component: '',
+      //   parent: 428473020705734100,
+      //   children: [
+      //     {
+      //       id: 428475721485188540,
+      //       created_at: '2022-10-05T06:03:51.830833+08:00',
+      //       updated_at: '2022-10-05T06:03:51.837466+08:00',
+      //       title: '主机管理',
+      //       name: 'test',
+      //       kind: 'menu',
+      //       display: true,
+      //       priority: '1.2.1',
+      //       icon: '',
+      //       code: '8ed49b05a641999a',
+      //       path: '',
+      //       component: '',
+      //       parent: 428474162395282900,
+      //     },
+      //     {
+      //       id: 428475736651791800,
+      //       created_at: '2022-10-05T06:04:00.871921+08:00',
+      //       updated_at: '2022-10-05T06:04:00.879749+08:00',
+      //       title: '机柜管理',
+      //       name: 'test',
+      //       kind: 'menu',
+      //       display: true,
+      //       priority: '1.2.2',
+      //       icon: '',
+      //       code: 'd930f928d40440f1',
+      //       path: '',
+      //       component: '',
+      //       parent: 428474162395282900,
+      //     },
+      //     {
+      //       id: 428475749452807600,
+      //       created_at: '2022-10-05T06:04:08.500691+08:00',
+      //       updated_at: '2022-10-05T06:04:08.507351+08:00',
+      //       title: '数据中心',
+      //       name: 'test',
+      //       kind: 'menu',
+      //       display: true,
+      //       priority: '1.2.3',
+      //       icon: '',
+      //       code: 'd568d2aae7ca9429',
+      //       path: '',
+      //       component: '',
+      //       parent: 428474162395282900,
+      //     },
+      //   ],
+      // },
+    ],
+  },
+  {
+    id: 428473393327701440,
+    created_at: '2022-10-05T05:40:44.140822+08:00',
+    updated_at: '2022-10-05T05:40:44.147747+08:00',
+    title: '云管平台',
+    name: 'test6',
+    kind: 'directory',
+    display: true,
+    priority: '6',
+    icon: '',
+    code: '8c4bcd59c6f8b92c',
+    path: '/home/test6',
+    component: 'LAYOUT',
+    parent: null,
+    children: [
+      {
+        id: 428485398566600100,
+        created_at: '2022-10-05T07:39:59.821401+08:00',
+        updated_at: '2022-10-05T07:39:59.832527+08:00',
+        title: '平台资源',
+        name: 'welcome',
+        kind: 'directory',
+        display: true,
+        priority: '1.3',
+        icon: '',
+        code: '99503728eb500dec',
+        path: '/welcome/index',
+        component: '/welcome/index',
+        parent: 428473020705734100,
+      },
+      {
+        id: 428485417239641540,
+        created_at: '2022-10-05T07:40:10.950764+08:00',
+        updated_at: '2022-10-05T07:40:10.957664+08:00',
+        title: '安全资源1',
+        name: 'welcome1',
+        kind: 'directory',
+        display: true,
+        priority: '1.4',
+        icon: '',
+        code: '0a329648b22f75c6',
+        path: '/welcome/index1',
+        component: '/welcome/index1',
+        parent: 428473020705734100,
+      },
+      {
+        id: 428485484130401700,
+        created_at: '2022-10-05T07:40:50.820775+08:00',
+        updated_at: '2022-10-05T07:40:50.827572+08:00',
+        title: '阿里云资源',
+        name: 'test9',
+        kind: 'directory',
+        display: true,
+        priority: '1.5',
+        icon: '',
+        code: 'fccf6b58f2415697',
+        path: '/home/test9',
+        component: '',
+        parent: 428473020705734100,
+      },
+    ],
+  },
+];
 const menusList = [
   {
     path: '/dashboard',
@@ -298,27 +489,24 @@ export const usePermissionStore = defineStore({
         const { ignoreRoute } = meta || {};
         return !ignoreRoute;
       };
-      // !Simulate to obtain permission codes from the background,
-      // this function may only need to be executed once, and the actual project can be put at the right time by itself
       let routeList: AppRouteRecordRaw[] = [];
       try {
         routeList = (await permmenu()) as AppRouteRecordRaw[];
-        console.log('获取菜单', routeList, menusList);
       } catch (error) {
         console.error(error);
       }
-
-      // // Dynamically introduce components
-      routeList = transformObjToRoute(routeList);
-      //  Background routing to menu structure
+      console.log('获取', menusList1);
+      // Dynamically introduce components
+      routeList = transformObjToRoute(menusList1);
+      // Background routing to menu structure
       const backMenuList = transformRouteToMenu(routeList);
-      console.log('获取', backMenuList);
       this.setBackMenuList(backMenuList);
-      // // remove meta.ignoreRoute item
+      // remove meta.ignoreRoute item
       routeList = filter(routeList, routeRemoveIgnoreFilter);
       routeList = routeList.filter(routeRemoveIgnoreFilter);
       routeList = flatMultiLevelRoutes(routeList);
-      routes = [...routeList];
+      routes = [...Common, ...routeList];
+      console.log('获取', routeList, routes);
 
       return routes;
     },
