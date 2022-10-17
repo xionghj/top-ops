@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
+import { cloneDeep } from 'lodash-es';
 import type { AppRouteRecordRaw, Menu } from '@/router/types';
+import router from '@/router';
 import Common from '@/router/staticModules/index';
 
 import { transformObjToRoute, flatMultiLevelRoutes } from '@/router/helper/routeHelper';
@@ -17,6 +19,7 @@ interface PermissionState {
   lastBuildMenuTime: number;
   // Backstage menu list
   backMenuList: Menu[];
+  subMenus: Menu[];
 }
 const menusList1 = [
   {
@@ -62,6 +65,21 @@ const menusList1 = [
             code: '1cd98a1443958a40',
             path: '/home/index',
             component: '/home/index',
+            parent: 428474974546755000,
+          },
+          {
+            id: 428475468585434560,
+            created_at: '2022-10-05T06:01:21.090827+08:00',
+            updated_at: '2022-10-05T06:01:21.099168+08:00',
+            title: '菜单管理',
+            name: 'menu',
+            kind: 'menu',
+            display: true,
+            priority: '1.1.1',
+            icon: '',
+            code: '1cd98a1443958a40',
+            path: '/system/permission/menu/index',
+            component: '/system/permission/menu/index',
             parent: 428474974546755000,
           },
           // {
@@ -444,7 +462,13 @@ export const usePermissionStore = defineStore({
     lastBuildMenuTime: 0,
     // Backstage menu list
     backMenuList: [],
+    subMenus: [],
   }),
+  // 开启持久化
+  persist: {
+    key: 'app-permission',
+    paths: ['subMenus'], // 指定数据持久化
+  },
   getters: {
     getPermCodeList(): string[] | number[] {
       return this.permCodeList;
@@ -460,6 +484,11 @@ export const usePermissionStore = defineStore({
     },
   },
   actions: {
+    /** 清空菜单 */
+    resetMenus() {
+      this.backMenuList = [];
+      this.subMenus = [];
+    },
     setPermCodeList(codeList: string[]) {
       this.permCodeList = codeList;
     },
@@ -495,12 +524,12 @@ export const usePermissionStore = defineStore({
       } catch (error) {
         console.error(error);
       }
-      console.log('获取', menusList1);
       // Dynamically introduce components
-      routeList = transformObjToRoute(menusList1);
+      routeList = transformObjToRoute(cloneDeep(menusList1));
       // Background routing to menu structure
       const backMenuList = transformRouteToMenu(routeList);
       this.setBackMenuList(backMenuList);
+      this.setCurrentRoute();
       // remove meta.ignoreRoute item
       routeList = filter(routeList, routeRemoveIgnoreFilter);
       routeList = routeList.filter(routeRemoveIgnoreFilter);
@@ -509,6 +538,21 @@ export const usePermissionStore = defineStore({
       console.log('获取', routeList, routes);
 
       return routes;
+    },
+    // 设置当前选中二级路由
+    async setCurrentRoute() {
+      if (this.subMenus.length === 0) {
+        this.subMenus = this.backMenuList[0].children;
+        const routerPath = this.childrenRecursion(this.subMenus);
+        router.replace(routerPath);
+      }
+    },
+    childrenRecursion(arr: any): any {
+      if (arr[0].children && arr[0].children.length > 0) {
+        return this.childrenRecursion(arr[0].children);
+      } else {
+        return arr[0];
+      }
     },
   },
 });

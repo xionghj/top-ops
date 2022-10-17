@@ -44,12 +44,12 @@
   import { storeToRefs } from 'pinia';
   import subMenuGroup from './sub-menu-group.vue';
   import type { MenuProps } from 'ant-design-vue';
-  import { useUserStore } from '@/store/modules/user';
+  import { usePermissionStore } from '@/store/modules/permission';
   // 当前路由
   const currentRoute = useRoute();
   const router = useRouter();
-  const userStore = useUserStore();
-  const { subMenus } = storeToRefs(userStore);
+  const permissionStore = usePermissionStore();
+  const { subMenus } = storeToRefs(permissionStore);
   const state = reactive({
     openKeys: [] as string[],
     selectedKeys: [currentRoute.name] as string[],
@@ -72,12 +72,37 @@
     () => {
       // state.openKeys = getOpenKeys();
       const meta = currentRoute.meta;
+      if (currentRoute.name != 'Layout' && currentRoute.name != 'PageNotFound') {
+        getSubMenus();
+      }
       state.selectedKeys = [currentRoute.meta?.activeMenu ?? currentRoute.name] as string[];
+      console.log('路由切换', currentRoute.name);
     },
     {
       immediate: true,
     },
   );
+  // 获取当前路由的二级菜单
+  function getSubMenus() {
+    const menus = permissionStore.backMenuList;
+    const subMenus = getsubMenusParents(menus, currentRoute.name);
+    permissionStore.subMenus = subMenus[subMenus.length - 1].children;
+  }
+  function getsubMenusParents(list: any, name: any): any {
+    for (const i in list) {
+      if (list[i].name === name) {
+        //查询到就返回该数组对象
+        return [list[i]];
+      }
+      if (list[i].children) {
+        const node = getsubMenusParents(list[i].children, name);
+        if (node !== undefined) {
+          //查询到把父节点连起来
+          return node.concat(list[i]);
+        }
+      }
+    }
+  }
   // 根据activeMenu获取指定的menu
   const getTargetMenuByActiveMenuName = (activeMenu: string) => {
     return router.getRoutes().find((n) => [n.name, n.path].includes(activeMenu));

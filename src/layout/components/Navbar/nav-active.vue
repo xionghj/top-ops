@@ -22,6 +22,7 @@
   const { name } = storeToRefs(userStore);
   function signOut() {
     localStorage.clear();
+    userStore.logout();
     router.replace({ name: 'login' });
   }
   // 退出登录
