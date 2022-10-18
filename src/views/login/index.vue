@@ -36,7 +36,15 @@
 <script setup lang="ts">
   import { reactive } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { message, Modal } from 'ant-design-vue';
+  import {
+    Form as AForm,
+    FormItem as AFormItem,
+    Input as AInput,
+    InputPassword as AInputPassword,
+    Button as AButton,
+    message,
+    Modal,
+  } from 'ant-design-vue';
   import { useUserStore } from '@/store/modules/user';
   import { to } from '@/utils/awaitTo';
 

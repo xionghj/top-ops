@@ -42,6 +42,11 @@
   import { ChromeOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
   import { useRoute, useRouter } from 'vue-router';
   import { storeToRefs } from 'pinia';
+  import {
+    LayoutSider as ALayoutSider,
+    Menu as AMenu,
+    MenuItem as AMenuItem,
+  } from 'ant-design-vue';
   import subMenuGroup from './sub-menu-group.vue';
   import type { MenuProps } from 'ant-design-vue';
   import { usePermissionStore } from '@/store/modules/permission';

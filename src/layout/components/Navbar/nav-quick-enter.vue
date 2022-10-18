@@ -8,10 +8,10 @@
 <script setup lang="ts">
   const quickList = [
     {
-      name: '快捷菜单1',
+      name: '资源管理',
     },
     {
-      name: '快捷菜单2',
+      name: '研发效能',
     },
   ];
 </script>

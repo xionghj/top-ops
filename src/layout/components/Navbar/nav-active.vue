@@ -15,7 +15,13 @@
   import { useRouter } from 'vue-router';
   import { storeToRefs } from 'pinia';
   import { QuestionCircleOutlined } from '@ant-design/icons-vue';
-  import { message, Modal } from 'ant-design-vue';
+  import {
+    Dropdown as ADropdown,
+    Menu as AMenu,
+    MenuItem as AMenuItem,
+    message,
+    Modal,
+  } from 'ant-design-vue';
   import { useUserStore } from '@/store/modules/user';
   const router = useRouter();
   const userStore = useUserStore();

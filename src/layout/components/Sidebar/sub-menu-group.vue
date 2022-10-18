@@ -21,6 +21,7 @@
 </template>
 <script setup lang="ts">
   import { ChromeOutlined, EllipsisOutlined } from '@ant-design/icons-vue';
+  import { MenuItemGroup as AMenuItemGroup, MenuItem as AMenuItem } from 'ant-design-vue';
   import subMenu from './sub-menu.vue';
   defineProps({
     menuInfo: {

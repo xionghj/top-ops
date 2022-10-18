@@ -19,6 +19,7 @@
 </template>
 <script setup lang="ts">
   import { ChromeOutlined } from '@ant-design/icons-vue';
+  import { MenuItem as AMenuItem, SubMenu as ASubMenu } from 'ant-design-vue';
   defineProps({
     menuInfo: {
       type: Object,
