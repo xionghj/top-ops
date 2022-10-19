@@ -10,7 +10,7 @@ function joinParentPath(menus: Menu[], parentPath = '') {
     // https://next.router.vuejs.org/guide/essentials/nested-routes.html
     // Note that nested paths that start with / will be treated as a root path.
     // This allows you to leverage the component nesting without having to use a nested URL.
-    if (!menu.path.startsWith('/')) {
+    if (!(menu.path.startsWith('/') || isUrl(menu.path))) {
       // path doesn't start with /, nor is it a url, join parent path
       menu.path = `${parentPath}/${menu.path}`;
     }

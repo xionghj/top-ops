@@ -3,7 +3,8 @@
     <div class="navbar-left">
       <div class="navbar-logo">
         <div class="navbar-logo__img" />
-        <div class="navbar-logo__title">Ops</div>
+        <!-- <div class="navbar-logo__title">Ops</div> -->
+        <SvgIcon name="logo" size="36" />
       </div>
       <navMenu />
       <navQuickEnter />
@@ -17,6 +18,7 @@
   import navMenu from './nav-menu.vue';
   import navQuickEnter from './nav-quick-enter.vue';
   import navActive from './nav-active.vue';
+  import { SvgIcon } from '@/components/svg-icon';
 </script>
 <style lang="less" scoped>
   .navbar {

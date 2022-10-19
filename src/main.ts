@@ -6,6 +6,7 @@ import { setupStore } from '@/store';
 
 // 引入 less
 import './styles/index.less';
+import 'virtual:svg-icons-register';
 
 import 'ant-design-vue/dist/antd.css';
 

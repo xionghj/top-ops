@@ -64,11 +64,38 @@
     // router.push({ name: e.key });
     router.push({ name: e.key });
   };
+  // 根据activeMenu获取指定的menu
+  const getTargetMenuByActiveMenuName = (activeMenu: string) => {
+    return router.getRoutes().find((n) => [n.name, n.path].includes(activeMenu));
+  };
+
+  // 获取当前打开的子菜单
+  const getOpenKeys = () => {
+    const meta = currentRoute.meta;
+    if (meta?.activeMenu) {
+      const targetMenu = getTargetMenuByActiveMenuName(meta.activeMenu);
+      return targetMenu?.meta?.namePath ?? [meta?.activeMenu];
+    }
+
+    return (
+      meta?.hideInMenu
+        ? state?.openKeys || []
+        : currentRoute.meta?.namePath ?? currentRoute.matched.slice(1).map((n) => n.name)
+    ) as string[];
+  };
   const collapsed = ref<boolean>(false);
   watch(
     () => state.openKeys,
     (val) => {
       console.log('openKeys', val);
+    },
+  );
+  // 监听菜单收缩状态
+  watch(
+    () => collapsed.value,
+    (newVal) => {
+      state.openKeys = newVal ? [] : getOpenKeys();
+      state.selectedKeys = [currentRoute.name] as string[];
     },
   );
   // 跟随页面路由变化，切换菜单选中状态
@@ -108,10 +135,6 @@
       }
     }
   }
-  // 根据activeMenu获取指定的menu
-  const getTargetMenuByActiveMenuName = (activeMenu: string) => {
-    return router.getRoutes().find((n) => [n.name, n.path].includes(activeMenu));
-  };
   const list = [
     {
       key: '1',

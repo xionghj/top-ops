@@ -1,7 +1,11 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx';
 import eslint from 'vite-plugin-eslint';
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
+
+const CWD = process.cwd();
 
 export default defineConfig({
   resolve: {
@@ -9,6 +13,15 @@ export default defineConfig({
   },
   plugins: [
     vue(),
+    vueJsx({
+      // options are passed on to @vue/babel-plugin-jsx
+    }),
+    createSvgIconsPlugin({
+      // Specify the icon folder to be cached
+      iconDirs: [resolve(CWD, 'src/assets/icons')],
+      // Specify symbolId format
+      symbolId: 'svg-icon-[dir]-[name]',
+    }),
     eslint({
       cache: false,
     }),

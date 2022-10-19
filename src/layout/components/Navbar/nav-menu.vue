@@ -4,7 +4,7 @@
       >全部<down-outlined class="ml-1 text-xs"
     /></div>
     <div v-if="focusing" class="menus-overlay">
-      <div class="nav-dropdown-box">
+      <div :class="[focusing ? 'show' : 'hidden']" class="nav-dropdown-box">
         <div class="product-panel">
           <div class="product-left">
             <div class="dropdown-box__group">
@@ -146,6 +146,11 @@
       min-width: 140px;
       font-size: 12px;
       box-shadow: 0 0 16px 0 rgb(54 58 80 / 16%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      &.show {
+        opacity: 1;
+      }
       .product-panel {
         height: inherit;
         min-height: 600px;
