@@ -1,8 +1,8 @@
 <template>
   <div class="relative flex items-center ml-2 h-full" @mouseenter="onFocus" @mouseleave="onBlur">
-    <div class="cursor-pointer text-xs hover:text-blue-400"
-      >全部<down-outlined class="ml-1 text-xs"
-    /></div>
+    <div class="cursor-pointer text-xs hover:text-blue-400">
+      全部<icon-font class="ml-2" type="jiantouxia" size="12" />
+    </div>
     <div v-if="focusing" class="menus-overlay">
       <div :class="[focusing ? 'show' : 'hidden']" class="nav-dropdown-box">
         <div class="product-panel">
@@ -72,6 +72,7 @@
   } from '@ant-design/icons-vue';
   import { useRouter } from 'vue-router';
   import { usePermissionStore } from '@/store/modules/permission';
+  import { IconFont } from '@/components/iconfont';
   const userPermissionStore = usePermissionStore();
   const router = useRouter();
   const menus = computed(() => {
