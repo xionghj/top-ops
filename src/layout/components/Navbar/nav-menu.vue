@@ -1,7 +1,14 @@
 <template>
   <div class="relative flex items-center ml-2 h-full" @mouseenter="onFocus" @mouseleave="onBlur">
-    <div class="cursor-pointer text-xs hover:text-blue-400">
-      全部<icon-font class="ml-2" type="jiantouxia" size="12" />
+    <div class="nav-dropdown-container cursor-pointer text-xs">
+      <span :class="[focusing ? 'nav-dropdown-container__text' : '']">全部</span>
+      <icon-font
+        class="ml-1 nav-dropdown-container__icon"
+        :class="[focusing ? 'rotate-180' : '']"
+        :color="focusing ? '#006eff' : ''"
+        type="xialajiantouxiao"
+        size="10"
+      />
     </div>
     <div v-if="focusing" class="menus-overlay">
       <div :class="[focusing ? 'show' : 'hidden']" class="nav-dropdown-box">
@@ -10,10 +17,10 @@
             <div class="dropdown-box__group">
               <h3 class="dropdown-box__label">快捷访问</h3>
               <div class="menus-list">
-                <div v-for="(item, index) in quickAccess" :key="index" class="menus-block">
+                <div v-for="(item, index) in favoriteList" :key="index" class="menus-block">
                   <div class="flex items-center">
                     <holder-outlined class="menus-icon-drop" />
-                    <span class="mx-1">{{ item.name }}</span>
+                    <span class="mx-1">{{ item.title }}</span>
                   </div>
                   <close-circle-outlined class="menus-icon-dismiss" />
                 </div>
@@ -49,7 +56,21 @@
                         <span class="cursor-pointer menus-list-item__text">
                           {{ subItem.meta && subItem.meta.title }}
                         </span>
-                        <heart-outlined class="collect-icon" @click.stop="clickCollection" />
+                        <icon-font
+                          v-if="favoriteIdList.indexOf(subItem.id) > -1 ? false : true"
+                          class="collect-icon"
+                          type="shoucang"
+                          size="16"
+                          color="#888"
+                          @click.stop="clickCollection(subItem.id)"
+                        />
+                        <icon-font
+                          v-else
+                          type="shoucang1"
+                          size="16"
+                          color="#ff7200"
+                          @click.stop="clickCollection(subItem.id)"
+                        />
                       </div>
                     </div>
                   </div>
@@ -64,23 +85,23 @@
 </template>
 <script setup lang="ts">
   import { ref, computed } from 'vue';
-  import {
-    DownOutlined,
-    HolderOutlined,
-    CloseCircleOutlined,
-    HeartOutlined,
-  } from '@ant-design/icons-vue';
+  import { DownOutlined, HolderOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
   import { useRouter } from 'vue-router';
   import { usePermissionStore } from '@/store/modules/permission';
+  import { useMenuFavoriteStore } from '@/store/modules/menuFavorite';
   import { IconFont } from '@/components/iconfont';
-  const userPermissionStore = usePermissionStore();
+
+  import { setMenuFavorite } from '@/api/system/menu';
+
+  const permissionStore = usePermissionStore();
+  const menuFavoriteStore = useMenuFavoriteStore();
   const router = useRouter();
   const menus = computed(() => {
-    // return [...userPermissionStore.backMenuList].filter((n) => !n.hideInMenu);
+    // return [...permissionStore.backMenuList].filter((n) => !n.hideInMenu);
     return handleMenus();
   });
   function handleMenus() {
-    const data = [...userPermissionStore.backMenuList];
+    const data = [...permissionStore.backMenuList];
     const result = [];
     for (let i = 0; i < data.length; i += 4) {
       result.push(data.slice(i, i + 4));
@@ -96,7 +117,7 @@
   }
   handleMenus();
   function clickMenus(item: any, subItem: any) {
-    userPermissionStore.subMenus = [...item];
+    permissionStore.subMenus = [...item];
     const routerPath = childrenRecursion([subItem]);
     router.push({ name: routerPath.name });
     focusing.value = false;
@@ -115,30 +136,45 @@
   function onBlur() {
     focusing.value = false;
   }
-  function clickCollection() {
-    console.log('收藏');
+  async function clickCollection(id: string) {
+    console.log('收藏', id);
+    try {
+      const result = await setMenuFavorite(id);
+      await menuFavoriteStore.getMenuFavoriteList();
+      console.log('设置成功', result);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
-  const quickAccess = [
-    {
-      name: '云服务器',
-      id: '1',
-    },
-    {
-      name: '对象存储',
-      id: '2',
-    },
-    {
-      name: '容器服务',
-      id: '3',
-    },
-  ];
+  const favoriteList = computed(() => {
+    return menuFavoriteStore.menuFavoriteList;
+  });
+  const favoriteIdList = computed(() => {
+    // return menuFavoriteStore.menuFavoriteIdList;
+    return [428474974546755000, 428475824262413760];
+  });
 </script>
 <style lang="less" scoped>
+  .nav-dropdown-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+
+    .nav-dropdown-container__icon {
+      transition: all 0.6s;
+    }
+    .nav-dropdown-container__text {
+      transition: all 0.6s;
+      color: #006eff;
+    }
+  }
+
   .menus-overlay {
     position: fixed;
     top: 50px;
     left: 190px;
     z-index: 1001;
+
     .nav-dropdown-box {
       background-color: #fff;
       max-height: calc(100vh - 68px);
@@ -149,9 +185,11 @@
       box-shadow: 0 0 16px 0 rgb(54 58 80 / 16%);
       opacity: 0;
       transition: opacity 0.5s ease;
+
       &.show {
         opacity: 1;
       }
+
       .product-panel {
         height: inherit;
         min-height: 600px;
@@ -162,6 +200,7 @@
         padding-left: 180px;
         box-sizing: border-box;
         min-width: 1000px;
+
         .product-left {
           box-sizing: border-box;
           background-color: #f3f4f7;
@@ -172,8 +211,10 @@
           position: absolute;
           top: 0;
           left: 0;
+
           .dropdown-box__group {
             margin-bottom: 30px;
+
             .dropdown-box__label {
               font-size: 14px;
               color: #888;
@@ -182,6 +223,7 @@
               display: inline-flex;
               align-items: center;
             }
+
             .menus-list {
               .menus-block {
                 background-color: #fff;
@@ -191,18 +233,22 @@
                 align-items: center;
                 justify-content: space-between;
                 margin-bottom: 8px;
+
                 &:hover {
                   .menus-icon-drop {
                     opacity: 1;
                   }
+
                   .menus-icon-dismiss {
                     opacity: 1;
                   }
                 }
+
                 .menus-icon-drop {
                   opacity: 0;
                   cursor: move;
                 }
+
                 .menus-icon-dismiss {
                   opacity: 0;
                   cursor: pointer;
@@ -211,17 +257,20 @@
             }
           }
         }
+
         .product-right {
           height: inherit;
           max-height: calc(100vh - 68px);
           padding: 30px 10px;
           overflow: auto;
           box-sizing: border-box;
+
           .product-panel-header {
             display: flex;
             align-items: center;
             margin-bottom: 12px;
             padding: 0 10px;
+
             .product-panel-header__label {
               font-size: 14px;
               color: #888;
@@ -229,28 +278,35 @@
               display: inline-flex;
               align-items: center;
             }
+
             .product-panel-header__item {
               margin-left: 10px;
             }
+
             .recently-visited {
               display: flex;
               padding: 0 10px;
+
               .recently-visited__item {
                 margin-left: 10px;
                 cursor: pointer;
+
                 &:hover {
                   color: #006eff;
                 }
               }
             }
           }
+
           .product-panel-body {
             .menus-grid {
               display: grid;
               grid-template-columns: 1fr 1fr 1fr 1fr;
+
               .menus-grid-box {
                 .menus-grid-item {
                   margin: 10px 0;
+
                   .menus-grid-item__label {
                     font-size: 14px;
                     color: #888;
@@ -260,6 +316,7 @@
                     margin-bottom: 12px;
                     padding: 0 10px;
                   }
+
                   .menus-list {
                     .menus-list-item {
                       display: flex;
@@ -277,16 +334,20 @@
                       box-sizing: border-box;
                       transition-duration: 0.2s;
                       transition-property: background;
+
                       &:hover {
                         .collect-icon {
                           opacity: 1;
                           transition-duration: 0.2s;
                         }
+
                         .menus-list-item__text {
                           color: #006eff;
                         }
+
                         background: rgba(33, 150, 243, 0.1);
                       }
+
                       .collect-icon {
                         opacity: 0;
                       }

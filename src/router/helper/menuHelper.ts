@@ -47,13 +47,14 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
   });
   const list = treeMap(routeList, {
     conversion: (node: AppRouteRecordRaw) => {
-      const { name, title, display } = node;
+      const { name, title, display, id } = node;
       return {
         ...(node.meta || {}),
         meta: {
           title,
           display,
         },
+        id,
         name,
         path: node.path,
         ...(node.redirect ? { redirect: node.redirect } : {}),

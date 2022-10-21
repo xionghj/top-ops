@@ -1,19 +1,17 @@
 <template>
   <div class="quick-enter">
-    <div v-for="(item, index) in quickList" :key="index" class="quick-list__item">
-      <span>{{ item.name }}</span>
+    <div v-for="(item, index) in favoriteList" :key="index" class="quick-list__item">
+      <span>{{ item.title }}</span>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-  const quickList = [
-    {
-      name: '资源管理',
-    },
-    {
-      name: '研发效能',
-    },
-  ];
+  import { ref, computed } from 'vue';
+  import { useMenuFavoriteStore } from '@/store/modules/menuFavorite';
+  const menuFavoriteStore = useMenuFavoriteStore();
+  const favoriteList = computed(() => {
+    return menuFavoriteStore.menuFavoriteList;
+  });
 </script>
 <style lang="less" scoped>
   .quick-enter {

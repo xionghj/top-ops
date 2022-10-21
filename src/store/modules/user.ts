@@ -4,6 +4,7 @@ import { RouteRecordRaw } from 'vue-router';
 import { login, permmenu } from '@/api/login';
 import { generatorDynamicRouter } from '@/router/generator-router';
 import { usePermissionStore } from '@/store/modules/permission';
+import { useMenuFavoriteStore } from '@/store/modules/menuFavorite';
 import router from '@/router';
 
 interface UserState {
@@ -12,6 +13,7 @@ interface UserState {
   name: string;
   avatar: string;
   userInfo: object;
+  recentlyVisited: [];
 }
 
 export const useUserStore = defineStore({
@@ -22,6 +24,7 @@ export const useUserStore = defineStore({
     name: 'amdin',
     avatar: '',
     userInfo: {},
+    recentlyVisited: [], // 最近访问
   }),
   getters: {
     getToken(): string {
@@ -38,6 +41,7 @@ export const useUserStore = defineStore({
     /** 清空token及用户信息 */
     resetToken() {
       this.userInfo = {};
+      this.recentlyVisited = [];
       const permissionStore = usePermissionStore();
       permissionStore.resetMenus();
     },
@@ -70,6 +74,8 @@ export const useUserStore = defineStore({
           router.addRoute(route as unknown as RouteRecordRaw);
         });
         // router.addRoute(PAGE_NOT_FOUND_ROUTE as unknown as RouteRecordRaw);
+        const menuFavoriteStore = useMenuFavoriteStore();
+        await menuFavoriteStore.getMenuFavoriteList();
         console.log('获取得菜单数据', routes, router.getRoutes());
       } catch (error) {
         return Promise.reject(error);

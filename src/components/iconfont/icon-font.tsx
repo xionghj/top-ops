@@ -8,7 +8,7 @@ let scriptUrls = [`${import.meta.env.BASE_URL}iconfont.js`];
 let MyIconFont = createFromIconfontCN({
   // scriptUrl: '//at.alicdn.com/t/font_8d5l8fzk5b87iudi.js',
   // scriptUrl: '//at.alicdn.com/t/font_2184398_zflo1kjcemp.js',
-  scriptUrl: '//at.alicdn.com/t/c/font_3715960_s0nrbzeys7k.js',
+  scriptUrl: '//at.alicdn.com/t/c/font_3715960_gxee8i87feh.js',
   // iconfont字体图标本地化，详见：/public/iconfont.js
   // scriptUrl: scriptUrls,
 });
