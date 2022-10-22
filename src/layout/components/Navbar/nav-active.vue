@@ -2,7 +2,7 @@
   <a-dropdown :trigger="['hover']">
     <div class="ant-dropdown-link nav-active" @click.prevent>
       <span class="nav-active__header" />
-      <span>{{ name }}</span>
+      <span>{{ userInfo && userInfo.name }}</span>
     </div>
     <template #overlay>
       <a-menu>
@@ -25,7 +25,7 @@
   import { useUserStore } from '@/store/modules/user';
   const router = useRouter();
   const userStore = useUserStore();
-  const { name } = storeToRefs(userStore);
+  const { userInfo } = storeToRefs(userStore);
   function signOut() {
     localStorage.clear();
     userStore.logout();

@@ -85,8 +85,8 @@ export function setMenuFavorite(id: string) {
  * @param {MenuFavoriteOrder} data
  * @returns
  */
-export function setMenuFavoriteOrder(data: API.MenuFavoriteOrder) {
-  return request<API.MenuFavoriteListResult>({
+export function setMenuFavoriteOrder(data: API.MenuFavoriteOrderParams) {
+  return request({
     url: `/permission/menu/favorite/`,
     method: 'post',
     data,

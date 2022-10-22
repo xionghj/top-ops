@@ -9,7 +9,7 @@ import { transformRouteToMenu } from '@/router/helper/menuHelper';
 
 import { filter } from '@/utils/helper/treeHelper';
 
-import { permmenu } from '@/api/login';
+import { getPermissionMenu } from '@/api/login';
 interface PermissionState {
   // Permission code list
   permCodeList: string[] | number[];
@@ -552,12 +552,12 @@ export const usePermissionStore = defineStore({
       };
       let routeList: AppRouteRecordRaw[] = [];
       try {
-        routeList = (await permmenu()) as AppRouteRecordRaw[];
+        routeList = (await getPermissionMenu()) as AppRouteRecordRaw[];
       } catch (error) {
         console.error(error);
       }
       // Dynamically introduce components
-      routeList = transformObjToRoute(cloneDeep(routeList));
+      routeList = transformObjToRoute(cloneDeep(menusList1));
       // Background routing to menu structure
       const backMenuList = transformRouteToMenu(routeList);
       this.setBackMenuList(backMenuList);

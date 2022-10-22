@@ -101,5 +101,7 @@ declare namespace API {
     id: boolean;
   };
   /** 菜单收藏顺序 */
-  type MenuFavoriteOrder = string [];
+  type MenuFavoriteOrderParams = {
+    related_ids: string [];
+  };
 }

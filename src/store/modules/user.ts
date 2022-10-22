@@ -1,19 +1,36 @@
 import { defineStore } from 'pinia';
 import jwtDecode from 'jwt-decode';
 import { RouteRecordRaw } from 'vue-router';
-import { login, permmenu } from '@/api/login';
+import { login, getPermissionMenu } from '@/api/login';
 import { generatorDynamicRouter } from '@/router/generator-router';
 import { usePermissionStore } from '@/store/modules/permission';
 import { useMenuFavoriteStore } from '@/store/modules/menuFavorite';
 import router from '@/router';
 
+type UserInfo = {
+  exp: number;
+  iat: number;
+  jti: string;
+  name: string;
+  token_type: string;
+  user_id: string;
+};
+interface Meta {
+  title: string;
+  display: boolean;
+}
+type Menu = {
+  id: number;
+  meta: Meta;
+  name: string;
+  path: string;
+};
+
 interface UserState {
   token: string;
   refreshToken: string;
-  name: string;
-  avatar: string;
-  userInfo: object;
-  recentlyVisited: [];
+  userInfo: Partial<UserInfo>;
+  recentlyVisited: Menu[];
 }
 
 export const useUserStore = defineStore({
@@ -21,20 +38,17 @@ export const useUserStore = defineStore({
   state: (): UserState => ({
     token: '',
     refreshToken: '',
-    name: 'amdin',
-    avatar: '',
     userInfo: {},
     recentlyVisited: [], // 最近访问
   }),
+  // 开启持久化
+  persist: {
+    key: 'user',
+    paths: ['userInfo', 'recentlyVisited'], // 指定数据持久化
+  },
   getters: {
     getToken(): string {
       return this.token;
-    },
-    getAvatar(): string {
-      return this.avatar;
-    },
-    getName(): string {
-      return this.name;
     },
   },
   actions: {
@@ -49,8 +63,8 @@ export const useUserStore = defineStore({
     setToken(access: string, refresh: string) {
       this.token = access ?? '';
       this.refreshToken = refresh ?? '';
-      const decodeToken = jwtDecode(access);
-      this.name = decodeToken.name;
+      const decodeToken: UserInfo = jwtDecode(access);
+      this.userInfo = decodeToken;
       localStorage.setItem('ACCESS_TOKEN_KEY', access);
     },
     /** 登录 */
@@ -66,7 +80,7 @@ export const useUserStore = defineStore({
     /** 登录成功之后, 获取用户信息以及生成权限路由 */
     async afterLogin() {
       try {
-        // const result = await permmenu();
+        // const result = await getPermissionMenu();
         // 生成路由
         const permissionStore = usePermissionStore();
         const routes = await permissionStore.buildRoutesAction();
@@ -79,6 +93,21 @@ export const useUserStore = defineStore({
         console.log('获取得菜单数据', routes, router.getRoutes());
       } catch (error) {
         return Promise.reject(error);
+      }
+    },
+    /** 设置最近访问 */
+    setRecentlyVisited(item: Menu) {
+      for (let i = 0; i < this.recentlyVisited.length; i++) {
+        if (this.recentlyVisited[i].id == item.id) {
+          this.recentlyVisited.splice(0, 0, this.recentlyVisited.splice(i, 1)[0]);
+          return;
+        }
+      }
+      if (this.recentlyVisited.length > 6) {
+        this.recentlyVisited.unshift(item);
+        this.recentlyVisited.pop();
+      } else {
+        this.recentlyVisited.unshift(item);
       }
     },
     /** 登出 */

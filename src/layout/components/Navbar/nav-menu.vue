@@ -10,67 +10,83 @@
         size="10"
       />
     </div>
-    <div v-if="focusing" class="menus-overlay">
-      <div :class="[focusing ? 'show' : 'hidden']" class="nav-dropdown-box">
-        <div class="product-panel">
-          <div class="product-left">
-            <div class="dropdown-box__group">
-              <h3 class="dropdown-box__label">快捷访问</h3>
-              <div class="menus-list">
-                <div v-for="(item, index) in favoriteList" :key="index" class="menus-block">
-                  <div class="flex items-center">
-                    <holder-outlined class="menus-icon-drop" />
-                    <span class="mx-1">{{ item.title }}</span>
+    <Transition name="fade">
+      <div v-if="focusing" class="menus-overlay">
+        <div class="nav-dropdown-box">
+          <div class="product-panel">
+            <div class="product-left">
+              <div class="dropdown-box__group">
+                <h3 class="dropdown-box__label">快捷访问</h3>
+                <div ref="columnListRef" class="menus-list">
+                  <div v-for="item in favoriteList" :key="item.id" class="menus-block">
+                    <div class="flex items-center">
+                      <holder-outlined
+                        class="menus-icon-drop"
+                        style="color: #888"
+                        title="拖动排序"
+                      />
+                      <span class="mx-1">{{ item.title }}</span>
+                    </div>
+                    <close-circle-outlined
+                      class="menus-icon-dismiss"
+                      style="font-size: 14px; color: #888"
+                      title="从快捷访问中删除"
+                      @click.stop="clickCollection(String(item.id))"
+                    />
                   </div>
-                  <close-circle-outlined class="menus-icon-dismiss" />
                 </div>
               </div>
             </div>
-          </div>
-          <div class="product-right">
-            <div class="product-panel-header">
-              <div class="product-panel-header__label">最近访问</div>
-              <div class="recently-visited">
-                <div class="recently-visited__item">主机管理</div>
-                <div class="recently-visited__item">系统管理</div>
+            <div class="product-right">
+              <div class="product-panel-header">
+                <div class="product-panel-header__label">最近访问</div>
+                <div class="recently-visited">
+                  <div
+                    v-for="(item, index) in recentlyVisited"
+                    :key="index"
+                    class="recently-visited__item"
+                    @click="goToRouter(item)"
+                    >{{ item.meta.title }}</div
+                  >
+                </div>
               </div>
-            </div>
-            <div class="product-panel-body">
-              <div class="menus-grid">
-                <div
-                  v-for="(menusList, indexMenus) in menus"
-                  :key="indexMenus"
-                  class="menus-grid-box"
-                >
-                  <div v-for="item in menusList" :key="item.code" class="menus-grid-item">
-                    <div class="menus-grid-item__label">
-                      <span>{{ item.meta && item.meta.title }}</span>
-                    </div>
-                    <div
-                      v-for="(subItem, index) in item.children"
-                      :key="index"
-                      class="menus-list"
-                      @click="clickMenus(item.children, subItem)"
-                    >
-                      <div class="menus-list-item">
-                        <span class="cursor-pointer menus-list-item__text">
-                          {{ subItem.meta && subItem.meta.title }}
-                        </span>
-                        <icon-font
-                          v-if="favoriteIdList.indexOf(subItem.id) > -1 ? false : true"
-                          class="collect-icon"
-                          type="shoucang"
-                          size="16"
-                          color="#888"
-                          @click.stop="clickCollection(subItem.id)"
-                        />
-                        <icon-font
-                          v-else
-                          type="shoucang1"
-                          size="16"
-                          color="#ff7200"
-                          @click.stop="clickCollection(subItem.id)"
-                        />
+              <div class="product-panel-body">
+                <div class="menus-grid">
+                  <div
+                    v-for="(subMenusList, indexMenus) in menus"
+                    :key="indexMenus"
+                    class="menus-grid-box"
+                  >
+                    <div v-for="item in subMenusList" :key="item.code" class="menus-grid-item">
+                      <div class="menus-grid-item__label">
+                        <span>{{ item.meta && item.meta.title }}</span>
+                      </div>
+                      <div
+                        v-for="(subItem, index) in item.children"
+                        :key="index"
+                        class="menus-list"
+                        @click="clickMenus(item.children, subItem)"
+                      >
+                        <div class="menus-list-item">
+                          <span class="cursor-pointer menus-list-item__text">
+                            {{ subItem.meta && subItem.meta.title }}
+                          </span>
+                          <icon-font
+                            v-if="favoriteIdList.indexOf(subItem.id) > -1 ? false : true"
+                            class="collect-icon"
+                            type="shoucang"
+                            size="16"
+                            color="#888"
+                            @click.stop="clickCollection(subItem.id)"
+                          />
+                          <icon-font
+                            v-else
+                            type="shoucang1"
+                            size="16"
+                            color="#ff7200"
+                            @click.stop="clickCollection(subItem.id)"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -80,19 +96,26 @@
           </div>
         </div>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
+  import { ref, nextTick, unref, computed } from 'vue';
   import { DownOutlined, HolderOutlined, CloseCircleOutlined } from '@ant-design/icons-vue';
   import { useRouter } from 'vue-router';
+  import { storeToRefs } from 'pinia';
+  import { useUserStore } from '@/store/modules/user';
   import { usePermissionStore } from '@/store/modules/permission';
   import { useMenuFavoriteStore } from '@/store/modules/menuFavorite';
+  import { useSortable } from '@/hooks/useSortable';
   import { IconFont } from '@/components/iconfont';
 
   import { setMenuFavorite } from '@/api/system/menu';
 
+  import { isNullAndUnDef } from '@/utils/is';
+
+  const userStore = useUserStore();
+  const { recentlyVisited } = storeToRefs(userStore);
   const permissionStore = usePermissionStore();
   const menuFavoriteStore = useMenuFavoriteStore();
   const router = useRouter();
@@ -117,9 +140,15 @@
   }
   handleMenus();
   function clickMenus(item: any, subItem: any) {
+    userStore.setRecentlyVisited(subItem);
     permissionStore.subMenus = [...item];
     const routerPath = childrenRecursion([subItem]);
     router.push({ name: routerPath.name });
+    focusing.value = false;
+  }
+  // 最近访问跳转
+  function goToRouter(item: any) {
+    router.push({ name: item.name });
     focusing.value = false;
   }
   function childrenRecursion(arr: any): any {
@@ -132,6 +161,7 @@
   const focusing = ref(false);
   function onFocus() {
     focusing.value = true;
+    handleVisibleChange();
   }
   function onBlur() {
     focusing.value = false;
@@ -150,9 +180,30 @@
     return menuFavoriteStore.menuFavoriteList;
   });
   const favoriteIdList = computed(() => {
-    // return menuFavoriteStore.menuFavoriteIdList;
-    return [428474974546755000, 428475824262413760];
+    return menuFavoriteStore.menuFavoriteIdList;
+    // return [428474974546755000, 428475824262413760];
   });
+  const columnListRef = ref<HTMLDivElement>();
+  async function handleVisibleChange() {
+    await nextTick();
+    const columnListEl = unref(columnListRef);
+    if (!columnListEl) return;
+
+    // Drag and drop sort
+    const { initSortable } = useSortable(columnListEl, {
+      handle: '.menus-icon-drop',
+      onEnd: (evt) => {
+        const { oldIndex, newIndex } = evt;
+
+        if (isNullAndUnDef(oldIndex) || isNullAndUnDef(newIndex) || oldIndex === newIndex) {
+          return;
+        }
+        // Sort column
+        menuFavoriteStore.setMenuFavoriteListOrder(oldIndex, newIndex);
+      },
+    });
+    initSortable();
+  }
 </script>
 <style lang="less" scoped>
   .nav-dropdown-container {
@@ -168,7 +219,15 @@
       color: #006eff;
     }
   }
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.5s ease;
+  }
 
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
   .menus-overlay {
     position: fixed;
     top: 50px;
@@ -183,12 +242,6 @@
       min-width: 140px;
       font-size: 12px;
       box-shadow: 0 0 16px 0 rgb(54 58 80 / 16%);
-      opacity: 0;
-      transition: opacity 0.5s ease;
-
-      &.show {
-        opacity: 1;
-      }
 
       .product-panel {
         height: inherit;

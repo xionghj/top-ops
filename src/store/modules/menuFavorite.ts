@@ -1,5 +1,9 @@
 import { defineStore } from 'pinia';
-import { getMenuFavoriteList, getMenuFavoriteIdList } from '@/api/system/menu';
+import {
+  getMenuFavoriteList,
+  getMenuFavoriteIdList,
+  setMenuFavoriteOrder,
+} from '@/api/system/menu';
 
 interface MenuFavoriteState {
   menuFavoriteList: API.MenuFavoriteListItem[];
@@ -26,6 +30,20 @@ export const useMenuFavoriteStore = defineStore({
         this.menuFavoriteList = favoriteList;
         this.menuFavoriteIdList = favoriteIdList;
         console.log('获取菜单收藏列表', favoriteList, favoriteIdList);
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+    // 设置菜单顺序
+    async setMenuFavoriteListOrder(oldIndex: number, newIndex: number) {
+      const columns = this.menuFavoriteIdList;
+      columns.splice(newIndex, 0, columns.splice(oldIndex, 1)[0]);
+      try {
+        const params = {
+          related_ids: columns,
+        };
+        await setMenuFavoriteOrder(params);
+        await this.getMenuFavoriteList();
       } catch (error) {
         return Promise.reject(error);
       }

@@ -7,7 +7,7 @@ import { request } from '@/utils/request';
  * @returns
  */
 export function login(data: API.LoginParams) {
-  return request<BaseResponse<API.LoginResult>>(
+  return request<API.LoginResult>(
     {
       url: 'api/token/',
       method: 'post',
@@ -18,7 +18,7 @@ export function login(data: API.LoginParams) {
     },
   );
 }
-export function permmenu() {
+export function getPermissionMenu() {
   return request<API.PermMenu>({
     url: 'permission/menu/tree/',
     method: 'get',

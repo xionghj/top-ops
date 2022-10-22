@@ -134,7 +134,7 @@
   } from 'ant-design-vue';
   import type { Rule, FormInstance } from 'ant-design-vue/es/form';
   // import { getPermissionMenuList } from '@/api/system/menu';
-  import { permmenu } from '@/api/login';
+  import { getPermissionMenu } from '@/api/login';
   import { updateMenu, createMenu, deleteMenu } from '@/api/system/menu';
   const columns = [
     {
@@ -174,7 +174,7 @@
   // 获取菜单
   async function getMenus() {
     try {
-      const data = await permmenu();
+      const data = await getPermissionMenu();
       menusList.value = data;
       options.value = data;
       console.log('获取的数据', menusList.value);
