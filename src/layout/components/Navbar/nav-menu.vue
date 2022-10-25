@@ -108,7 +108,7 @@
   import { usePermissionStore } from '@/store/modules/permission';
   import { useMenuFavoriteStore } from '@/store/modules/menuFavorite';
   import { useSortable } from '@/hooks/useSortable';
-  import { IconFont } from '@/components/iconfont';
+  import { IconFont } from '@/components/basic/iconfont';
 
   import { setMenuFavorite } from '@/api/system/menu';
 

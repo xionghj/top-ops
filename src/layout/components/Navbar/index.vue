@@ -18,7 +18,7 @@
   import navMenu from './nav-menu.vue';
   import navQuickEnter from './nav-quick-enter.vue';
   import navActive from './nav-active.vue';
-  import { SvgIcon } from '@/components/svg-icon';
+  import { SvgIcon } from '@/components/basic/svg-icon';
 </script>
 <style lang="less" scoped>
   .navbar {
@@ -29,7 +29,7 @@
     height: 100%;
     position: relative;
     background: #fff;
-    box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+    // box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
     flex: 0 0 50px;
     .navbar-left {
       display: flex;
