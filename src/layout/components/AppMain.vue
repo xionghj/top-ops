@@ -1,7 +1,6 @@
 <template>
   <div class="app-main">
     <div style="height: auto">
-      <Breadcrumb />
       <router-view v-slot="{ Component }">
         <template v-if="Component">
           <transition
@@ -18,7 +17,6 @@
 </template>
 <script setup lang="ts">
   import { useRoute } from 'vue-router';
-  import Breadcrumb from '@/components/basic/Breadcrumb/index.vue';
   const route = useRoute();
 </script>
 <style scoped>
