@@ -6,7 +6,8 @@
       <template v-if="!item.children">
         <a-menu-item :key="item.name">
           <template #icon>
-            <ChromeOutlined />
+            <!-- <ChromeOutlined /> -->
+            <icon-font type="zhixian" size="12" />
           </template>
           {{ item.meta && item.meta.title }}
         </a-menu-item>
@@ -20,6 +21,7 @@
 <script setup lang="ts">
   import { ChromeOutlined } from '@ant-design/icons-vue';
   import { MenuItem as AMenuItem, SubMenu as ASubMenu } from 'ant-design-vue';
+  import { IconFont } from '@/components/basic/iconfont';
   defineProps({
     menuInfo: {
       type: Object,

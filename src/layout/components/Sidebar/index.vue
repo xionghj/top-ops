@@ -174,6 +174,14 @@
     z-index: 1;
     overflow: auto;
     overflow-x: hidden;
+    box-shadow: 0 2px 4px rgb(15 34 58 / 12%);
+    // :deep(.ant-menu-submenu-selected) {
+    //   color: #1890ff;
+    // }
+    // :deep(.ant-menu-title-content) {
+    //   // color: #212529;
+    //   color: red;
+    // }
     .sidebar-container-fixed-stuff {
       flex-shrink: 0;
       transition: width 0.2s;

@@ -2,7 +2,7 @@
   <a-menu-item-group :key="menuInfo.name">
     <template #title>
       <span v-if="collapsed" class="sub-mene-group-title"><EllipsisOutlined /></span>
-      <span v-else>{{ menuInfo.meta && menuInfo.meta.title }}</span>
+      <span v-else class="menu-title">{{ menuInfo.meta && menuInfo.meta.title }}</span>
     </template>
     <template v-for="item in menuInfo.children" :key="item.name">
       <template v-if="!item.children">
@@ -42,5 +42,13 @@
   .sub-mene-group-title {
     display: block;
     text-align: center;
+  }
+  .menu-title {
+    letter-spacing: 0.05em;
+    cursor: default;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #919da9;
+    font-weight: 600;
   }
 </style>
