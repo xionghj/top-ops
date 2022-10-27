@@ -20,18 +20,17 @@ declare namespace API {
   /** 获取菜单列表参数 */
   type MenuListResult = MenuListResultItem[];
 
-  /** 新增菜单参数 */
+  /** 新增编辑菜单参数 */
   type MenuAddParams = {
-    type: number;
-    parentId: number;
-    name: string;
-    orderNum: number;
-    router: string;
-    isShow: boolean;
-    keepalive: boolean;
-    icon: string;
-    perms: string;
-    viewPath: string;
+    id: string,
+    name: string,
+    title: string,
+    kind: string,
+    path: string,
+    component: string,
+    priority: string,
+    parent: string,
+    display: boolean,
   };
 
   /** 更新某项菜单参数 */

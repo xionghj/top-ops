@@ -1,4 +1,5 @@
 import axios from 'axios';
+import jsonBig from 'json-bigint';
 import { message as $message } from 'ant-design-vue';
 import { uniqueSlash } from './urlUtils';
 import type { AxiosRequestConfig } from 'axios';
@@ -14,12 +15,25 @@ export interface RequestOptions {
 
 const UNKNOWN_ERROR = '未知错误，请重试';
 /** 真实请求的路径前缀 */
-// const baseApiUrl = 'http://192.168.253.207:8000/';
-const baseApiUrl = '/api/';
+const baseApiUrl = 'http://192.168.253.207:8000/';
+// const baseApiUrl = '/api/';
 
 const service = axios.create({
-  // baseURL: baseApiUrl,
+  baseURL: baseApiUrl,
   timeout: 6000,
+  transformResponse: [
+    function (data) {
+      try {
+        // 如果转换成功则返回转换的数据结果
+        return jsonBig.parse(data);
+      } catch (err) {
+        // 如果转换失败，则包装为统一数据格式并返回
+        return {
+          data,
+        };
+      }
+    },
+  ],
 });
 
 service.interceptors.request.use(

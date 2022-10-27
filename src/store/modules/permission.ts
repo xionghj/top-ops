@@ -557,7 +557,7 @@ export const usePermissionStore = defineStore({
         console.error(error);
       }
       // Dynamically introduce components
-      routeList = transformObjToRoute(cloneDeep(menusList1));
+      routeList = transformObjToRoute(cloneDeep(routeList));
       // Background routing to menu structure
       const backMenuList = transformRouteToMenu(routeList);
       this.setBackMenuList(backMenuList);

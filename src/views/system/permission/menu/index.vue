@@ -1,3 +1,4 @@
+<!-- 菜单管理 -->
 <template>
   <div>
     <Breadcrumb />
@@ -8,27 +9,29 @@
           <a-button type="primary" @click="showDrawer('add')">新增菜单</a-button>
         </div>
       </div>
-      <a-table :columns="columns" :data-source="menusList" row-key="id">
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'name'">
-            {{ record.name }}
+      <a-spin :spinning="spinning">
+        <a-table :columns="columns" :data-source="menusList" row-key="id">
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'name'">
+              {{ record.name }}
+            </template>
+            <template v-else-if="column.key === 'action'">
+              <span>
+                <a @click="showDrawer('edit', record)">编辑</a>
+                <a-divider type="vertical" />
+                <a-popconfirm
+                  title="是否确认删除?"
+                  ok-text="是"
+                  cancel-text="否"
+                  @confirm="deleteMenuConfirm(record.id)"
+                >
+                  <span class="text-red-500 cursor-pointer" href="#">删除</span>
+                </a-popconfirm>
+              </span>
+            </template>
           </template>
-          <template v-else-if="column.key === 'action'">
-            <span>
-              <a @click="showDrawer('edit', record)">编辑</a>
-              <a-divider type="vertical" />
-              <a-popconfirm
-                title="是否确认删除?"
-                ok-text="是"
-                cancel-text="否"
-                @confirm="deleteMenu(record.id)"
-              >
-                <span class="text-red-500 cursor-pointer" href="#">删除</span>
-              </a-popconfirm>
-            </span>
-          </template>
-        </template>
-      </a-table>
+        </a-table>
+      </a-spin>
       <a-drawer
         :title="form.id ? '编辑菜单' : '新增菜单'"
         :width="720"
@@ -87,19 +90,6 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="24">
-              <a-form-item label="父级菜单" name="parent">
-                <a-cascader
-                  v-model:value="form.parent"
-                  :options="options"
-                  placeholder="请选择父级菜单"
-                  :field-names="{ label: 'name', value: 'id', children: 'children' }"
-                  change-on-select
-                />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="16">
-            <a-col :span="24">
               <a-form-item label="前端是否可见" name="display">
                 <div class="ml-4">
                   <a-radio-group v-model:value="form.display">
@@ -107,6 +97,19 @@
                     <a-radio :value="false">否</a-radio>
                   </a-radio-group>
                 </div>
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row :gutter="16">
+            <a-col :span="24">
+              <a-form-item label="父级菜单" name="parent">
+                <a-cascader
+                  v-model:value="form.parent"
+                  :options="options"
+                  placeholder="请选择父级菜单"
+                  :field-names="{ label: 'title', value: 'id', children: 'children' }"
+                  change-on-select
+                />
               </a-form-item>
             </a-col>
           </a-row>
@@ -121,7 +124,7 @@
 </template>
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
-  import { PlusOutlined } from '@ant-design/icons-vue';
+  import { cloneDeep } from 'lodash-es';
   import {
     Table as ATable,
     Form as AForm,
@@ -138,10 +141,10 @@
     Popconfirm as APopconfirm,
     Row as ARow,
     Col as ACol,
+    Spin as ASpin,
   } from 'ant-design-vue';
   import type { Rule, FormInstance } from 'ant-design-vue/es/form';
   import Breadcrumb from '@/components/basic/Breadcrumb/index.vue';
-  // import { getPermissionMenuList } from '@/api/system/menu';
   import { getPermissionMenu } from '@/api/login';
   import { updateMenu, createMenu, deleteMenu } from '@/api/system/menu';
   const columns = [
@@ -171,24 +174,35 @@
     },
   ];
 
-  interface DataItem {
-    key: number;
-    name: string;
-    age: number;
-    address: string;
-    children?: DataItem[];
-  }
-  const menusList = ref([]);
+  const menusList = ref<any>([]);
+  const spinning = ref(false);
   // 获取菜单
   async function getMenus() {
     try {
+      if (spinning.value) {
+        return;
+      }
+      spinning.value = true;
       const data = await getPermissionMenu();
+      spinning.value = false;
       menusList.value = data;
-      options.value = data;
-      console.log('获取的数据', menusList.value);
     } catch (error) {
+      spinning.value = false;
       console.error(error);
     }
+  }
+  function getTreeData(data: any, id: any) {
+    for (let i = 0; i < data.length; i++) {
+      data[i]['id'] = data[i].id.toString();
+      if (id && data[i].id == id) {
+        data[i].disabled = true;
+      }
+      if (data[i].children && data[i].children.length > 1) {
+        // children若为空数组，则不作操作
+        getTreeData(data[i].children, id);
+      }
+    }
+    return data;
   }
   getMenus();
   const formRef = ref<FormInstance>();
@@ -200,7 +214,7 @@
     path: '',
     component: '',
     priority: '',
-    parent: [],
+    parent: [] as any,
     display: true,
   });
 
@@ -211,14 +225,15 @@
     path: [{ required: true, message: 'please enter url' }],
     component: [{ required: true, message: 'please enter component' }],
     priority: [{ required: true, message: 'Please choose the priority' }],
-    parent: [{ required: true, message: 'Please choose the parent' }],
     display: [{ required: true, message: 'Please choose the parent' }],
   };
   const options = ref([]);
   const visible = ref<boolean>(false);
-  const showDrawer = (type: string, item?: any) => {
+  const showDrawer = (type: string, item?: API.MenuAddParams) => {
     formRef.value && formRef.value.resetFields();
+    options.value = [];
     visible.value = true;
+    options.value = getTreeData(cloneDeep(menusList.value), item && item.id ? item.id : '');
     if (!item) {
       form.id = '';
       form.name = '';
@@ -233,12 +248,32 @@
       form.id = item.id;
       form.name = item.name;
       form.title = item.title;
-      form.parent = item.parent;
+      let parentIdArr = [];
+      if (item.parent) {
+        const big = item.parent.toString();
+        const parentArr = getParentId(options.value, big);
+        parentIdArr = parentArr.reverse();
+      }
+      form.parent = parentIdArr;
       form.kind = item.kind;
       form.path = item.path;
       form.component = item.component;
       form.priority = item.priority;
       form.display = item.display;
+    }
+  };
+  // 根据id查询本节点和所有父级节点
+  const getParentId: any = (list: any, id: string) => {
+    for (const i in list) {
+      if (list[i].id == id) {
+        return [list[i].id];
+      }
+      if (list[i].children) {
+        const node = getParentId(list[i].children, id);
+        if (node !== undefined) {
+          return node.concat(list[i].id);
+        }
+      }
     }
   };
   const onClose = () => {
@@ -251,16 +286,24 @@
       });
   }
   async function submitReuest() {
-    const params = form;
-    params.parent = form.parent[0];
+    const params = cloneDeep(form);
+    params.parent =
+      form.parent && form.parent.length > 0 ? form.parent[form.parent.length - 1] : null;
     if (form.id) {
       await updateMenu(form.id, params);
     } else {
       await createMenu(params);
     }
+    getMenus();
+    visible.value = false;
   }
   // 删除菜单
   async function deleteMenuConfirm(id: string) {
-    await deleteMenu(id);
+    try {
+      await deleteMenu(id);
+      getMenus();
+    } catch (error) {
+      console.error(error);
+    }
   }
 </script>

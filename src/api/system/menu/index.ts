@@ -28,9 +28,9 @@ export function createMenu(data: API.MenuAddParams) {
  * @param {PermMenu} data
  * @returns
  */
-export function updateMenu(id: number, data: API.MenuAddParams) {
+export function updateMenu(id: string, data: API.MenuAddParams) {
   return request<API.MenuListResultItem>({
-    url: `permission/menu/${id}`,
+    url: `permission/menu/${id}/`,
     method: 'put',
     data,
   });
@@ -42,7 +42,7 @@ export function updateMenu(id: number, data: API.MenuAddParams) {
  */
 export function deleteMenu(id: string) {
   return request<API.MenuListResultItem>({
-    url: `permission/menu/${id}`,
+    url: `permission/menu/${id}/`,
     method: 'delete',
   });
 }

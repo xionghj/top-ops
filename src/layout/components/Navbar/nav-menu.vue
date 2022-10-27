@@ -72,7 +72,7 @@
                             {{ subItem.meta && subItem.meta.title }}
                           </span>
                           <icon-font
-                            v-if="favoriteIdList.indexOf(subItem.id) > -1 ? false : true"
+                            v-if="favoriteIdList.indexOf(subItem.id.toString()) > -1 ? false : true"
                             class="collect-icon"
                             type="shoucang"
                             size="16"
