@@ -19,9 +19,9 @@ function asyncImportRoute(routes: AppRouteRecordRaw[] | undefined) {
   dynamicViewsModules = dynamicViewsModules || import.meta.glob('../../views/**/*.{vue,tsx}');
   if (!routes) return;
   routes.forEach((item) => {
-    if (!item.component && item.meta?.frameSrc) {
-      item.component = 'IFRAME';
-    }
+    // if (!item.component && item.meta?.frameSrc) {
+    //   item.component = 'IFRAME';
+    // }
     const { component, name } = item;
     const { children } = item;
     if (component) {
@@ -68,10 +68,8 @@ function dynamicImport(
 // Turn background objects into routing objects
 export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModule[]): T[] {
   routeList.forEach((route) => {
-    const component = route.component as string;
+    const component = route.component ? (route.component as string) : '/error/404';
     if (component) {
-      // dynamicViewsModules = dynamicViewsModules || import.meta.glob('../../views/**/*.{vue,tsx}');
-      // route.component = dynamicImport(dynamicViewsModules, component as string);
       route.component = LayoutMap.get(component.toUpperCase());
       if (component.toUpperCase() === 'LAYOUT') {
         route.component = LayoutMap.get(component.toUpperCase());

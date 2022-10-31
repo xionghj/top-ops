@@ -29,7 +29,6 @@ export const useMenuFavoriteStore = defineStore({
         const favoriteIdList = await getMenuFavoriteIdList();
         this.menuFavoriteList = favoriteList;
         this.menuFavoriteIdList = favoriteIdList;
-        console.log('获取菜单收藏列表', favoriteList, favoriteIdList);
       } catch (error) {
         return Promise.reject(error);
       }

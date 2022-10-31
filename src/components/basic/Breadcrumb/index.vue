@@ -57,7 +57,7 @@
     box-shadow: 0 1px 2px rgb(56 65 74 / 15%);
     border-bottom: 1px none;
     border-top: 1px none;
-    margin: -11px -12px 12px -12px;
+    margin: -17px -18px 18px -18px;
     display: flex;
     align-items: center;
   }

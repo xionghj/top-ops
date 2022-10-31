@@ -567,19 +567,20 @@ export const usePermissionStore = defineStore({
       routeList = routeList.filter(routeRemoveIgnoreFilter);
       routeList = flatMultiLevelRoutes(routeList);
       routes = [...Common, ...routeList];
-      console.log('获取', routeList, routes);
+      console.log('获取', routeList, routes, backMenuList);
 
       return routes;
     },
     // 设置当前选中二级路由
     async setCurrentRoute() {
-      if (this.subMenus.length === 0) {
-        this.subMenus = this.backMenuList[0].children;
-        const routerPath = this.childrenRecursion(this.subMenus);
+      if (JSON.stringify(this.subMenus) == '{}') {
+        this.subMenus = [this.backMenuList[0]];
+        const curentRouter = this.backMenuList[0].children as Menu[];
+        const routerPath = this.childrenRecursion(curentRouter);
         router.replace(routerPath);
       }
     },
-    childrenRecursion(arr: any): any {
+    childrenRecursion(arr: Menu[]): Menu {
       if (arr[0].children && arr[0].children.length > 0) {
         return this.childrenRecursion(arr[0].children);
       } else {

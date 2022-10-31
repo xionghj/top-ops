@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
 import jwtDecode from 'jwt-decode';
 import { RouteRecordRaw } from 'vue-router';
-import { login, getPermissionMenu } from '@/api/login';
-import { generatorDynamicRouter } from '@/router/generator-router';
+import { login } from '@/api/login';
 import { usePermissionStore } from '@/store/modules/permission';
 import { useMenuFavoriteStore } from '@/store/modules/menuFavorite';
 import router from '@/router';
@@ -38,7 +37,7 @@ export const useUserStore = defineStore({
   state: (): UserState => ({
     token: '',
     refreshToken: '',
-    userInfo: {},
+    userInfo: {}, // 用户信息
     recentlyVisited: [], // 最近访问
   }),
   // 开启持久化
@@ -80,7 +79,6 @@ export const useUserStore = defineStore({
     /** 登录成功之后, 获取用户信息以及生成权限路由 */
     async afterLogin() {
       try {
-        // const result = await getPermissionMenu();
         // 生成路由
         const permissionStore = usePermissionStore();
         const routes = await permissionStore.buildRoutesAction();
@@ -90,7 +88,6 @@ export const useUserStore = defineStore({
         // router.addRoute(PAGE_NOT_FOUND_ROUTE as unknown as RouteRecordRaw);
         const menuFavoriteStore = useMenuFavoriteStore();
         await menuFavoriteStore.getMenuFavoriteList();
-        console.log('获取得菜单数据', routes, router.getRoutes());
       } catch (error) {
         return Promise.reject(error);
       }

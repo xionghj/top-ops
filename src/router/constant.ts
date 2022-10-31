@@ -1,5 +1,5 @@
 export const PARENT_LAYOUT_NAME = 'ParentLayout';
-export const EXCEPTION_COMPONENT = () => import('@/views/exception/Exception.vue');
+export const EXCEPTION_COMPONENT = () => import('@/views/error/404.vue');
 /**
  * @description: default layout
  */

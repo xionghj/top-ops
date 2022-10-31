@@ -18,7 +18,12 @@
               <div class="dropdown-box__group">
                 <h3 class="dropdown-box__label">快捷访问</h3>
                 <div ref="columnListRef" class="menus-list">
-                  <div v-for="item in favoriteList" :key="item.id" class="menus-block">
+                  <div
+                    v-for="item in favoriteList"
+                    :key="item.id"
+                    class="menus-block"
+                    @click="onQuickAccess(item)"
+                  >
                     <div class="flex items-center">
                       <holder-outlined
                         class="menus-icon-drop"
@@ -146,9 +151,33 @@
     router.push({ name: routerPath.name });
     focusing.value = false;
   }
+  // 快捷访问跳转
+  function onQuickAccess(item: any) {
+    const menus = permissionStore.backMenuList;
+    const subMenus = getsubMenusParents(menus, item.name);
+    const routerPath = childrenRecursion(subMenus);
+    router.push({ name: routerPath.name });
+    console.log('获取的快捷访问', routerPath);
+  }
+  function getsubMenusParents(list: any, name: any): any {
+    for (const i in list) {
+      if (list[i].name === name) {
+        //查询到就返回该数组对象
+        return [list[i]];
+      }
+      if (list[i].children) {
+        const node = getsubMenusParents(list[i].children, name);
+        if (node !== undefined) {
+          //查询到把父节点连起来
+          return node.concat(list[i]);
+        }
+      }
+    }
+  }
   // 最近访问跳转
   function goToRouter(item: any) {
-    router.push({ name: item.name });
+    const routerPath = childrenRecursion([item]);
+    router.push({ name: routerPath.name });
     focusing.value = false;
   }
   function childrenRecursion(arr: any): any {
@@ -167,11 +196,9 @@
     focusing.value = false;
   }
   async function clickCollection(id: string) {
-    console.log('收藏', id);
     try {
-      const result = await setMenuFavorite(id);
+      await setMenuFavorite(id);
       await menuFavoriteStore.getMenuFavoriteList();
-      console.log('设置成功', result);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -181,7 +208,6 @@
   });
   const favoriteIdList = computed(() => {
     return menuFavoriteStore.menuFavoriteIdList;
-    // return [428474974546755000, 428475824262413760];
   });
   const columnListRef = ref<HTMLDivElement>();
   async function handleVisibleChange() {
@@ -212,10 +238,10 @@
     align-items: center;
 
     .nav-dropdown-container__icon {
-      transition: all 0.6s;
+      transition: all 0.5s;
     }
     .nav-dropdown-container__text {
-      transition: all 0.6s;
+      transition: all 0.5s;
       color: #006eff;
     }
   }
@@ -286,6 +312,7 @@
                 align-items: center;
                 justify-content: space-between;
                 margin-bottom: 8px;
+                cursor: pointer;
 
                 &:hover {
                   .menus-icon-drop {
@@ -304,7 +331,6 @@
 
                 .menus-icon-dismiss {
                   opacity: 0;
-                  cursor: pointer;
                 }
               }
             }
@@ -341,7 +367,7 @@
               padding: 0 10px;
 
               .recently-visited__item {
-                margin-left: 10px;
+                margin-left: 16px;
                 cursor: pointer;
 
                 &:hover {

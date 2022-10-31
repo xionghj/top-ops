@@ -10,26 +10,31 @@
       collapsed-width="70"
     >
       <div style="flex: 1 1 0%; overflow: hidden auto">
-        <a-menu
-          v-model:openKeys="state.openKeys"
-          v-model:selectedKeys="state.selectedKeys"
-          mode="inline"
-          @click="handleClick"
-        >
-          <template v-for="item in subMenus" :key="item.name">
-            <template v-if="!item.children">
-              <a-menu-item :key="item.name">
-                <template #icon>
-                  <ChromeOutlined />
-                </template>
-                {{ item.meta && item.meta.title }}
-              </a-menu-item>
+        <template v-for="subMenusGroud in subMenus" :key="subMenusGroud.name">
+          <div class="sidebar-mune__title">{{
+            subMenusGroud.meta && subMenusGroud.meta.title
+          }}</div>
+          <a-menu
+            v-model:openKeys="state.openKeys"
+            v-model:selectedKeys="state.selectedKeys"
+            mode="inline"
+            @click="handleClick"
+          >
+            <template v-for="item in subMenusGroud.children" :key="item.name">
+              <template v-if="!item.children">
+                <a-menu-item :key="item.name">
+                  <template #icon>
+                    <ChromeOutlined />
+                  </template>
+                  {{ item.meta && item.meta.title }}
+                </a-menu-item>
+              </template>
+              <template v-else>
+                <sub-menu-group :key="item.name" :menu-info="item" :collapsed="collapsed" />
+              </template>
             </template>
-            <template v-else>
-              <sub-menu-group :key="item.name" :menu-info="item" :collapsed="collapsed" />
-            </template>
-          </template>
-        </a-menu>
+          </a-menu>
+        </template>
       </div>
       <div class="menu-fold" @click="collapsed = !collapsed">
         <component :is="collapsed ? MenuUnfoldOutlined : MenuFoldOutlined" />
@@ -118,7 +123,7 @@
   function getSubMenus() {
     const menus = permissionStore.backMenuList;
     const subMenus = getsubMenusParents(menus, currentRoute.name);
-    permissionStore.subMenus = subMenus[subMenus.length - 1].children;
+    permissionStore.subMenus = [subMenus[subMenus.length - 1]];
   }
   function getsubMenusParents(list: any, name: any): any {
     for (const i in list) {
@@ -135,37 +140,6 @@
       }
     }
   }
-  const list = [
-    {
-      key: '1',
-      title: '系统管理',
-      children: [
-        { key: 'home', title: '用户管理' },
-        { key: '404', title: '权限管理' },
-      ],
-    },
-    {
-      key: '2',
-      title: '资源管理',
-      children: [
-        {
-          key: '2.1',
-          title: '资源管理',
-          children: [
-            {
-              key: '2.1.1',
-              title: '基础资源',
-              children: [
-                { key: '2.2.1', title: '主机管理' },
-                { key: '2.2.2', title: '数据中心' },
-              ],
-            },
-            { key: 'welcome', title: '应用资源' },
-          ],
-        },
-      ],
-    },
-  ];
 </script>
 <style lang="less" scoped>
   .sidebar-container {
@@ -192,6 +166,20 @@
       left: 0;
       z-index: 10;
       height: calc(100% - 50px);
+      .sidebar-mune__title {
+        padding: 10px 16px;
+        color: #262626;
+        font-weight: 500;
+        font-size: 15px;
+        line-height: 21px;
+        margin-top: 3px;
+        word-wrap: break-word;
+        word-break: break-word;
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
       :deep(.ant-menu-item:after) {
         border-right: none;
       }

@@ -58,7 +58,7 @@ service.interceptors.response.use(
   },
   (error) => {
     // 处理 422 或者 500 的错误异常提示
-    const errMsg = error?.response?.data?.detail ?? UNKNOWN_ERROR;
+    const errMsg = error?.response?.data?.message ?? UNKNOWN_ERROR;
     $message.error(errMsg);
     error.message = errMsg;
     return Promise.reject(error);

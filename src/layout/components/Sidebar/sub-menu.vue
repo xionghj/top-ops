@@ -7,7 +7,7 @@
         <a-menu-item :key="item.name">
           <template #icon>
             <!-- <ChromeOutlined /> -->
-            <icon-font type="zhixian" size="12" />
+            <icon-font type="dian" size="16" />
           </template>
           {{ item.meta && item.meta.title }}
         </a-menu-item>

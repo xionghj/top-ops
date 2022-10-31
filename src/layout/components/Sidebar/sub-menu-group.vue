@@ -46,9 +46,8 @@
   .menu-title {
     letter-spacing: 0.05em;
     cursor: default;
-    font-size: 11px;
+    font-size: 13px;
     text-transform: uppercase;
     color: #919da9;
-    font-weight: 600;
   }
 </style>
