@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Breadcrumb />
     <SvgIcon name="logo" size="50" />
     <icon-font type="shoucang" size="18" color="red" />
   </div>

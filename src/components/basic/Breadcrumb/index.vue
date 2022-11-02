@@ -7,48 +7,47 @@
     </div> -->
     <a-breadcrumb>
       <template #separator><span>></span></template>
-      <a-breadcrumb-item>Home</a-breadcrumb-item>
-      <a-breadcrumb-item href="">Application Center</a-breadcrumb-item>
-      <a-breadcrumb-item href="">Application List</a-breadcrumb-item>
-      <a-breadcrumb-item>An Application</a-breadcrumb-item>
+      <a-breadcrumb-item v-for="(item, index) in menus" :key="index">{{
+        item.meta && item.meta.title
+      }}</a-breadcrumb-item>
     </a-breadcrumb>
+    <div>
+      <slot name="right"></slot>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { ref } from 'vue';
   import { useRoute } from 'vue-router';
   import { Breadcrumb as ABreadcrumb, BreadcrumbItem as ABreadcrumbItem } from 'ant-design-vue';
+  import { usePermissionStore } from '@/store/modules/permission';
 
-  const arr = [
-    {
-      name: '阶段一',
-    },
-    {
-      name: '阶段二',
-    },
-  ];
   const route = useRoute();
-  // const menus = computed(() => {
-  //   if (route.meta?.namePath) {
-  //     let children = userStore.menus;
-  //     const paths = route.meta?.namePath?.map((item) => {
-  //       const a = children.find((n) => n.name === item);
-  //       children = a?.children || [];
-  //       return a;
-  //     });
-  //     return [
-  //       {
-  //         name: '__index',
-  //         meta: {
-  //           title: '首页',
-  //         },
-  //         children: userStore.menus,
-  //       },
-  //       ...paths,
-  //     ];
-  //   }
-  //   return route.matched;
-  // });
+  const permissionStore = usePermissionStore();
+  const menus = ref([]);
+  // 获取当前路由的二级菜单
+  function getSubMenus() {
+    const menusList = permissionStore.backMenuList;
+    const subMenus = getsubMenusParents(menusList, route.name);
+    console.log('获取二级菜单', subMenus);
+    menus.value = subMenus.reverse();
+  }
+  function getsubMenusParents(list: any, name: any): any {
+    for (const i in list) {
+      if (list[i].name === name) {
+        //查询到就返回该数组对象
+        return [list[i]];
+      }
+      if (list[i].children) {
+        const node = getsubMenusParents(list[i].children, name);
+        if (node !== undefined) {
+          //查询到把父节点连起来
+          return node.concat(list[i]);
+        }
+      }
+    }
+  }
+  getSubMenus();
 </script>
 <style lang="less" scoped>
   .page-title-box {
@@ -60,6 +59,11 @@
     margin: -17px -18px 18px -18px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+
+    :deep(.ant-breadcrumb) {
+      font-size: 12px;
+    }
   }
   .breadcrumb {
     display: flex;

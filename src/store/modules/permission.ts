@@ -561,7 +561,6 @@ export const usePermissionStore = defineStore({
       // Background routing to menu structure
       const backMenuList = transformRouteToMenu(routeList);
       this.setBackMenuList(backMenuList);
-      this.setCurrentRoute();
       // remove meta.ignoreRoute item
       routeList = filter(routeList, routeRemoveIgnoreFilter);
       routeList = routeList.filter(routeRemoveIgnoreFilter);
@@ -573,7 +572,7 @@ export const usePermissionStore = defineStore({
     },
     // 设置当前选中二级路由
     async setCurrentRoute() {
-      if (JSON.stringify(this.subMenus) == '{}') {
+      if (this.subMenus.length == 0) {
         this.subMenus = [this.backMenuList[0]];
         const curentRouter = this.backMenuList[0].children as Menu[];
         const routerPath = this.childrenRecursion(curentRouter);

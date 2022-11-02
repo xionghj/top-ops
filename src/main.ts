@@ -10,7 +10,13 @@ import 'virtual:svg-icons-register';
 
 import 'ant-design-vue/dist/antd.css';
 
+import { setupCustomComponents } from '@/plugins';
+
 const app = createApp(App);
+function setupPlugins() {
+  // 注册全局自定义组件,如：<svg-icon />
+  setupCustomComponents(app);
+}
 // app.use(Antd);
 async function setupApp() {
   setupStore(app);
@@ -19,4 +25,6 @@ async function setupApp() {
 
   app.mount('#app');
 }
+setupPlugins();
+
 setupApp();

@@ -70,7 +70,7 @@
                         v-for="(subItem, index) in item.children"
                         :key="index"
                         class="menus-list"
-                        @click="clickMenus(item.children, subItem)"
+                        @click="clickMenus(item, subItem)"
                       >
                         <div class="menus-list-item">
                           <span class="cursor-pointer menus-list-item__text">
@@ -146,7 +146,7 @@
   handleMenus();
   function clickMenus(item: any, subItem: any) {
     userStore.setRecentlyVisited(subItem);
-    permissionStore.subMenus = [...item];
+    permissionStore.subMenus = [item];
     const routerPath = childrenRecursion([subItem]);
     router.push({ name: routerPath.name });
     focusing.value = false;
@@ -157,7 +157,6 @@
     const subMenus = getsubMenusParents(menus, item.name);
     const routerPath = childrenRecursion(subMenus);
     router.push({ name: routerPath.name });
-    console.log('获取的快捷访问', routerPath);
   }
   function getsubMenusParents(list: any, name: any): any {
     for (const i in list) {

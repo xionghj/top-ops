@@ -85,6 +85,7 @@ export const useUserStore = defineStore({
         routes.forEach((route) => {
           router.addRoute(route as unknown as RouteRecordRaw);
         });
+        permissionStore.setCurrentRoute();
         // router.addRoute(PAGE_NOT_FOUND_ROUTE as unknown as RouteRecordRaw);
         const menuFavoriteStore = useMenuFavoriteStore();
         await menuFavoriteStore.getMenuFavoriteList();

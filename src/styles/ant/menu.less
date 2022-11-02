@@ -1,11 +1,15 @@
-// .ant-menu-submenu-selected {
-//   color: #405189 !important;
-// }
+.ant-menu-submenu-selected {
+  background-color: #f2f3fe !important;
+  color: #405189 !important;
+}
 // .ant-menu-submenu-active,.ant-menu-submenu-title:hover {
 //   color: #405189 !important;
 // }
+.ant-menu {
+  color: #6d7080 !important;
+}
 .ant-menu-item-group-list {
-  color: #212529 !important;
+  color: #7b8190 !important;
 }
 .ant-menu-item {
   padding-left: 20px !important;
@@ -22,12 +26,19 @@
 .ant-menu-submenu-arrow::before, .ant-menu-submenu-arrow::after {
   height: 1px !important;
 }
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background-color: transparent !important;
+}
 // // 选中菜单状态
-// .ant-menu-item-selected {
-//   // background-color: white !important;
-//   color: #405189 !important;
-// }
+.ant-menu-item-selected {
+  // background-color: white !important;
+  // color: #405189 !important;
+  color: #383c40!important;
+}
 // // 设置未选中菜单项鼠标滑过样式
-// .ant-menu-item-active {
-//   color: #405189 !important;
-// }
+.ant-menu-item-active {
+  color: #405189 !important;
+}
+.ant-menu-light .ant-menu-item:hover, .ant-menu-light .ant-menu-item-active, .ant-menu-light .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open, .ant-menu-light .ant-menu-submenu-active, .ant-menu-light .ant-menu-submenu-title:hover {
+  color: #405189 !important;
+}

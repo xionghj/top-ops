@@ -1,13 +1,17 @@
 <!-- 菜单管理 -->
 <template>
   <div>
-    <Breadcrumb />
-    <div class="p-2 bg-white">
+    <Breadcrumb>
+      <template #right>
+        <a-button type="primary" @click="showDrawer('add')">新增菜单</a-button>
+      </template>
+    </Breadcrumb>
+    <div class="p-4 bg-white">
       <div class="flex justify-between mb-2 mx-2">
         <div class="text-base">菜单列表</div>
-        <div class="flex">
+        <!-- <div class="flex">
           <a-button type="primary" @click="showDrawer('add')">新增菜单</a-button>
-        </div>
+        </div> -->
       </div>
       <a-spin :spinning="spinning">
         <a-table :columns="columns" :data-source="menusList" row-key="id">
@@ -144,7 +148,6 @@
     Spin as ASpin,
   } from 'ant-design-vue';
   import type { Rule, FormInstance } from 'ant-design-vue/es/form';
-  import Breadcrumb from '@/components/basic/Breadcrumb/index.vue';
   import { getPermissionMenu } from '@/api/login';
   import { updateMenu, createMenu, deleteMenu } from '@/api/system/menu';
   const columns = [
