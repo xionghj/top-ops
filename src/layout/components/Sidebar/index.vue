@@ -11,7 +11,7 @@
     >
       <div style="flex: 1 1 0%; overflow: hidden auto">
         <template v-for="subMenusGroud in subMenus" :key="subMenusGroud.name">
-          <div class="sidebar-mune__title">{{
+          <div v-if="!collapsed" class="sidebar-mune__title">{{
             subMenusGroud.meta && subMenusGroud.meta.title
           }}</div>
           <a-menu
