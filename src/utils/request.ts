@@ -1,6 +1,8 @@
+import { h } from 'vue';
 import axios from 'axios';
 import jsonBig from 'json-bigint';
-import { message as $message } from 'ant-design-vue';
+import { InfoCircleOutlined } from '@ant-design/icons-vue';
+import { message as $message, Modal, notification } from 'ant-design-vue';
 import { uniqueSlash } from './urlUtils';
 import type { AxiosRequestConfig } from 'axios';
 
@@ -58,11 +60,27 @@ service.interceptors.response.use(
   },
   (error) => {
     console.log('获取数据', error);
-    // 处理 422 或者 500 的错误异常提示
-    const errMsg = error?.response?.data?.message ?? UNKNOWN_ERROR;
-    $message.error(errMsg);
-    error.message = errMsg;
-    return Promise.reject(error);
+    if (error.code === 403) {
+      Modal.error({
+        title: '提示',
+        content: '登录过期，请重新登录',
+        okText: '重新登录',
+        onOk: () => {
+          localStorage.clear();
+          window.location.reload();
+        },
+      });
+    } else {
+      // 处理 422 或者 500 的错误异常提示
+      const errMsg = error?.response?.data?.message ?? UNKNOWN_ERROR;
+      // $message.error(errMsg);
+      notification.open({
+        message: errMsg,
+        icon: () => h(InfoCircleOutlined, { style: 'color: #ff4d4f' }),
+      });
+      error.message = errMsg;
+      return Promise.reject(error);
+    }
   },
 );
 
