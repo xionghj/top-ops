@@ -7,9 +7,9 @@
         <a-menu-item :key="item.name">
           <template #icon>
             <!-- <ChromeOutlined /> -->
-            <icon-font type="dian" size="16" />
+            <!-- <icon-font type="dian" size="16" /> -->
           </template>
-          {{ item.meta && item.meta.title }}
+          <span class="menu-item">{{ item.meta && item.meta.title }}</span>
         </a-menu-item>
       </template>
       <template v-else>

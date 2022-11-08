@@ -3,7 +3,7 @@
   <div>
     <Breadcrumb>
       <template #right>
-        <a-button type="primary" @click="showDrawer('add')">新增菜单</a-button>
+        <span class="cursor-pointer hover:text-blue-500" @click="showDrawer('add')">新增菜单</span>
       </template>
     </Breadcrumb>
     <div class="p-4 bg-white">

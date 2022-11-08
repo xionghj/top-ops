@@ -11,7 +11,7 @@ export interface AppRouteRecordRaw extends Omit<RouteRecordRaw, 'meta'> {
   name: string;
   title?: string,
   display?: boolean,
-  id?: string,
+  id?: number,
   meta?: RouteMeta;
   component?: Component | string;
   components?: Component;

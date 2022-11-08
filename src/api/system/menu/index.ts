@@ -1,11 +1,11 @@
 import { request } from '@/utils/request';
 
 /**
- * @description 获取菜单列表
+ * @description 获取菜单列表-平铺数据（暂无使用）
  * @param {PermMenu} data
  * @returns
  */
-export function getPermissionMenuList() {
+export function getPermissionMenuTileList() {
   return request<API.MenuListResultItem>({
     url: 'permission/menu/',
     method: 'get',
@@ -13,11 +13,11 @@ export function getPermissionMenuList() {
 }
 /**
  * @description 创建菜单
- * @param {PermMenu} data
+ * @param {MenuAddParams} data
  * @returns
  */
 export function createMenu(data: API.MenuAddParams) {
-  return request<API.MenuListResultItem>({
+  return request({
     url: 'permission/menu/',
     method: 'post',
     data,
@@ -25,11 +25,11 @@ export function createMenu(data: API.MenuAddParams) {
 }
 /**
  * @description 编辑菜单
- * @param {PermMenu} data
+ * @param {MenuAddParams} data
  * @returns
  */
 export function updateMenu(id: string, data: API.MenuAddParams) {
-  return request<API.MenuListResultItem>({
+  return request({
     url: `permission/menu/${id}/`,
     method: 'put',
     data,
@@ -37,11 +37,10 @@ export function updateMenu(id: string, data: API.MenuAddParams) {
 }
 /**
  * @description 删除菜单
- * @param {PermMenu} data
  * @returns
  */
 export function deleteMenu(id: string) {
-  return request<API.MenuListResultItem>({
+  return request({
     url: `permission/menu/${id}/`,
     method: 'delete',
   });
@@ -49,7 +48,6 @@ export function deleteMenu(id: string) {
 
 /**
  * @description 获取收藏菜单列表
- * @param {PermMenu} data
  * @returns
  */
 export function getMenuFavoriteList() {
@@ -60,7 +58,6 @@ export function getMenuFavoriteList() {
 }
 /**
  * @description 获取收藏菜单Id列表
- * @param {PermMenu} data
  * @returns
  */
 export function getMenuFavoriteIdList() {
@@ -71,18 +68,17 @@ export function getMenuFavoriteIdList() {
 }
 /**
  * @description 设置收藏菜单
- * @param {PermMenu} data
  * @returns
  */
 export function setMenuFavorite(id: string) {
-  return request<API.MenuFavoriteListResult>({
+  return request<API.SetMenuFavoriteIdResult>({
     url: `/permission/menu/${id}/favorite/`,
     method: 'post',
   });
 }
 /**
  * @description 设置收藏菜单列表顺序
- * @param {MenuFavoriteOrder} data
+ * @param {MenuFavoriteOrderParams} data
  * @returns
  */
 export function setMenuFavoriteOrder(data: API.MenuFavoriteOrderParams) {

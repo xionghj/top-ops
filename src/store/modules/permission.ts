@@ -11,8 +11,6 @@ import { filter } from '@/utils/helper/treeHelper';
 
 import { getPermissionMenu } from '@/api/login';
 interface PermissionState {
-  // Permission code list
-  permCodeList: string[] | number[];
   // Whether the route has been dynamically added
   isDynamicAddedRoute: boolean;
   // To trigger a menu update
@@ -487,7 +485,6 @@ const menusList = [
 export const usePermissionStore = defineStore({
   id: 'app-permission',
   state: (): PermissionState => ({
-    permCodeList: [],
     // Whether the route has been dynamically added
     isDynamicAddedRoute: false,
     // To trigger a menu update
@@ -502,9 +499,6 @@ export const usePermissionStore = defineStore({
     paths: ['subMenus'], // 指定数据持久化
   },
   getters: {
-    getPermCodeList(): string[] | number[] {
-      return this.permCodeList;
-    },
     getBackMenuList(): Menu[] {
       return this.backMenuList;
     },
@@ -521,9 +515,6 @@ export const usePermissionStore = defineStore({
       this.backMenuList = [];
       this.subMenus = [];
     },
-    setPermCodeList(codeList: string[]) {
-      this.permCodeList = codeList;
-    },
 
     setBackMenuList(list: Menu[]) {
       this.backMenuList = list;
@@ -539,7 +530,6 @@ export const usePermissionStore = defineStore({
     },
     resetState(): void {
       this.isDynamicAddedRoute = false;
-      this.permCodeList = [];
       this.backMenuList = [];
       this.lastBuildMenuTime = 0;
     },
@@ -566,7 +556,7 @@ export const usePermissionStore = defineStore({
       routeList = routeList.filter(routeRemoveIgnoreFilter);
       routeList = flatMultiLevelRoutes(routeList);
       routes = [...Common, ...routeList];
-      console.log('获取', routeList, routes, backMenuList);
+      console.log('获取', routes);
 
       return routes;
     },

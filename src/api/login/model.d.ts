@@ -4,12 +4,13 @@ declare namespace API {
     username: string;
     password: string;
   };
-
   /** 登录成功结果 */
   type LoginResult = {
     access: string;
     refresh: string;
   };
+
+  /** 菜单树 */
   type MenuTreeItem = {
     id: number;
     created_at: string;
@@ -17,7 +18,7 @@ declare namespace API {
     title: string;
     name: string;
     kind: string;
-    display: string;
+    display: boolean;
     icon: string;
     code: string;
     path: string;
@@ -25,6 +26,6 @@ declare namespace API {
     parent: string;
     children: MenuTreeItem[];
   };
-  /** 获取菜单树 */
-  type PermMenu = MenuTreeItem[];
+  /** 菜单树结果 */
+  type PermissionMenuResult = MenuTreeItem[];
 }

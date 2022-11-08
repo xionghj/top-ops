@@ -22,8 +22,11 @@ function asyncImportRoute(routes: AppRouteRecordRaw[] | undefined) {
     // if (!item.component && item.meta?.frameSrc) {
     //   item.component = 'IFRAME';
     // }
-    const { component, name } = item;
+    const { name } = item;
     const { children } = item;
+    const meta = item.meta || { title: item.title, hideInMenu: item.display, name: item.name };
+    item.meta = meta;
+    const component = item.component ? item.component : '/error/404';
     if (component) {
       const layoutFound = LayoutMap.get(component.toUpperCase());
       if (layoutFound) {
@@ -78,7 +81,11 @@ export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModul
         route.component = LAYOUT;
         route.name = `${route.name}Parent`;
         route.path = '';
-        const meta = route.meta || {};
+        const meta = route.meta || {
+          title: route.title,
+          hideInMenu: route.display,
+          name: route.name,
+        };
         meta.single = true;
         meta.affix = false;
         route.meta = meta;

@@ -9,24 +9,20 @@ interface MenuFavoriteState {
   menuFavoriteList: API.MenuFavoriteListItem[];
   menuFavoriteIdList: string[];
 }
-
+// 菜单收藏Store
 export const useMenuFavoriteStore = defineStore({
   id: 'menu-favorite',
   state: (): MenuFavoriteState => ({
-    menuFavoriteList: [],
-    menuFavoriteIdList: [],
+    menuFavoriteList: [], // 菜单收藏列表
+    menuFavoriteIdList: [], // 菜单收藏ID列表
   }),
-  getters: {
-    // getMenuFavoriteList(): string [] {
-    //   return this.menuFavoriteList;
-    // },
-  },
+  getters: {},
   actions: {
     // 获取菜单收藏列表
     async getMenuFavoriteList() {
       try {
-        const favoriteList = await getMenuFavoriteList();
         const favoriteIdList = await getMenuFavoriteIdList();
+        const favoriteList = await getMenuFavoriteList();
         this.menuFavoriteList = favoriteList;
         this.menuFavoriteIdList = favoriteIdList;
       } catch (error) {

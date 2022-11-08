@@ -18,8 +18,12 @@ export function login(data: API.LoginParams) {
     },
   );
 }
+/**
+ * @description 获取权限菜单树
+ * @returns
+ */
 export function getPermissionMenu() {
-  return request<API.PermMenu>({
+  return request<API.PermissionMenuResult>({
     url: 'permission/menu/tree/',
     method: 'get',
   });
