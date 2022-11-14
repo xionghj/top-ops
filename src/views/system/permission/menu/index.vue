@@ -14,7 +14,12 @@
         </div> -->
       </div>
       <a-spin :spinning="spinning">
-        <a-table :columns="columns" :data-source="menusList" row-key="id">
+        <a-table
+          :columns="columns"
+          :data-source="menusList"
+          row-key="id"
+          :expandIcon="(props: any) => expandIcon(props)"
+        >
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'name'">
               {{ record.name }}
@@ -127,8 +132,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { reactive, ref, h } from 'vue';
   import { cloneDeep } from 'lodash-es';
+  import { CaretRightOutlined, CaretDownOutlined } from '@ant-design/icons-vue';
   import {
     Table as ATable,
     Form as AForm,
@@ -176,7 +182,43 @@
       key: 'action',
     },
   ];
-
+  // 展开图标
+  function expandIcon(pro: any) {
+    if (!pro.record.children) {
+      return h(
+        CaretRightOutlined,
+        { class: 'no-icon' },
+        {
+          onclick: (e: any) => {
+            pro.onExpand(pro.record, e);
+          },
+        },
+      );
+    }
+    if (pro.record.children.length > 0) {
+      //有数据
+      if (pro.expanded) {
+        //有数据展开
+        return h(CaretDownOutlined, {
+          class: 'expanded-icon',
+          onclick: (e: any) => {
+            pro.onExpand(pro.record, e);
+          },
+        });
+      } else {
+        //有数据未展开
+        return h(CaretRightOutlined, {
+          class: 'expanded-icon',
+          onclick: (e: any) => {
+            pro.onExpand(pro.record, e);
+          },
+        });
+      }
+    } else {
+      //无数据
+      return '';
+    }
+  }
   const menusList = ref<any>([]);
   const spinning = ref(false);
   // 获取菜单
@@ -310,3 +352,15 @@
     }
   }
 </script>
+<style lang="less" scoped>
+  .no-icon {
+    margin-top: 2.5005px;
+    margin-right: 8px;
+    visibility: hidden;
+  }
+  .expanded-icon {
+    margin-top: 2.5005px;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+</style>

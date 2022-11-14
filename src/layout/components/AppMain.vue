@@ -3,11 +3,7 @@
     <div style="height: auto">
       <router-view v-slot="{ Component }">
         <template v-if="Component">
-          <transition
-            :name="Object.is(route.meta?.transitionName, false) ? '' : 'fade-transform'"
-            mode="out-in"
-            appear
-          >
+          <transition mode="out-in" appear>
             <component :is="Component" :key="route.fullPath" />
           </transition>
         </template>
