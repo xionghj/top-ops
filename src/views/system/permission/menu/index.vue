@@ -9,9 +9,6 @@
     <div class="p-4 bg-white">
       <div class="flex justify-between mb-2 mx-2">
         <div class="text-base">菜单列表</div>
-        <!-- <div class="flex">
-          <a-button type="primary" @click="showDrawer('add')">新增菜单</a-button>
-        </div> -->
       </div>
       <a-spin :spinning="spinning">
         <a-table
@@ -135,7 +132,7 @@
 <script lang="ts" setup>
   import { reactive, ref, h } from 'vue';
   import { cloneDeep } from 'lodash-es';
-  import { CaretRightOutlined, CaretDownOutlined } from '@ant-design/icons-vue';
+  import { CaretRightOutlined } from '@ant-design/icons-vue';
   import {
     Table as ATable,
     Form as AForm,
@@ -155,6 +152,7 @@
     Spin as ASpin,
   } from 'ant-design-vue';
   import type { Rule, FormInstance } from 'ant-design-vue/es/form';
+  import { IconFont } from '@/components/basic/iconfont';
   import { getPermissionMenu } from '@/api/login';
   import { updateMenu, createMenu, deleteMenu } from '@/api/system/menu';
   const columns = [
@@ -200,16 +198,18 @@
       //有数据
       if (pro.expanded) {
         //有数据展开
-        return h(CaretDownOutlined, {
+        return h(IconFont, {
           class: 'expanded-icon',
+          type: 'caret-down',
           onclick: (e: any) => {
             pro.onExpand(pro.record, e);
           },
         });
       } else {
         //有数据未展开
-        return h(CaretRightOutlined, {
+        return h(IconFont, {
           class: 'expanded-icon',
+          type: 'caret-right',
           onclick: (e: any) => {
             pro.onExpand(pro.record, e);
           },
@@ -353,15 +353,3 @@
     }
   }
 </script>
-<style lang="less" scoped>
-  .no-icon {
-    margin-top: 2.5005px;
-    margin-right: 8px;
-    visibility: hidden;
-  }
-  .expanded-icon {
-    margin-top: 2.5005px;
-    margin-right: 8px;
-    cursor: pointer;
-  }
-</style>
