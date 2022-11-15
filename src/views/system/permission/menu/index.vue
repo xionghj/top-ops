@@ -18,7 +18,8 @@
           :columns="columns"
           :data-source="menusList"
           row-key="id"
-          :expandIcon="(props: any) => expandIcon(props)"
+          :expand-icon="(props: any) => expandIcon(props)"
+          :pagination="false"
         >
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'name'">
