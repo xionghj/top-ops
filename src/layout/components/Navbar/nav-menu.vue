@@ -146,6 +146,7 @@
   handleMenus();
   function clickMenus(item: any, subItem: any) {
     userStore.setRecentlyVisited(subItem);
+    console.log('获取点击的数据', item);
     permissionStore.subMenus = [item];
     const routerPath = childrenRecursion([subItem]);
     router.push({ name: routerPath.name });

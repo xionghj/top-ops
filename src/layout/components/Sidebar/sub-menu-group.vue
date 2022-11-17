@@ -5,7 +5,7 @@
       <span v-else class="menu-title">{{ menuInfo.meta && menuInfo.meta.title }}</span>
     </template>
     <template v-for="item in menuInfo.children" :key="item.name">
-      <template v-if="!item.children">
+      <template v-if="!item.children || (item.meta && item.meta.kind == 'menu_directory')">
         <a-menu-item :key="item.name">
           <template #icon>
             <ChromeOutlined />

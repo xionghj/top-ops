@@ -66,6 +66,7 @@
                 <a-select v-model:value="form.kind" placeholder="请选择菜单类型">
                   <a-select-option value="menu">页面</a-select-option>
                   <a-select-option value="directory">目录</a-select-option>
+                  <a-select-option value="menu_directory">菜单目录</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
