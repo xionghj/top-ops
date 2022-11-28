@@ -1,12 +1,18 @@
 // .ant-menu-submenu-active,.ant-menu-submenu-title:hover {
 //   color: #405189 !important;
 // }
+.ant-menu-sub.ant-menu-inline {
+  background: white !important;
+}
 // 菜单颜色
 .ant-menu {
-  color: #262626 !important;
+  color: #5b6e88 !important;
 }
 .ant-menu-item-group-list {
-  color: #262626 !important;
+  color: #5b6e88 !important;
+  .ant-menu-item-icon {
+    color: #7c878e;
+  }
 }
 .ant-menu-item {
   padding-left: 20px !important;
@@ -19,6 +25,7 @@
 .ant-menu-item-group-list .ant-menu-item,
 .ant-menu-item-group-list .ant-menu-submenu-title {
   padding: 0 16px 0 20px !important;
+  margin-bottom: 0 !important;
 }
 // 下拉箭头样式
 .ant-menu-submenu-arrow {
@@ -34,44 +41,48 @@
 }
 // 选中背景色
 .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
-  background-color: #f2f3fe !important;
+  background-color: #E0F3FF !important;
+  color: #364574 !important;
+  .ant-menu-item-icon {
+    color: #364574;
+  }
 }
 .ant-menu-submenu .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
   background-color: transparent !important;
 }
 // // 选中菜单状态
 .ant-menu-item-selected {
-  // background-color: white !important;
-  color: #038edc !important;
-  // color: #383c40 !important;
+  color: #364574 !important;
   .menu-item {
     padding-left: 24px;
     &::before {
-      border-color: #038edc !important;
-      background-color: #038edc !important;
+      border-color: #364574 !important;
+      background-color: #364574 !important;
     }
   }
 }
 // // 设置未选中菜单项鼠标滑过样式
 .ant-menu-item-active {
-  // color: #383c40 !important;
-  color: #038edc !important;
+  color: #364574 !important;
 }
 .ant-menu-light .ant-menu-item:hover,
 .ant-menu-light .ant-menu-item-active,
 .ant-menu-light .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open,
 .ant-menu-light .ant-menu-submenu-title:hover {
   // color: #383c40;
-  color: #038edc !important;
+  color: #364574 !important;
 }
 .ant-menu-light .ant-menu-submenu-active:hover {
-  color: #038edc;
+  color: #364574;
 }
 .ant-menu-submenu-selected {
-  background-color: #f2f3fe !important;
-  color: #038edc !important;
+  background-color: #E0F3FF !important;
+  color: #364574 !important;
+  .ant-menu-item-icon {
+    color: #364574;
+  }
   .ant-menu-submenu-title:hover {
-    color: #038edc !important;
+    color: #364574 !important;
   }
 }
 .ant-menu.ant-menu-inline-collapsed > .ant-menu-item,
@@ -92,8 +103,8 @@
   padding-left: 24px;
   &::before {
     content: '';
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background: 0 0;
     border: 1px solid #7b8190;
@@ -107,8 +118,8 @@
   .menu-item {
     padding-left: 24px;
     &::before {
-      border-color: #038edc !important;
-      background-color: #038edc !important;
+      border-color: #364574 !important;
+      background-color: #364574 !important;
     }
   }
 }

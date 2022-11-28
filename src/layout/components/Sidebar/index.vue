@@ -168,7 +168,7 @@
       height: calc(100% - 50px);
       .sidebar-mune__title {
         padding: 10px 16px;
-        color: #262626;
+        color: #263238;
         font-weight: 500;
         font-size: 15px;
         line-height: 21px;
