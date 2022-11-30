@@ -9,6 +9,9 @@
         <a-tab-pane key="1" tab="基本信息">Content of Tab Pane 1</a-tab-pane>
         <a-tab-pane key="2" tab="负责人" force-render>Content of Tab Pane 2</a-tab-pane>
         <a-tab-pane key="3" tab="应用实例">Content of Tab Pane 3</a-tab-pane>
+        <template #rightExtra>
+          <span>展开</span>
+        </template>
       </a-tabs>
     </div>
   </div>
