@@ -1,9 +1,22 @@
 export const hostManage = {
-  path: '/hostDetails',
-  name: 'hostDetails',
-  component: () => import('@/views/resourceManage/infrastructure/hostManage/hostDetails/index.vue'),
+  path: '/error',
+  name: 'error',
+  redirect: '/error/404',
+  component: () => import('@/layout/index.vue'),
   meta: {
-    title: '主机详情',
+    title: '错误页',
+    hideInMenu: true,
   },
+  children: [
+    {
+      path: '/hostDetails',
+      name: 'hostDetails',
+      component: () =>
+        import('@/views/resourceManage/infrastructure/hostManage/hostDetails/index.vue'),
+      meta: {
+        title: '主机详情',
+      },
+    },
+  ],
 };
 export default [hostManage];

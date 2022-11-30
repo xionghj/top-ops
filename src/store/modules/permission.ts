@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash-es';
 import type { AppRouteRecordRaw, Menu } from '@/router/types';
 import router from '@/router';
 import Common from '@/router/staticModules/index';
+import asyncRouter from '@/router/asyncModules/index';
 
 import { transformObjToRoute, flatMultiLevelRoutes } from '@/router/helper/routeHelper';
 import { transformRouteToMenu } from '@/router/helper/menuHelper';
@@ -555,7 +556,7 @@ export const usePermissionStore = defineStore({
       routeList = filter(routeList, routeRemoveIgnoreFilter);
       routeList = routeList.filter(routeRemoveIgnoreFilter);
       routeList = flatMultiLevelRoutes(routeList);
-      routes = [...Common, ...routeList];
+      routes = [...Common, ...asyncRouter, ...routeList];
       console.log('获取', routes);
       return routes;
     },

@@ -123,6 +123,8 @@
   function getSubMenus() {
     const menus = permissionStore.backMenuList;
     const subMenus = getsubMenusParents(menus, currentRoute.name);
+    console.log('获取的子菜单', subMenus);
+    if (!subMenus) return;
     permissionStore.subMenus = [subMenus[subMenus.length - 1]];
   }
   function getsubMenusParents(list: any, name: any): any {

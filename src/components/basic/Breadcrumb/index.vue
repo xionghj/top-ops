@@ -30,6 +30,7 @@
     const menusList = permissionStore.backMenuList;
     const subMenus = getsubMenusParents(menusList, route.name);
     console.log('获取二级菜单', subMenus);
+    if (!subMenus) return;
     menus.value = subMenus.reverse();
   }
   function getsubMenusParents(list: any, name: any): any {

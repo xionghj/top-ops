@@ -1,4 +1,4 @@
-<!-- 主机管理列表 -->
+<!-- 主机管理-列表 -->
 <template>
   <div>
     <Breadcrumb>
@@ -8,7 +8,7 @@
             <div class="cursor-pointer hover:text-blue-500" @click.prevent> 更多操作 </div>
             <template #overlay>
               <a-menu>
-                <a-menu-item>
+                <a-menu-item @click="onJumeTo">
                   <a href="javascript:;">导入</a>
                 </a-menu-item>
                 <a-menu-item>
@@ -63,6 +63,7 @@
 </template>
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
+  import { useRouter } from 'vue-router';
   import {
     Table as ATable,
     Spin as ASpin,
@@ -74,6 +75,7 @@
   } from 'ant-design-vue';
   import { getHostMangeList } from '@/api/resourceManage/infrastructure/hostManage';
   type Key = string | number;
+  const router = useRouter();
   const list = ref<API.HostManageListItem[]>([]);
   const search = ref('');
   const columns = [
@@ -165,5 +167,8 @@
   const onSelectChange = (selectedRowKeys: Key[]) => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     state.selectedRowKeys = selectedRowKeys;
+  };
+  const onJumeTo = function () {
+    router.push({ name: 'hostDetails' });
   };
 </script>
