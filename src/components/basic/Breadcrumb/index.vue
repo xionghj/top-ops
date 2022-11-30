@@ -52,6 +52,7 @@
 <style lang="less" scoped>
   .page-title-box {
     padding: 10px 1.5rem;
+    height: 42px;
     background-color: #fff;
     box-shadow: 0 1px 2px rgb(56 65 74 / 15%);
     border-bottom: 1px none;
