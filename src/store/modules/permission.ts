@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash-es';
 import type { AppRouteRecordRaw, Menu } from '@/router/types';
 import router from '@/router';
 import Common from '@/router/staticModules/index';
-import asyncRouter from '@/router/asyncModules/index';
+import asyncRouterNode from '@/router/asyncModules/index';
 
 import { transformObjToRoute, flatMultiLevelRoutes } from '@/router/helper/routeHelper';
 import { transformRouteToMenu } from '@/router/helper/menuHelper';
@@ -547,6 +547,7 @@ export const usePermissionStore = defineStore({
       } catch (error) {
         console.error(error);
       }
+      this.addMenusTree(routeList);
       // Dynamically introduce components
       routeList = transformObjToRoute(cloneDeep(routeList));
       // Background routing to menu structure
@@ -556,8 +557,8 @@ export const usePermissionStore = defineStore({
       routeList = filter(routeList, routeRemoveIgnoreFilter);
       routeList = routeList.filter(routeRemoveIgnoreFilter);
       routeList = flatMultiLevelRoutes(routeList);
-      routes = [...Common, ...asyncRouter, ...routeList];
-      console.log('获取', routes);
+      routes = [...Common, ...routeList];
+      console.log('获取', backMenuList);
       return routes;
     },
     // 设置当前选中二级路由
@@ -575,6 +576,29 @@ export const usePermissionStore = defineStore({
       } else {
         return arr[0];
       }
+    },
+    addMenusTree(oriData: any) {
+      const data = oriData;
+      asyncRouterNode.forEach((node) => {
+        this.insertNode(data, node);
+      });
+      return data;
+    },
+    // 插入节点
+    insertNode(data: any, node: any) {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].code === node.code) {
+          if (!data[i].children) {
+            data[i].children = [];
+          }
+          data[i].children.push(node);
+          return true;
+        }
+        if (data[i].children && this.insertNode(data[i].children, node)) {
+          return true;
+        }
+      }
+      return false;
     },
   },
 });

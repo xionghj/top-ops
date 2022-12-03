@@ -60,7 +60,7 @@ service.interceptors.response.use(
   },
   (error) => {
     console.log('获取数据', error);
-    if (error.response.status === 403) {
+    if (error.response.status === 401) {
       Modal.error({
         title: '提示',
         content: '登录过期，请重新登录',

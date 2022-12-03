@@ -9,7 +9,7 @@ import './styles/index.less';
 import 'virtual:svg-icons-register';
 
 import 'ant-design-vue/dist/antd.css';
-
+import './styles/public.less';
 import { setupCustomComponents } from '@/plugins';
 
 const app = createApp(App);

@@ -13,6 +13,7 @@ export interface AppRouteRecordRaw extends Omit<RouteRecordRaw, 'meta'> {
   display?: boolean,
   kind?: string,
   id?: number,
+  code?: string,
   meta?: RouteMeta;
   component?: Component | string;
   components?: Component;
@@ -39,7 +40,7 @@ export interface Menu {
 
   meta?: Partial<RouteMeta>;
 
-  hideMenu?: boolean;
+  hideInMenu?: boolean;
 }
 
 export interface MenuModule {

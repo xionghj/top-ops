@@ -80,14 +80,14 @@
   const search = ref('');
   const columns = [
     {
-      title: '主机名',
-      dataIndex: 'hostname',
-      key: 'hostname',
-    },
-    {
       title: 'IP 地址',
       dataIndex: 'ip',
       key: 'ip',
+    },
+    {
+      title: '主机名',
+      dataIndex: 'hostname',
+      key: 'hostname',
     },
     {
       title: 'CPU 核数',

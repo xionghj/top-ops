@@ -6,7 +6,7 @@
     </template>
     <template v-for="item in menuInfo.children" :key="item.name">
       <template v-if="!item.children || (item.meta && item.meta.kind == 'menu_directory')">
-        <a-menu-item :key="item.name">
+        <a-menu-item v-if="item.hideInMenu" :key="item.name">
           <template #icon>
             <ChromeOutlined />
           </template>
