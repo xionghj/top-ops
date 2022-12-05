@@ -19,7 +19,8 @@
   .app-main {
     /* min-height: calc(100% - 50px); */
     background-color: #f0f2f5;
-    flex-grow: 1;
+    /* flex-grow: 1; */
+    flex: 1;
     overflow: auto;
     padding: 18px;
   }

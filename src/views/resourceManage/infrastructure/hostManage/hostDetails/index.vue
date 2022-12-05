@@ -6,7 +6,7 @@
     </Breadcrumb>
     <div class="p-4 bg-white">
       <a-tabs v-model:activeKey="activeKey">
-        <a-tab-pane key="1" tab="基本信息">Content of Tab Pane 1</a-tab-pane>
+        <a-tab-pane key="1" tab="基本信息"><BasicInfo /></a-tab-pane>
         <a-tab-pane key="2" tab="负责人" force-render>Content of Tab Pane 2</a-tab-pane>
         <a-tab-pane key="3" tab="应用实例">Content of Tab Pane 3</a-tab-pane>
         <template #rightExtra>
@@ -19,6 +19,7 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
   import { Tabs as ATabs, TabPane as ATabPane } from 'ant-design-vue';
+  import BasicInfo from './fragments/basic-info.vue';
   import { getHostMangeList } from '@/api/resourceManage/infrastructure/hostManage';
   const list = ref<API.HostManageListItem[]>([]);
   const spinning = ref(false);
