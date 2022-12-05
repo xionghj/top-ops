@@ -558,7 +558,6 @@ export const usePermissionStore = defineStore({
       routeList = routeList.filter(routeRemoveIgnoreFilter);
       routeList = flatMultiLevelRoutes(routeList);
       routes = [...Common, ...routeList];
-      console.log('获取', backMenuList);
       return routes;
     },
     // 设置当前选中二级路由

@@ -24,7 +24,12 @@ function asyncImportRoute(routes: AppRouteRecordRaw[] | undefined) {
     // }
     const { name } = item;
     const { children } = item;
-    const meta = item.meta || { title: item.title, hideInMenu: item.display, name: item.name };
+    const meta = item.meta || {
+      title: item.title,
+      hideInMenu: item.display,
+      name: item.name,
+      activeMenu: item.activeMenu,
+    };
     item.meta = meta;
     const component = item.component ? item.component : '/error/404';
     if (component) {
@@ -85,6 +90,7 @@ export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModul
           title: route.title,
           hideInMenu: route.display,
           name: route.name,
+          activeMenu: route.activeMenu,
         };
         meta.single = true;
         meta.affix = false;

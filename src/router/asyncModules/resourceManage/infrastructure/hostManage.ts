@@ -20,6 +20,7 @@
 export const hostDetails = {
   title: '主机详情',
   name: 'hostDetails',
+  activeMenu: 'p',
   kind: 'menu',
   display: false,
   priority: '1.2.1',

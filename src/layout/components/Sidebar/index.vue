@@ -66,7 +66,6 @@
   });
   const handleClick: MenuProps['onClick'] = (e) => {
     console.log('click', e, state.selectedKeys, state.openKeys);
-    // router.push({ name: e.key });
     router.push({ name: e.key });
   };
   // 根据activeMenu获取指定的menu
@@ -113,7 +112,6 @@
         getSubMenus();
       }
       state.selectedKeys = [currentRoute.meta?.activeMenu ?? currentRoute.name] as string[];
-      console.log('路由切换', currentRoute.name);
     },
     {
       immediate: true,
@@ -126,6 +124,29 @@
     console.log('获取的子菜单', subMenus);
     if (!subMenus) return;
     permissionStore.subMenus = [subMenus[subMenus.length - 1]];
+    console.log(
+      '1',
+      currentRoute,
+      permissionStore.subMenus,
+      getParentName(permissionStore.subMenus, currentRoute.name),
+    );
+  }
+  function getParentName(treeData: any, name: any) {
+    console.log('获取数据', treeData, name);
+    const pid: string[] = [];
+    const fn = (treeData: any, name: string) => {
+      for (let i = 0; i < treeData.length; i++) {
+        const item = treeData[i];
+        console.log('找到了', item);
+        if (item.name === name) {
+          pid.push(name);
+          return;
+        }
+        if (item?.children) fn(item.children, item.name);
+      }
+    };
+    fn(treeData, name);
+    return [pid];
   }
   function getsubMenusParents(list: any, name: any): any {
     for (const i in list) {
