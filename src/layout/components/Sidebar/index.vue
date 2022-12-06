@@ -78,22 +78,16 @@
     const meta = currentRoute.meta;
     if (meta?.activeMenu) {
       const targetMenu = getTargetMenuByActiveMenuName(meta.activeMenu);
-      return targetMenu?.meta?.namePath ?? [meta?.activeMenu];
+      return targetMenu?.meta?.name ?? [meta?.activeMenu];
     }
 
     return (
       meta?.hideInMenu
         ? state?.openKeys || []
-        : currentRoute.meta?.namePath ?? currentRoute.matched.slice(1).map((n) => n.name)
+        : currentRoute.meta?.name ?? currentRoute.matched.slice(1).map((n) => n.name)
     ) as string[];
   };
   const collapsed = ref<boolean>(false);
-  watch(
-    () => state.openKeys,
-    (val) => {
-      console.log('openKeys', val);
-    },
-  );
   // 监听菜单收缩状态
   watch(
     () => collapsed.value,
@@ -106,7 +100,7 @@
   watch(
     () => currentRoute.fullPath,
     () => {
-      // state.openKeys = getOpenKeys();
+      state.openKeys = findParent(currentRoute, permissionStore.subMenus);
       const meta = currentRoute.meta;
       if (currentRoute.name != 'Layout' && currentRoute.name != 'PageNotFound') {
         getSubMenus();
@@ -117,36 +111,24 @@
       immediate: true,
     },
   );
+  // 根据name寻找tree父级元素
+  function findParent(node: any, tree: any, parent?: any): any {
+    for (let i = 0; i < tree.length; i++) {
+      const item = tree[i];
+      if (item.name === node.name) {
+        return [parent.name];
+      }
+      if (item.children && item.children.length > 0) {
+        return findParent(node, item.children, item);
+      }
+    }
+  }
   // 获取当前路由的二级菜单
   function getSubMenus() {
     const menus = permissionStore.backMenuList;
     const subMenus = getsubMenusParents(menus, currentRoute.name);
-    console.log('获取的子菜单', subMenus);
     if (!subMenus) return;
     permissionStore.subMenus = [subMenus[subMenus.length - 1]];
-    console.log(
-      '1',
-      currentRoute,
-      permissionStore.subMenus,
-      getParentName(permissionStore.subMenus, currentRoute.name),
-    );
-  }
-  function getParentName(treeData: any, name: any) {
-    console.log('获取数据', treeData, name);
-    const pid: string[] = [];
-    const fn = (treeData: any, name: string) => {
-      for (let i = 0; i < treeData.length; i++) {
-        const item = treeData[i];
-        console.log('找到了', item);
-        if (item.name === name) {
-          pid.push(name);
-          return;
-        }
-        if (item?.children) fn(item.children, item.name);
-      }
-    };
-    fn(treeData, name);
-    return [pid];
   }
   function getsubMenusParents(list: any, name: any): any {
     for (const i in list) {

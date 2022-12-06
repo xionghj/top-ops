@@ -29,6 +29,18 @@ export const hostDetails = {
   path: 'hostDetails',
   component: '/resourceManage/infrastructure/hostManage/hostDetails/index',
 };
+export const userDetails = {
+  title: '用户详情',
+  name: 'userDetails',
+  activeMenu: 'UserManage',
+  kind: 'menu',
+  display: false,
+  priority: '1.2.1',
+  icon: '',
+  code: '66e0135555995909',
+  path: 'userDetails',
+  component: '/resourceManage/infrastructure/hostManage/hostDetails/index',
+};
 // export const hostDetails1 = {
 //   path: '/hostDetails1',
 //   name: 'hostDetails1',
@@ -38,4 +50,4 @@ export const hostDetails = {
 //     title: '主机详情1',
 //   },
 // };
-export default [hostDetails];
+export default [hostDetails, userDetails];
