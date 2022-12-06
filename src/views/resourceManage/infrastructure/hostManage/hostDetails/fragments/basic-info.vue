@@ -1,10 +1,10 @@
 <template>
   <div>
     <a-descriptions :column="2">
-      <a-descriptions-item label="IP地址">Zhou Maomao</a-descriptions-item>
-      <a-descriptions-item label="主机名">1810000000</a-descriptions-item>
-      <a-descriptions-item label="主机环境">Hangzhou, Zhejiang</a-descriptions-item>
-      <a-descriptions-item label="Agent状态">empty</a-descriptions-item>
+      <a-descriptions-item label="IP地址"></a-descriptions-item>
+      <a-descriptions-item label="主机名"></a-descriptions-item>
+      <a-descriptions-item label="主机环境"></a-descriptions-item>
+      <a-descriptions-item label="Agent状态"></a-descriptions-item>
       <a-descriptions-item label="物理地址"> </a-descriptions-item>
       <a-descriptions-item label="第一负责人"> </a-descriptions-item>
       <a-descriptions-item label="运营状态"> </a-descriptions-item>
@@ -42,12 +42,203 @@
       <a-descriptions-item label="录入时间"> </a-descriptions-item>
     </a-descriptions>
   </div>
+  <div class="mt-4">
+    <a-descriptions>
+      <a-descriptions-item label="磁盘信息" :span="3">
+        <a-table
+          :columns="diskColumns"
+          :data-source="diskList"
+          row-key="id"
+          :pagination="false"
+          :loading="diskLodding"
+          class="w-full"
+        >
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'agent_status'">
+              <a-tag :color="'green'">
+                {{ record.agent_status }}
+              </a-tag>
+            </template>
+          </template>
+        </a-table>
+      </a-descriptions-item>
+    </a-descriptions>
+  </div>
+  <div class="mt-4">
+    <a-descriptions>
+      <a-descriptions-item label="网卡信息" :span="3">
+        <a-table
+          :columns="networkCardColumns"
+          :data-source="diskList"
+          row-key="id"
+          :pagination="false"
+          :loading="diskLodding"
+          class="w-full"
+        >
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'agent_status'">
+              <a-tag :color="'green'">
+                {{ record.agent_status }}
+              </a-tag>
+            </template>
+          </template>
+        </a-table>
+      </a-descriptions-item>
+    </a-descriptions>
+  </div>
+  <div class="mt-4">
+    <a-descriptions>
+      <a-descriptions-item label="服务信息" :span="3">
+        <a-table
+          :columns="serveColumns"
+          :data-source="diskList"
+          row-key="id"
+          :pagination="false"
+          :loading="diskLodding"
+          class="w-full"
+        >
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'agent_status'">
+              <a-tag :color="'green'">
+                {{ record.agent_status }}
+              </a-tag>
+            </template>
+          </template>
+        </a-table>
+      </a-descriptions-item>
+    </a-descriptions>
+  </div>
 </template>
 <script lang="ts" setup>
+  import { ref, reactive } from 'vue';
   import {
     Descriptions as ADescriptions,
     DescriptionsItem as ADescriptionsItem,
+    Table as ATable,
+    Tag as ATag,
   } from 'ant-design-vue';
+  import { getHostMangeList } from '@/api/resourceManage/infrastructure/hostManage';
+  const diskList = ref<API.HostManageListItem[]>([]);
+  const diskListQuery = reactive({
+    search: '',
+    page: 1,
+    pageSize: 10,
+  });
+  const diskColumns = [
+    {
+      title: '磁盘',
+      dataIndex: 'ip',
+      key: 'ip',
+    },
+    {
+      title: '文件类型',
+      dataIndex: 'hostname',
+      key: 'hostname',
+    },
+    {
+      title: '挂载点',
+      dataIndex: 'cpu_count',
+      key: 'cpu_count',
+    },
+    {
+      title: '容量',
+      dataIndex: 'mem_size',
+      key: 'mem_size',
+    },
+    {
+      title: '可用容量',
+      dataIndex: 'os_release',
+      key: 'os_release',
+    },
+    {
+      title: '使用率',
+      dataIndex: 'first_owner',
+      key: 'first_owner',
+    },
+  ];
+  const diskLodding = ref(false);
+  // 获取主机列表
+  async function getHostMangeListRequest() {
+    try {
+      if (diskLodding.value) {
+        return;
+      }
+      diskLodding.value = true;
+      const data = await getHostMangeList(diskListQuery);
+      diskLodding.value = false;
+      diskList.value = data.results;
+    } catch (error) {
+      diskLodding.value = false;
+      console.error(error);
+    }
+  }
+  getHostMangeListRequest();
+  // 网卡信息
+  const networkCardColumns = [
+    {
+      title: '网卡',
+      dataIndex: 'ip',
+      key: 'ip',
+    },
+    {
+      title: '状态',
+      dataIndex: 'hostname',
+      key: 'hostname',
+    },
+    {
+      title: '关联 IP',
+      dataIndex: 'cpu_count',
+      key: 'cpu_count',
+    },
+    {
+      title: '子网掩码',
+      dataIndex: 'mem_size',
+      key: 'mem_size',
+    },
+    {
+      title: '速度',
+      dataIndex: 'os_release',
+      key: 'os_release',
+    },
+    {
+      title: 'Mac 地址',
+      dataIndex: 'first_owner',
+      key: 'first_owner',
+    },
+  ];
+  // 服务信息
+  const serveColumns = [
+    {
+      title: '服务名称',
+      dataIndex: 'ip',
+      key: 'ip',
+    },
+    {
+      title: '工作目录',
+      dataIndex: 'hostname',
+      key: 'hostname',
+    },
+    {
+      title: '执行路径',
+      dataIndex: 'cpu_count',
+      key: 'cpu_count',
+    },
+    {
+      title: '监听地址',
+      dataIndex: 'mem_size',
+      key: 'mem_size',
+    },
+    {
+      title: '监听端口',
+      dataIndex: 'os_release',
+      key: 'os_release',
+    },
+    {
+      title: '执行用户',
+      dataIndex: 'first_owner',
+      key: 'first_owner',
+    },
+  ];
 </script>
 <style lang="less" scoped>
   :deep(.ant-descriptions-item-label) {

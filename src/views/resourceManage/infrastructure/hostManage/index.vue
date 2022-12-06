@@ -8,7 +8,7 @@
             <div class="cursor-pointer hover:text-blue-500" @click.prevent> 更多操作 </div>
             <template #overlay>
               <a-menu>
-                <a-menu-item @click="onJumeTo">
+                <a-menu-item>
                   <a href="javascript:;">导入</a>
                 </a-menu-item>
                 <a-menu-item>
@@ -29,10 +29,14 @@
         </div>
       </template>
     </Breadcrumb>
-    <div class="p-4 bg-white">
+    <div class="p-6 bg-white">
       <div class="flex justify-between mb-4">
-        <div class="w-80">
-          <a-input v-model:value="search" placeholder="根据关键词搜索" />
+        <div class="w-56">
+          <a-input
+            v-model:value="listQuery.search"
+            placeholder="根据关键词搜索"
+            @change="getHostMangeListRequest()"
+          />
         </div>
       </div>
       <a-spin :spinning="spinning">
@@ -45,10 +49,10 @@
           @change="handleTableChange"
         >
           <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'name'">
-              <a>
-                {{ record.name }}
-              </a>
+            <template v-if="column.key === 'ip'">
+              <span class="text-blue-500 cursor-pointer hover:text-blue-700" @click="onJumeTo">
+                {{ record.ip }}
+              </span>
             </template>
             <template v-if="column.key === 'agent_status'">
               <a-tag :color="'green'">
@@ -77,7 +81,12 @@
   type Key = string | number;
   const router = useRouter();
   const list = ref<API.HostManageListItem[]>([]);
-  const search = ref('');
+  const listQuery = reactive({
+    search: '',
+    page: 1,
+    pageSize: 10,
+  });
+  const total = ref(0);
   const columns = [
     {
       title: 'IP 地址',
@@ -121,13 +130,10 @@
     },
   ];
   const spinning = ref(false);
-  const total = ref(0);
-  const current = ref(1);
-  const pageSize = ref(10);
   const pagination = computed(() => ({
     total: total.value,
-    current: current.value,
-    pageSize: pageSize.value,
+    current: listQuery.page,
+    pageSize: listQuery.pageSize,
     showTotal: (total: number) => `总共 ${total} 项`,
     defaultPageSize: 10,
     showSizeChanger: true, // 是否显示pagesize选择
@@ -136,8 +142,8 @@
 
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
-    current.value = pag.current;
-    pageSize.value = pag.pageSize;
+    listQuery.page = pag.current;
+    listQuery.pageSize = pag.pageSize;
     getHostMangeListRequest();
   };
   // 获取主机列表
@@ -147,7 +153,7 @@
         return;
       }
       spinning.value = true;
-      const data = await getHostMangeList();
+      const data = await getHostMangeList(listQuery);
       spinning.value = false;
       list.value = data.results;
       total.value = data.count;
