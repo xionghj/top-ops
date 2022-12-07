@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-descriptions :column="2">
-      <a-descriptions-item label="IP地址"></a-descriptions-item>
+      <a-descriptions-item label="IP地址"> {{ basicInfo.ip }}</a-descriptions-item>
       <a-descriptions-item label="主机名"></a-descriptions-item>
       <a-descriptions-item label="主机环境"></a-descriptions-item>
       <a-descriptions-item label="Agent状态"></a-descriptions-item>
@@ -42,82 +42,97 @@
       <a-descriptions-item label="录入时间"> </a-descriptions-item>
     </a-descriptions>
   </div>
-  <div class="mt-4">
-    <a-descriptions>
-      <a-descriptions-item label="磁盘信息" :span="3">
-        <a-table
-          :columns="diskColumns"
-          :data-source="diskList"
-          row-key="id"
-          :pagination="false"
-          :loading="diskLodding"
-          class="w-full"
-        >
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'agent_status'">
-              <a-tag :color="'green'">
-                {{ record.agent_status }}
-              </a-tag>
+  <div v-if="basicInfoExpand">
+    <div class="mt-4">
+      <a-descriptions>
+        <a-descriptions-item label="磁盘信息" :span="3">
+          <a-table
+            :columns="diskColumns"
+            :data-source="diskList"
+            row-key="id"
+            :pagination="false"
+            :loading="diskLodding"
+            class="w-full"
+          >
+            <template #bodyCell="{ column, record }">
+              <template v-if="column.key === 'agent_status'">
+                <a-tag :color="'green'">
+                  {{ record.agent_status }}
+                </a-tag>
+              </template>
             </template>
-          </template>
-        </a-table>
-      </a-descriptions-item>
-    </a-descriptions>
-  </div>
-  <div class="mt-4">
-    <a-descriptions>
-      <a-descriptions-item label="网卡信息" :span="3">
-        <a-table
-          :columns="networkCardColumns"
-          :data-source="diskList"
-          row-key="id"
-          :pagination="false"
-          :loading="diskLodding"
-          class="w-full"
-        >
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'agent_status'">
-              <a-tag :color="'green'">
-                {{ record.agent_status }}
-              </a-tag>
+          </a-table>
+        </a-descriptions-item>
+      </a-descriptions>
+    </div>
+    <div class="mt-4">
+      <a-descriptions>
+        <a-descriptions-item label="网卡信息" :span="3">
+          <a-table
+            :columns="networkCardColumns"
+            :data-source="diskList"
+            row-key="id"
+            :pagination="false"
+            :loading="diskLodding"
+            class="w-full"
+          >
+            <template #bodyCell="{ column, record }">
+              <template v-if="column.key === 'agent_status'">
+                <a-tag :color="'green'">
+                  {{ record.agent_status }}
+                </a-tag>
+              </template>
             </template>
-          </template>
-        </a-table>
-      </a-descriptions-item>
-    </a-descriptions>
-  </div>
-  <div class="mt-4">
-    <a-descriptions>
-      <a-descriptions-item label="服务信息" :span="3">
-        <a-table
-          :columns="serveColumns"
-          :data-source="diskList"
-          row-key="id"
-          :pagination="false"
-          :loading="diskLodding"
-          class="w-full"
-        >
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'agent_status'">
-              <a-tag :color="'green'">
-                {{ record.agent_status }}
-              </a-tag>
+          </a-table>
+        </a-descriptions-item>
+      </a-descriptions>
+    </div>
+    <div class="mt-4">
+      <a-descriptions>
+        <a-descriptions-item label="服务信息" :span="3">
+          <a-table
+            :columns="serveColumns"
+            :data-source="diskList"
+            row-key="id"
+            :pagination="false"
+            :loading="diskLodding"
+            class="w-full"
+          >
+            <template #bodyCell="{ column, record }">
+              <template v-if="column.key === 'agent_status'">
+                <a-tag :color="'green'">
+                  {{ record.agent_status }}
+                </a-tag>
+              </template>
             </template>
-          </template>
-        </a-table>
-      </a-descriptions-item>
-    </a-descriptions>
+          </a-table>
+        </a-descriptions-item>
+      </a-descriptions>
+    </div>
   </div>
 </template>
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, toRefs } from 'vue';
   import {
     Descriptions as ADescriptions,
     DescriptionsItem as ADescriptionsItem,
     Table as ATable,
     Tag as ATag,
   } from 'ant-design-vue';
-  import { getHostMangeList } from '@/api/resourceManage/infrastructure/hostManage';
+  import {
+    getHostMangeList,
+    getHostMangeDetails,
+  } from '@/api/resourceManage/infrastructure/hostManage';
+  const props = defineProps({
+    basicInfoExpand: Boolean,
+    basicInfo: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
+  });
+  const { basicInfoExpand, basicInfo } = toRefs(props);
   const diskList = ref<API.HostManageListItem[]>([]);
   const diskListQuery = reactive({
     search: '',

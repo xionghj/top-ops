@@ -50,7 +50,10 @@
         >
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'ip'">
-              <span class="text-blue-500 cursor-pointer hover:text-blue-700" @click="onJumeTo">
+              <span
+                class="text-blue-500 cursor-pointer hover:text-blue-700"
+                @click="onJumeTo(record.id)"
+              >
                 {{ record.ip }}
               </span>
             </template>
@@ -174,7 +177,8 @@
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     state.selectedRowKeys = selectedRowKeys;
   };
-  const onJumeTo = function () {
-    router.push({ name: 'hostDetails' });
+  const onJumeTo = function (ids: number) {
+    console.log('获取数据', ids);
+    router.push({ name: 'hostDetails', query: { id: ids } });
   };
 </script>
