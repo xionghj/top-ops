@@ -4,11 +4,19 @@
       <a-descriptions-item label="IP地址"> {{ basicInfo.ip }}</a-descriptions-item>
       <a-descriptions-item label="主机名"></a-descriptions-item>
       <a-descriptions-item label="主机环境"></a-descriptions-item>
-      <a-descriptions-item label="Agent状态"></a-descriptions-item>
+      <a-descriptions-item label="Agent状态">{{ basicInfo.agent_status }}</a-descriptions-item>
       <a-descriptions-item label="物理地址"> </a-descriptions-item>
-      <a-descriptions-item label="第一负责人"> </a-descriptions-item>
+      <a-descriptions-item label="第一负责人">
+        <span v-for="(item, index) in basicInfo.first_owner" :key="index"
+          >{{ item.username }}{{ index != basicInfo.first_owner.length - 1 ? ',' : '' }}</span
+        >
+      </a-descriptions-item>
       <a-descriptions-item label="运营状态"> </a-descriptions-item>
-      <a-descriptions-item label="第二负责人"> </a-descriptions-item>
+      <a-descriptions-item label="第二负责人">
+        <span v-for="(item, index) in basicInfo.second_owner" :key="index"
+          >{{ item.username }}{{ index != basicInfo.second_owner.length - 1 ? ',' : '' }}</span
+        >
+      </a-descriptions-item>
       <a-descriptions-item label="Salt-key"> </a-descriptions-item>
       <a-descriptions-item label="Salt-master"> </a-descriptions-item>
     </a-descriptions>
@@ -36,7 +44,7 @@
       <a-descriptions-item label="资产编号"></a-descriptions-item>
       <a-descriptions-item label="Agent 版本"></a-descriptions-item>
       <a-descriptions-item label="数据中心"></a-descriptions-item>
-      <a-descriptions-item label="备注"></a-descriptions-item>
+      <a-descriptions-item label="备注">{{ basicInfo.description }}</a-descriptions-item>
       <a-descriptions-item label="供应商"> </a-descriptions-item>
       <a-descriptions-item label="DNS地址"> </a-descriptions-item>
       <a-descriptions-item label="录入时间"> </a-descriptions-item>
@@ -187,7 +195,7 @@
       console.error(error);
     }
   }
-  getHostMangeListRequest();
+  // getHostMangeListRequest();
   // 网卡信息
   const networkCardColumns = [
     {

@@ -129,19 +129,21 @@
     return handleMenus();
   });
   function handleMenus() {
-    const data = [...permissionStore.backMenuList];
-    const result = [];
-    for (let i = 0; i < data.length; i += 4) {
-      result.push(data.slice(i, i + 4));
-    }
-    const arrs: any = [[], [], [], [], []];
-    for (let j = 0; j < result.length; j++) {
-      for (let k = 0; k < result[j].length; k++) {
-        arrs[k].push(result[j][k]);
+    const array = [...permissionStore.backMenuList];
+    // 创建一个空数组，用于存储拆分后的数组
+    const splitArrays: any = [];
+    const n = 4;
+    for (let i = 0; i < array.length; i++) {
+      // 计算该元素应该被放入哪个数组
+      const arrayIndex = i % n;
+      // 如果该数组还不存在，则创建它
+      if (!splitArrays[arrayIndex]) {
+        splitArrays[arrayIndex] = [];
       }
+      // 将元素放入该数组中
+      splitArrays[arrayIndex].push(array[i]);
     }
-    console.log('获取处理的菜单数据', arrs);
-    return arrs;
+    return splitArrays;
   }
   handleMenus();
   function clickMenus(item: any, subItem: any) {

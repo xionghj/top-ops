@@ -7,7 +7,7 @@
           <a-input
             v-model:value="listQuery.search"
             placeholder="根据关键词搜索"
-            @change="getHostMangeListRequest()"
+            @change="getHostOwnerRequest()"
           />
         </div>
         <a-select v-model:value="listQuery.person" class="w-56">
@@ -38,7 +38,7 @@
 </template>
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
   import {
     Table as ATable,
     Input as AInput,
@@ -46,15 +46,17 @@
     Select as ASelect,
     SelectOption as ASelectOption,
   } from 'ant-design-vue';
-  import { getHostMangeList } from '@/api/resourceManage/infrastructure/hostManage';
+  import { getHostOwner } from '@/api/resourceManage/infrastructure/hostManage';
   type Key = string | number;
   const router = useRouter();
+  const route = useRoute();
   const list = ref<API.HostManageListItem[]>([]);
   const listQuery = reactive({
     search: '',
     page: 1,
     pageSize: 10,
     person: '',
+    role: 'first_owner',
   });
   const personOption = ref([
     {
@@ -70,18 +72,18 @@
   const columns = [
     {
       title: '用户名',
-      dataIndex: 'ip',
-      key: 'ip',
+      dataIndex: 'username',
+      key: 'username',
     },
     {
       title: '花名',
-      dataIndex: 'hostname',
-      key: 'hostname',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: '邮箱',
-      dataIndex: 'cpu_count',
-      key: 'cpu_count',
+      dataIndex: 'email',
+      key: 'email',
     },
     {
       title: '状态',
@@ -90,13 +92,13 @@
     },
     {
       title: '联系电话',
-      dataIndex: 'os_release',
-      key: 'os_release',
+      dataIndex: 'telephone',
+      key: 'telephone',
     },
     {
       title: '最近修改',
-      dataIndex: 'first_owner',
-      key: 'first_owner',
+      dataIndex: 'updated_at',
+      key: 'updated_at',
     },
   ];
   const lodding = ref(false);
@@ -114,25 +116,26 @@
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
     listQuery.pageSize = pag.pageSize;
-    getHostMangeListRequest();
+    getHostOwnerRequest();
   };
-  // 获取主机列表
-  async function getHostMangeListRequest() {
+  // 获取负责人列表
+  async function getHostOwnerRequest() {
     try {
       if (lodding.value) {
         return;
       }
       lodding.value = true;
-      const data = await getHostMangeList(listQuery);
+      const { id } = route.query;
+      const data = await getHostOwner(id, listQuery);
       lodding.value = false;
-      list.value = data.results;
+      list.value = data;
       total.value = data.count;
     } catch (error) {
       lodding.value = false;
       console.error(error);
     }
   }
-  getHostMangeListRequest();
+  getHostOwnerRequest();
   const state = reactive<{
     selectedRowKeys: Key[];
     loading: boolean;
@@ -143,8 +146,5 @@
   const onSelectChange = (selectedRowKeys: Key[]) => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     state.selectedRowKeys = selectedRowKeys;
-  };
-  const onJumeTo = function () {
-    router.push({ name: 'hostDetails' });
   };
 </script>

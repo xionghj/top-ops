@@ -9,10 +9,26 @@ export function getHostMangeList(query: API.PageParams) {
   });
 }
 
-// 获取主机管理-详情
+// 获取主机管理详情-基本信息
 export function getHostMangeDetails(id: number) {
-  return request<API.HostManageListResult>({
-    url: `cmdb/host/${id}`,
+  return request({
+    url: `cmdb/host/${id}/`,
     method: 'get',
+  });
+}
+// 获取主机管理详情-负责人
+export function getHostOwner(id: number, query: API.PageParams) {
+  return request({
+    url: `cmdb/host/${id}/owner/`,
+    method: 'get',
+    params: query,
+  });
+}
+// 获取主机管理详情-添加负责人
+export function hostOwner(id: number, data: API.PageParams) {
+  return request({
+    url: `cmdb/host/${id}/owner/`,
+    method: 'post',
+    data,
   });
 }
