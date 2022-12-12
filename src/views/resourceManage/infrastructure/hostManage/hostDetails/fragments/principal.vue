@@ -10,8 +10,8 @@
             @change="getHostOwnerRequest()"
           />
         </div>
-        <a-select v-model:value="listQuery.person" class="w-56">
-          <a-select-option v-for="(item, index) in personOption" :key="index" :value="item.id">{{
+        <a-select v-model:value="listQuery.role" class="w-56" @change="getHostOwnerRequest()">
+          <a-select-option v-for="(item, index) in roleOption" :key="index" :value="item.id">{{
             item.name
           }}</a-select-option>
         </a-select>
@@ -55,17 +55,16 @@
     search: '',
     page: 1,
     pageSize: 10,
-    person: '',
     role: 'first_owner',
   });
-  const personOption = ref([
+  const roleOption = ref([
     {
       name: '第一负责人',
-      id: '1',
+      id: 'first_owner',
     },
     {
       name: '第二负责人',
-      id: '2',
+      id: 'second_owner',
     },
   ]);
   const total = ref(0);
@@ -137,14 +136,15 @@
   }
   getHostOwnerRequest();
   const state = reactive<{
-    selectedRowKeys: Key[];
-    loading: boolean;
+    selectPrincipal: Key[];
   }>({
-    selectedRowKeys: [], // Check here to configure the default column
-    loading: false,
+    selectPrincipal: [],
   });
+  const selectPrincipal = ref<any>([]);
   const onSelectChange = (selectedRowKeys: Key[]) => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
-    state.selectedRowKeys = selectedRowKeys;
+    state.selectPrincipal = selectedRowKeys;
+    selectPrincipal.value = selectedRowKeys;
   };
+  defineExpose({ selectPrincipal, getHostOwnerRequest });
 </script>

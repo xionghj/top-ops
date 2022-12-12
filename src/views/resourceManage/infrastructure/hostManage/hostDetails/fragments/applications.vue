@@ -12,7 +12,6 @@
         </div>
       </div>
       <a-table
-        :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
         :columns="columns"
         :data-source="list"
         row-key="id"

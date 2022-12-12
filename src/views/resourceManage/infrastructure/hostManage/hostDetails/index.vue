@@ -40,7 +40,6 @@
                   <a href="javascript:;">导入</a>
                 </a-menu-item>
                 <a-menu-item>
-                  <!-- <a href="javascript:;" @click="deletHostOwnerRequest">移除负责人</a> -->
                   <div class="cursor-pointer hover:text-blue-500" @click="deletHostOwnerRequest()"
                     >移除负责人</div
                   >
@@ -49,19 +48,27 @@
             </template>
           </a-dropdown>
         </div>
+        <div v-if="activeKey == '5'" class="flex">
+          <div class="mr-2 cursor-pointer hover:text-blue-500">设置机柜</div>
+          <div class="mr-2 cursor-pointer hover:text-blue-500">移除机柜</div>
+        </div>
       </template>
     </Breadcrumb>
     <div class="p-4 bg-white">
       <a-spin :spinning="basicInfoLodding">
         <a-tabs v-model:activeKey="activeKey">
           <a-tab-pane key="1" tab="基本信息"
-            ><BasicInfo :basic-info-expand="basicInfoExpand" :basic-info="basicInfo"
+            ><BasicInfo
+              v-if="activeKey === '1'"
+              :basic-info-expand="basicInfoExpand"
+              :basic-info="basicInfo"
           /></a-tab-pane>
           <a-tab-pane key="2" tab="负责人" force-render
-            ><Principal ref="principalRef"
+            ><Principal v-if="activeKey === '2'" ref="principalRef"
           /></a-tab-pane>
-          <a-tab-pane key="3" tab="应用实例"><Applications /></a-tab-pane>
-          <a-tab-pane key="4" tab="服务列表"><ServiceList /></a-tab-pane>
+          <a-tab-pane key="3" tab="应用实例"><Applications v-if="activeKey === '3'" /></a-tab-pane>
+          <a-tab-pane key="4" tab="服务列表"><ServiceList v-if="activeKey === '4'" /></a-tab-pane>
+          <a-tab-pane key="5" tab="所属机柜"><Rack v-if="activeKey === '5'" /></a-tab-pane>
           <template v-if="activeKey === '1'" #rightExtra>
             <span
               class="cursor-pointer hover:text-blue-500"
@@ -88,13 +95,16 @@
     Dropdown as ADropdown,
     Menu as AMenu,
     MenuItem as AMenuItem,
+    message,
+    Modal,
   } from 'ant-design-vue';
   import BasicInfo from './fragments/basic-info.vue';
   import Principal from './fragments/principal.vue';
   import Applications from './fragments/applications.vue';
   import ServiceList from './fragments/service-list.vue';
+  import Rack from './fragments/rack.vue';
   import AddOwnerDialog from './dialog/add-owner-dialog.vue';
-  import { getHostMangeDetails } from '@/api/resourceManage/infrastructure/hostManage';
+  import { getHostMangeDetails, hostOwner } from '@/api/resourceManage/infrastructure/hostManage';
   const route = useRoute();
   const basicInfoExpand = ref(false);
   const activeKey = ref('1');
@@ -116,36 +126,47 @@
     }
   }
   getHostMangeDetailsRequest();
+  const principalRef = ref(null);
   // 打开添加负责人弹出框
   const addOwnerShowDialog = ref(false);
   function closeAddOwnerShowDialog() {
     addOwnerShowDialog.value = false;
+    principalRef.value && principalRef.value.getHostOwnerRequest();
   }
-  const principalRef = ref(null);
+  const deletePrincipalLodding = ref(false);
+  // 删除负责人
   async function deletHostOwnerRequest() {
-    console.log('获取', principalRef.value.list);
-    // if (state.selectedRowKeys.length == 0) {
-    //   message.warning('请至少勾选一个负责');
-    //   return;
-    // }
-    // try {
-    //   if (state.addLodding) {
-    //     return;
-    //   }
-    //   state.addLodding = true;
-    //   const { id } = route.query;
-    //   const params = {
-    //     action: 'add',
-    //     role: 'first_owner',
-    //     related_ids: state.selectedRowKeys,
-    //   };
-    //   const data = await hostOwner(id, params);
-    //   message.success(data.detail);
-    //   handleCancel();
-    //   state.addLodding = false;
-    // } catch (error) {
-    //   state.addLodding = false;
-    //   console.error(error);
-    // }
+    const selectPrincipal: any = principalRef.value && principalRef.value.selectPrincipal;
+    if (selectPrincipal.length == 0) {
+      message.warning('请至少勾选一个负责人!');
+      return;
+    }
+    Modal.confirm({
+      title: '您确定要删除选中的负责人吗？',
+      centered: true,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          if (deletePrincipalLodding.value) {
+            return;
+          }
+          deletePrincipalLodding.value = true;
+          const { id } = route.query;
+          const params = {
+            action: 'remove',
+            role: 'first_owner',
+            related_ids: selectPrincipal,
+          };
+          const data = await hostOwner(id, params);
+          message.success(data.detail);
+          principalRef.value && principalRef.value.getHostOwnerRequest();
+          deletePrincipalLodding.value = false;
+        } catch (error) {
+          deletePrincipalLodding.value = false;
+          console.error(error);
+        }
+      },
+    });
   }
 </script>
