@@ -5,12 +5,15 @@
         <a href="#">{{ item.name }}</a>
       </div>
     </div> -->
-    <a-breadcrumb>
-      <template #separator><span>></span></template>
-      <a-breadcrumb-item v-for="(item, index) in menus" :key="index">{{
-        item.meta && item.meta.title
-      }}</a-breadcrumb-item>
-    </a-breadcrumb>
+    <div class="flex items-center">
+      <slot name="left"></slot>
+      <a-breadcrumb>
+        <template #separator><span>></span></template>
+        <a-breadcrumb-item v-for="(item, index) in menus" :key="index">{{
+          item.meta && item.meta.title
+        }}</a-breadcrumb-item>
+      </a-breadcrumb>
+    </div>
     <div>
       <slot name="right"></slot>
     </div>

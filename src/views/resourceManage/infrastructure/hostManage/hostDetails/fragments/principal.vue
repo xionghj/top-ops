@@ -17,7 +17,7 @@
         </a-select>
       </div>
       <a-table
-        :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+        :row-selection="{ selectedRowKeys: state.selectPrincipal, onChange: onSelectChange }"
         :columns="columns"
         :data-source="list"
         row-key="id"
@@ -124,7 +124,7 @@
         return;
       }
       lodding.value = true;
-      const { id } = route.query;
+      const id: any = route.query && route.query.id;
       const data = await getHostOwner(id, listQuery);
       lodding.value = false;
       list.value = data;

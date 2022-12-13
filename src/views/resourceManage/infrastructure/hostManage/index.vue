@@ -58,9 +58,20 @@
               </span>
             </template>
             <template v-if="column.key === 'agent_status'">
-              <a-tag :color="'green'">
-                {{ record.agent_status }}
-              </a-tag>
+              <div class="flex items-center">
+                <ExclamationCircleFilled
+                  v-if="record.agent_status == 'not_install'"
+                  :style="{ fontSize: '16px', color: '#e38306' }"
+                />
+                <CheckCircleFilled v-else :style="{ fontSize: '16px', color: '#52c41a' }" />
+                <span
+                  class="ml-1"
+                  :class="[
+                    record.agent_status == 'not_install' ? 'text-[#e38306]' : 'text-[#52c41a]',
+                  ]"
+                  >{{ record.agent_status }}</span
+                >
+              </div>
             </template>
           </template>
         </a-table>
@@ -70,12 +81,12 @@
 </template>
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
+  import { CheckCircleFilled, ExclamationCircleFilled } from '@ant-design/icons-vue';
   import { useRouter } from 'vue-router';
   import {
     Table as ATable,
     Spin as ASpin,
     Input as AInput,
-    Tag as ATag,
     Dropdown as ADropdown,
     Menu as AMenu,
     MenuItem as AMenuItem,
@@ -170,11 +181,10 @@
     selectedRowKeys: Key[];
     loading: boolean;
   }>({
-    selectedRowKeys: [], // Check here to configure the default column
+    selectedRowKeys: [],
     loading: false,
   });
   const onSelectChange = (selectedRowKeys: Key[]) => {
-    console.log('selectedRowKeys changed: ', selectedRowKeys);
     state.selectedRowKeys = selectedRowKeys;
   };
   const onJumeTo = function (ids: number) {

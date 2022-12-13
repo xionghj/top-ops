@@ -1,16 +1,20 @@
 <!-- 主机管理-列表详情-所属机柜-->
 <template>
-  <div v-if="!rackInfo" class="flex">
-    <div>请<span>设置</span>所在机柜</div>
+  <div v-if="JSON.stringify(rackInfo) === '{}'" class="flex">
+    <div class="w-full h-32 bg-gray-50 flex items-center">
+      <div class="ml-4 text-[#FFA235] text-base"
+        >请 <span class="text-blue-500">设置</span> 所在机柜</div
+      >
+    </div>
   </div>
   <template v-else>
     <div>
       <a-descriptions :column="2">
-        <a-descriptions-item label="名称"> {{ basicInfo.ip }}</a-descriptions-item>
-        <a-descriptions-item label="机柜编号"></a-descriptions-item>
-        <a-descriptions-item label="机柜U数"></a-descriptions-item>
-        <a-descriptions-item label="可用U数">{{ basicInfo.agent_status }}</a-descriptions-item>
-        <a-descriptions-item label="备注说明"> </a-descriptions-item>
+        <a-descriptions-item label="名称"> {{ rackInfo.name }}</a-descriptions-item>
+        <a-descriptions-item label="机柜编号">{{ rackInfo.code }}</a-descriptions-item>
+        <a-descriptions-item label="机柜U数">{{ rackInfo.unum }}</a-descriptions-item>
+        <a-descriptions-item label="可用U数">{{ rackInfo.free_unum }}</a-descriptions-item>
+        <a-descriptions-item label="备注说明">{{ rackInfo.description }}</a-descriptions-item>
       </a-descriptions>
     </div>
     <div>
@@ -63,13 +67,14 @@
 </template>
 <script lang="ts" setup>
   import { ref, reactive, toRefs } from 'vue';
+  import { useRouter, useRoute } from 'vue-router';
   import {
     Descriptions as ADescriptions,
     DescriptionsItem as ADescriptionsItem,
     Table as ATable,
     Tag as ATag,
   } from 'ant-design-vue';
-  import { getHostMangeList } from '@/api/resourceManage/infrastructure/hostManage';
+  import { getHostMangeList, getHostRack } from '@/api/resourceManage/infrastructure/hostManage';
   const props = defineProps({
     basicInfoExpand: Boolean,
     basicInfo: {
@@ -79,14 +84,45 @@
       },
     },
   });
+  const route = useRoute();
   const { basicInfoExpand, basicInfo } = toRefs(props);
+  const hostRackLodding = ref(false);
+  // 获取所属机柜
+  const rackInfo = ref({
+    id: null,
+    created_at: '',
+    updated_at: '',
+    name: '',
+    code: '',
+    unum: null,
+    free_unum: null,
+    status: null,
+    creator: null,
+    description: '',
+    idc: null,
+  });
+  async function getHostRackRequest() {
+    try {
+      if (hostRackLodding.value) {
+        return;
+      }
+      hostRackLodding.value = true;
+      const id: any = route.query && route.query.id;
+      const data = await getHostRack(id);
+      rackInfo.value = data;
+      hostRackLodding.value = false;
+    } catch (error) {
+      hostRackLodding.value = false;
+      console.error(error);
+    }
+  }
+  getHostRackRequest();
   const diskList = ref<API.HostManageListItem[]>([]);
   const diskListQuery = reactive({
     search: '',
     page: 1,
     pageSize: 10,
   });
-  const rackInfo = ref(true);
   // 所属机房
   const diskColumns = [
     {
@@ -160,6 +196,7 @@
       key: 'first_owner',
     },
   ];
+  defineExpose({ getHostRackRequest, rackInfo });
 </script>
 <style lang="less" scoped>
   :deep(.ant-descriptions-item-label) {

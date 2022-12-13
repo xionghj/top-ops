@@ -32,3 +32,27 @@ export function hostOwner(id: number, data: API.PageParams) {
     data,
   });
 }
+
+// 获取主机-所属机柜详情
+export function getHostRack(id: number) {
+  return request({
+    url: `cmdb/host/${id}/rack/`,
+    method: 'get',
+  });
+}
+// 获取主机-机柜设置
+export function hostRackSettings(id: number, data: API.PageParams) {
+  return request({
+    url: `cmdb/host/${id}/rack/`,
+    method: 'post',
+    data,
+  });
+}
+// 获取主机-所属机柜
+export function getHostRackList(id: number, query: API.PageParams) {
+  return request({
+    url: `cmdb/host/${id}/rack/list/`,
+    method: 'get',
+    params: query,
+  });
+}

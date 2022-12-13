@@ -2,6 +2,13 @@
 <template>
   <div>
     <Breadcrumb>
+      <template #left>
+        <ArrowLeftOutlined
+          class="mr-2"
+          :style="{ fontSize: '14px', color: '#1e8eff' }"
+          @click="onBack"
+        />
+      </template>
       <template #right>
         <div v-if="activeKey == '1'" class="flex">
           <div class="mr-2 cursor-pointer hover:text-blue-500">编辑</div>
@@ -49,8 +56,12 @@
           </a-dropdown>
         </div>
         <div v-if="activeKey == '5'" class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500">设置机柜</div>
-          <div class="mr-2 cursor-pointer hover:text-blue-500">移除机柜</div>
+          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="addRackShowDialog = true"
+            >设置机柜</div
+          >
+          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="deletHostRackRequest"
+            >移除机柜</div
+          >
         </div>
       </template>
     </Breadcrumb>
@@ -68,7 +79,9 @@
           /></a-tab-pane>
           <a-tab-pane key="3" tab="应用实例"><Applications v-if="activeKey === '3'" /></a-tab-pane>
           <a-tab-pane key="4" tab="服务列表"><ServiceList v-if="activeKey === '4'" /></a-tab-pane>
-          <a-tab-pane key="5" tab="所属机柜"><Rack v-if="activeKey === '5'" /></a-tab-pane>
+          <a-tab-pane key="5" tab="所属机柜"
+            ><Rack v-if="activeKey === '5'" ref="rackRef"
+          /></a-tab-pane>
           <template v-if="activeKey === '1'" #rightExtra>
             <span
               class="cursor-pointer hover:text-blue-500"
@@ -83,11 +96,16 @@
       :add-owner-show-dialog="addOwnerShowDialog"
       @on-close-add-owner-show-dialog="closeAddOwnerShowDialog"
     />
+    <AddRackDialog
+      :add-rack-show-dialog="addRackShowDialog"
+      @on-close-add-rack-show-dialog="closeAddRackShowDialog"
+    />
   </div>
 </template>
 <script lang="ts" setup>
   import { ref } from 'vue';
-  import { useRoute } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
+  import { ArrowLeftOutlined } from '@ant-design/icons-vue';
   import {
     Tabs as ATabs,
     TabPane as ATabPane,
@@ -104,8 +122,17 @@
   import ServiceList from './fragments/service-list.vue';
   import Rack from './fragments/rack.vue';
   import AddOwnerDialog from './dialog/add-owner-dialog.vue';
-  import { getHostMangeDetails, hostOwner } from '@/api/resourceManage/infrastructure/hostManage';
+  import AddRackDialog from './dialog/add-rack-dialog.vue';
+  import {
+    getHostMangeDetails,
+    hostOwner,
+    hostRackSettings,
+  } from '@/api/resourceManage/infrastructure/hostManage';
   const route = useRoute();
+  const router = useRouter();
+  function onBack() {
+    router.go(-1);
+  }
   const basicInfoExpand = ref(false);
   const activeKey = ref('1');
   const basicInfo = ref({});
@@ -116,7 +143,7 @@
         return;
       }
       basicInfoLodding.value = true;
-      const { id } = route.query;
+      const id: any = route.query && route.query.id;
       const data = await getHostMangeDetails(id);
       basicInfoLodding.value = false;
       basicInfo.value = data;
@@ -126,7 +153,7 @@
     }
   }
   getHostMangeDetailsRequest();
-  const principalRef = ref(null);
+  const principalRef: any = ref(null);
   // 打开添加负责人弹出框
   const addOwnerShowDialog = ref(false);
   function closeAddOwnerShowDialog() {
@@ -136,7 +163,7 @@
   const deletePrincipalLodding = ref(false);
   // 删除负责人
   async function deletHostOwnerRequest() {
-    const selectPrincipal: any = principalRef.value && principalRef.value.selectPrincipal;
+    const selectPrincipal = principalRef.value && principalRef.value.selectPrincipal;
     if (selectPrincipal.length == 0) {
       message.warning('请至少勾选一个负责人!');
       return;
@@ -152,7 +179,7 @@
             return;
           }
           deletePrincipalLodding.value = true;
-          const { id } = route.query;
+          const id: any = route.query && route.query.id;
           const params = {
             action: 'remove',
             role: 'first_owner',
@@ -161,6 +188,47 @@
           const data = await hostOwner(id, params);
           message.success(data.detail);
           principalRef.value && principalRef.value.getHostOwnerRequest();
+          deletePrincipalLodding.value = false;
+        } catch (error) {
+          deletePrincipalLodding.value = false;
+          console.error(error);
+        }
+      },
+    });
+  }
+  const rackRef: any = ref(null);
+  // 添加所属机柜弹出框
+  const addRackShowDialog = ref(false);
+  function closeAddRackShowDialog() {
+    addRackShowDialog.value = false;
+    rackRef.value && rackRef.value.getHostRackRequest();
+  }
+  // 删除机柜
+  async function deletHostRackRequest() {
+    const rackInfo = rackRef.value && rackRef.value.rackInfo;
+    if (JSON.stringify(rackInfo) === '{}') {
+      message.warning('请先设置机柜!');
+      return;
+    }
+    Modal.confirm({
+      title: '您确定要移除机柜吗？',
+      centered: true,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          if (deletePrincipalLodding.value) {
+            return;
+          }
+          deletePrincipalLodding.value = true;
+          const id: any = route.query && route.query.id;
+          const params = {
+            action: 'remove',
+            related_id: rackInfo.id,
+          };
+          const data = await hostRackSettings(id, params);
+          message.success(data.detail);
+          rackRef.value && rackRef.value.getHostRackRequest();
           deletePrincipalLodding.value = false;
         } catch (error) {
           deletePrincipalLodding.value = false;
