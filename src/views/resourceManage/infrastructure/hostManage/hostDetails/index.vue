@@ -66,7 +66,7 @@
       </template>
     </Breadcrumb>
     <div class="p-4 bg-white">
-      <a-spin :spinning="basicInfoLodding">
+      <a-spin :spinning="basicInfoLoading">
         <a-tabs v-model:activeKey="activeKey">
           <a-tab-pane key="1" tab="基本信息"
             ><BasicInfo
@@ -136,19 +136,19 @@
   const basicInfoExpand = ref(false);
   const activeKey = ref('1');
   const basicInfo = ref({});
-  const basicInfoLodding = ref(false);
+  const basicInfoLoading = ref(false);
   async function getHostMangeDetailsRequest() {
     try {
-      if (basicInfoLodding.value) {
+      if (basicInfoLoading.value) {
         return;
       }
-      basicInfoLodding.value = true;
+      basicInfoLoading.value = true;
       const id: any = route.query && route.query.id;
       const data = await getHostMangeDetails(id);
-      basicInfoLodding.value = false;
+      basicInfoLoading.value = false;
       basicInfo.value = data;
     } catch (error) {
-      basicInfoLodding.value = false;
+      basicInfoLoading.value = false;
       console.error(error);
     }
   }
@@ -160,7 +160,7 @@
     addOwnerShowDialog.value = false;
     principalRef.value && principalRef.value.getHostOwnerRequest();
   }
-  const deletePrincipalLodding = ref(false);
+  const deletePrincipalLoading = ref(false);
   // 删除负责人
   async function deletHostOwnerRequest() {
     const selectPrincipal = principalRef.value && principalRef.value.selectPrincipal;
@@ -175,10 +175,10 @@
       cancelText: '取消',
       onOk: async () => {
         try {
-          if (deletePrincipalLodding.value) {
+          if (deletePrincipalLoading.value) {
             return;
           }
-          deletePrincipalLodding.value = true;
+          deletePrincipalLoading.value = true;
           const id: any = route.query && route.query.id;
           const params = {
             action: 'remove',
@@ -188,9 +188,9 @@
           const data = await hostOwner(id, params);
           message.success(data.detail);
           principalRef.value && principalRef.value.getHostOwnerRequest();
-          deletePrincipalLodding.value = false;
+          deletePrincipalLoading.value = false;
         } catch (error) {
-          deletePrincipalLodding.value = false;
+          deletePrincipalLoading.value = false;
           console.error(error);
         }
       },
@@ -217,10 +217,10 @@
       cancelText: '取消',
       onOk: async () => {
         try {
-          if (deletePrincipalLodding.value) {
+          if (deletePrincipalLoading.value) {
             return;
           }
-          deletePrincipalLodding.value = true;
+          deletePrincipalLoading.value = true;
           const id: any = route.query && route.query.id;
           const params = {
             action: 'remove',
@@ -229,9 +229,9 @@
           const data = await hostRackSettings(id, params);
           message.success(data.detail);
           rackRef.value && rackRef.value.getHostRackRequest();
-          deletePrincipalLodding.value = false;
+          deletePrincipalLoading.value = false;
         } catch (error) {
-          deletePrincipalLodding.value = false;
+          deletePrincipalLoading.value = false;
           console.error(error);
         }
       },

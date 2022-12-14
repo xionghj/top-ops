@@ -151,6 +151,7 @@
     Row as ARow,
     Col as ACol,
     Spin as ASpin,
+    message,
   } from 'ant-design-vue';
   import type { Rule, FormInstance } from 'ant-design-vue/es/form';
   import { IconFont } from '@/components/basic/iconfont';
@@ -338,8 +339,10 @@
       form.parent && form.parent.length > 0 ? form.parent[form.parent.length - 1] : null;
     if (form.id) {
       await updateMenu(form.id, params);
+      message.success('编辑成功');
     } else {
       await createMenu(params);
+      message.success('创建成功');
     }
     getMenus();
     visible.value = false;

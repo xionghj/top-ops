@@ -16,7 +16,7 @@
         :data-source="list"
         row-key="id"
         :pagination="pagination"
-        :loading="lodding"
+        :loading="loading "
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">
@@ -76,7 +76,7 @@
       key: 'first_owner',
     },
   ];
-  const lodding = ref(false);
+  const loading  = ref(false);
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
@@ -96,16 +96,16 @@
   // 获取主机列表
   async function getHostMangeListRequest() {
     try {
-      if (lodding.value) {
+      if (loading .value) {
         return;
       }
-      lodding.value = true;
+      loading .value = true;
       const data = await getHostMangeList(listQuery);
-      lodding.value = false;
+      loading .value = false;
       list.value = data.results;
       total.value = data.count;
     } catch (error) {
-      lodding.value = false;
+      loading .value = false;
       console.error(error);
     }
   }

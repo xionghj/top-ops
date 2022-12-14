@@ -23,7 +23,7 @@
           :data-source="list"
           row-key="id"
           :pagination="pagination"
-          :loading="lodding"
+          :loading="loading"
           @change="handleTableChange"
         >
           <template #bodyCell="{ column, record }">
@@ -113,7 +113,7 @@
       key: 'updated_at',
     },
   ];
-  const lodding = ref(false);
+  const loading = ref(false);
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
@@ -133,27 +133,27 @@
   // 获取负责人列表
   async function getHostOwnerRequest() {
     try {
-      if (lodding.value) {
+      if (loading.value) {
         return;
       }
-      lodding.value = true;
+      loading.value = true;
       const id: any = route.query && route.query.id;
       const data = await getHostOwner(id, listQuery);
-      lodding.value = false;
+      loading.value = false;
       list.value = data;
       total.value = data.count;
     } catch (error) {
-      lodding.value = false;
+      loading.value = false;
       console.error(error);
     }
   }
   // 添加负责人
   const state = reactive<{
     selectedRowKeys: Key[];
-    addLodding: boolean;
+    addLoading: boolean;
   }>({
     selectedRowKeys: [],
-    addLodding: false,
+    addLoading: false,
   });
   async function addHostOwnerRequest() {
     if (state.selectedRowKeys.length == 0) {
@@ -161,10 +161,10 @@
       return;
     }
     try {
-      if (state.addLodding) {
+      if (state.addLoading) {
         return;
       }
-      state.addLodding = true;
+      state.addLoading = true;
       const id: any = route.query && route.query.id;
       const params = {
         action: 'add',
@@ -174,9 +174,9 @@
       const data = await hostOwner(id, params);
       message.success(data.detail);
       handleCancel();
-      state.addLodding = false;
+      state.addLoading = false;
     } catch (error) {
-      state.addLodding = false;
+      state.addLoading = false;
       console.error(error);
     }
   }

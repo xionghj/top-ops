@@ -1,6 +1,6 @@
 // import { resourceManage } from './resourceManage';
 // import { developEfficiency } from './developEfficiency';
-import hostManage from './resourceManage/infrastructure/hostManage';
-const asyncRouterMap = [...hostManage];
+import infrastructure from './resourceManage/infrastructure/index';
+const asyncRouterMap = [...infrastructure];
 
 export default asyncRouterMap;

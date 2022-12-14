@@ -20,7 +20,7 @@
 export const hostDetails = {
   title: '主机详情',
   name: 'hostDetails',
-  activeMenu: 'p',
+  activeMenu: 'hostManage',
   kind: 'menu',
   display: false,
   priority: '1.2.1',
@@ -41,13 +41,5 @@ export const userDetails = {
   path: 'userDetails',
   component: '/resourceManage/infrastructure/hostManage/hostDetails/index',
 };
-// export const hostDetails1 = {
-//   path: '/hostDetails1',
-//   name: 'hostDetails1',
-//   code: '8ed49b05a641999a',
-//   component: () => import('@/views/resourceManage/infrastructure/hostManage/hostDetails/index.vue'),
-//   meta: {
-//     title: '主机详情1',
-//   },
-// };
+
 export default [hostDetails, userDetails];

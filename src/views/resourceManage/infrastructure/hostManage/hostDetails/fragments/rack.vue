@@ -26,7 +26,7 @@
               :data-source="diskList"
               row-key="id"
               :pagination="false"
-              :loading="diskLodding"
+              :loading="diskLoading"
               class="w-full"
             >
               <template #bodyCell="{ column, record }">
@@ -48,7 +48,7 @@
               :data-source="diskList"
               row-key="id"
               :pagination="false"
-              :loading="diskLodding"
+              :loading="diskLoading"
               class="w-full"
             >
               <template #bodyCell="{ column, record }">
@@ -141,19 +141,19 @@
       key: 'cpu_count',
     },
   ];
-  const diskLodding = ref(false);
+  const diskLoading = ref(false);
   // 获取主机列表
   async function getHostMangeListRequest() {
     try {
-      if (diskLodding.value) {
+      if (diskLoading.value) {
         return;
       }
-      diskLodding.value = true;
+      diskLoading.value = true;
       const data = await getHostMangeList(diskListQuery);
-      diskLodding.value = false;
+      diskLoading.value = false;
       diskList.value = data.results;
     } catch (error) {
-      diskLodding.value = false;
+      diskLoading.value = false;
       console.error(error);
     }
   }

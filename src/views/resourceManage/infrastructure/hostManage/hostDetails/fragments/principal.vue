@@ -22,13 +22,13 @@
         :data-source="list"
         row-key="id"
         :pagination="pagination"
-        :loading="lodding"
+        :loading="loading "
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'agent_status'">
+          <template v-if="column.key === 'is_active'">
             <a-tag :color="'green'">
-              {{ record.agent_status }}
+              {{ record.is_active ? '激活' : '未激活' }}
             </a-tag>
           </template>
         </template>
@@ -86,8 +86,8 @@
     },
     {
       title: '状态',
-      dataIndex: 'mem_size',
-      key: 'mem_size',
+      dataIndex: 'is_active',
+      key: 'is_active',
     },
     {
       title: '联系电话',
@@ -100,7 +100,7 @@
       key: 'updated_at',
     },
   ];
-  const lodding = ref(false);
+  const loading  = ref(false);
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
@@ -120,17 +120,17 @@
   // 获取负责人列表
   async function getHostOwnerRequest() {
     try {
-      if (lodding.value) {
+      if (loading .value) {
         return;
       }
-      lodding.value = true;
+      loading .value = true;
       const id: any = route.query && route.query.id;
       const data = await getHostOwner(id, listQuery);
-      lodding.value = false;
+      loading .value = false;
       list.value = data;
       total.value = data.count;
     } catch (error) {
-      lodding.value = false;
+      loading .value = false;
       console.error(error);
     }
   }
