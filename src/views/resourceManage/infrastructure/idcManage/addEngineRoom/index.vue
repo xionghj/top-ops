@@ -1,4 +1,4 @@
-<!-- 机柜管理 -- 新增机柜 -->
+<!-- 数据中心 -- 新增机房 -->
 <template>
   <div>
     <Breadcrumb>
@@ -10,53 +10,60 @@
         /> </template
     ></Breadcrumb>
     <div class="p-6 bg-white">
-      <a-spin :spinning="rackInfoLoading">
+      <a-spin :spinning="idcInfoLoading">
         <a-form ref="formRef" :model="form" :rules="rules" layout="vertical">
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="机柜名称" name="name">
-                <a-input v-model:value="form.name" placeholder="请输入机柜名称" />
+              <a-form-item label="机房名称" name="name">
+                <a-input v-model:value="form.name" placeholder="请输入机房名称" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="机柜U数" name="unum">
-                <a-input v-model:value="form.unum" placeholder="请输入机柜U数" />
+              <a-form-item label="机房简写" name="short_name">
+                <a-input v-model:value="form.short_name" placeholder="请输入机房简写" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <!-- <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="机房类型" name="free_unum">
+                <a-input v-model:value="form.free_unum" placeholder="请输入机房类型" />
+              </a-form-item>
+            </a-col>
+          </a-row> -->
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="联系人" name="contact">
+                <a-input v-model:value="form.contact" placeholder="请输入联系人" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="可用U数" name="free_unum">
-                <a-input v-model:value="form.free_unum" placeholder="请输入可用U数" />
+              <a-form-item label="联系电话" name="telephone">
+                <a-input v-model:value="form.telephone" placeholder="请输入联系电话" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <!-- <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="机房编号" name="code">
+                <a-input v-model:value="form.code" placeholder="请输入机房编号" />
+              </a-form-item>
+            </a-col>
+          </a-row> -->
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="机房地址" name="address">
+                <a-input v-model:value="form.address" placeholder="请输入机房地址" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="机柜编号" name="code">
-                <a-input v-model:value="form.code" placeholder="请输入机柜编号" />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-item label="所属机房" name="idc">
-                <a-select v-model:value="form.idc" placeholder="请选择所属机房">
-                  <a-select-option
-                    v-for="(item, index) in ibcList"
-                    :key="index"
-                    :value="item.bigId"
-                    >{{ item.name }}</a-select-option
-                  >
-                </a-select>
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-item label="机柜状态" name="status">
+              <a-form-item label="机房状态" name="status">
                 <a-select v-model:value="form.status" placeholder="请选择机柜状态">
                   <a-select-option :value="1">启用</a-select-option>
                   <a-select-option :value="2">停用</a-select-option>
@@ -97,12 +104,7 @@
     message,
   } from 'ant-design-vue';
   import type { Rule, FormInstance } from 'ant-design-vue/es/form';
-  import {
-    addRack,
-    editRack,
-    getRackDetails,
-  } from '@/api/resourceManage/infrastructure/rackManage';
-  import { getIbcMangeList } from '@/api/resourceManage/infrastructure/ibcManage';
+  import { addIdc, editIdc, getIdcDetails } from '@/api/resourceManage/infrastructure/idcManage';
   const router = useRouter();
   const route = useRoute();
   function onBack() {
@@ -112,23 +114,22 @@
   const type = ref('add');
   const form = ref({
     name: '',
-    code: '',
-    unum: '',
-    free_unum: '',
-    status: null,
+    short_name: '',
+    contact: '',
+    telephone: '',
+    address: '',
+    status: 1,
     description: '',
-    priority: '',
-    idc: '',
   });
   const loading = ref(false);
   const rules: Record<string, Rule[]> = {
-    name: [{ required: true, message: '请输入机柜名称' }],
-    code: [{ required: true, message: '请输入机柜编号' }],
-    unum: [{ required: true, message: '请输入机柜U数' }],
-    free_unum: [{ required: true, message: '请输入可用U数' }],
-    status: [{ required: true, message: '请输入机柜名称' }],
+    name: [{ required: true, message: '请输入' }],
+    short_name: [{ required: true, message: '请输入' }],
+    contact: [{ required: true, message: '请输入' }],
+    telephone: [{ required: true, message: '请输入' }],
+    address: [{ required: true, message: '请输入' }],
+    status: [{ required: true, message: '请输入' }],
     description: [{ required: true, message: '请输入备注说明' }],
-    idc: [{ required: true, message: '请输入机柜名称' }],
   };
   function onSubmit() {
     formRef.value &&
@@ -145,12 +146,12 @@
     try {
       const params: any = cloneDeep(form.value);
       if (type.value == 'add') {
-        await addRack(params);
+        await addIdc(params);
         message.success('添加成功');
       } else {
         delete params.creator;
         const id: any = route.query && route.query.id;
-        await editRack(id, params);
+        await editIdc(id, params);
         message.success('编辑成功');
       }
       router.go(-1);
@@ -159,48 +160,28 @@
       loading.value = false;
     }
   }
-  // 获取数据中心列表
-  const ibcList = ref<API.IbcManageListItem[]>([]);
-  async function getIbcMangeListRequest() {
-    try {
-      const params = {
-        search: '',
-        page: 1,
-        pageSize: 100,
-      };
-      const data = await getIbcMangeList(params);
-      ibcList.value = data.results;
-      ibcList.value.forEach((item) => {
-        item.bigId = item.id.toString();
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
   // 获取机柜信息
-  const rackInfoLoading = ref(false);
-  async function getRackInfo() {
+  const idcInfoLoading = ref(false);
+  async function getIdcInfo() {
     try {
-      if (rackInfoLoading.value) {
+      if (idcInfoLoading.value) {
         return;
       }
-      rackInfoLoading.value = true;
+      idcInfoLoading.value = true;
       const id: any = route.query && route.query.id;
-      const data = await getRackDetails(id);
-      data.idc = data.idc.id.toString();
+      const data = await getIdcDetails(id);
       form.value = data;
-      rackInfoLoading.value = false;
+      idcInfoLoading.value = false;
     } catch (error) {
-      rackInfoLoading.value = false;
+      idcInfoLoading.value = false;
       console.error(error);
     }
   }
   onMounted(async () => {
     const types: any = route.query && route.query.type;
     type.value = types;
-    await getIbcMangeListRequest();
     if (types === 'view') {
-      getRackInfo();
+      getIdcInfo();
     }
   });
 </script>

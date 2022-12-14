@@ -102,7 +102,7 @@
     editRack,
     getRackDetails,
   } from '@/api/resourceManage/infrastructure/rackManage';
-  import { getIbcMangeList } from '@/api/resourceManage/infrastructure/ibcManage';
+  import { getIbcMangeList } from '@/api/resourceManage/infrastructure/idcManage';
   const router = useRouter();
   const route = useRoute();
   function onBack() {

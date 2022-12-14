@@ -17,7 +17,7 @@
         :data-source="list"
         row-key="id"
         :pagination="pagination"
-        :loading="loading "
+        :loading="loading"
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">

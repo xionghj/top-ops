@@ -22,7 +22,7 @@
         :data-source="list"
         row-key="id"
         :pagination="pagination"
-        :loading="loading "
+        :loading="loading"
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">
@@ -100,7 +100,7 @@
       key: 'updated_at',
     },
   ];
-  const loading  = ref(false);
+  const loading = ref(false);
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
@@ -120,17 +120,17 @@
   // 获取负责人列表
   async function getHostOwnerRequest() {
     try {
-      if (loading .value) {
+      if (loading.value) {
         return;
       }
-      loading .value = true;
+      loading.value = true;
       const id: any = route.query && route.query.id;
       const data = await getHostOwner(id, listQuery);
-      loading .value = false;
+      loading.value = false;
       list.value = data;
       total.value = data.count;
     } catch (error) {
-      loading .value = false;
+      loading.value = false;
       console.error(error);
     }
   }

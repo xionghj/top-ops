@@ -29,7 +29,7 @@
           <a-input
             v-model:value="listQuery.search"
             placeholder="根据关键词搜索"
-            @change="getIbcMangeListRequest()"
+            @change="getIdcMangeListRequest()"
           />
         </div>
       </div>
@@ -51,11 +51,6 @@
                 {{ record.name }}
               </span>
             </template>
-            <template v-if="column.key === 'creator'">
-              <span>
-                {{ record.creator[0].username }}
-              </span>
-            </template>
           </template>
         </a-table>
       </a-spin>
@@ -73,7 +68,7 @@
     Menu as AMenu,
     MenuItem as AMenuItem,
   } from 'ant-design-vue';
-  import { getIbcMangeList } from '@/api/resourceManage/infrastructure/ibcManage';
+  import { getIdcMangeList } from '@/api/resourceManage/infrastructure/idcManage';
   type Key = string | number;
   const router = useRouter();
   const list = ref<API.IbcManageListItem[]>([]);
@@ -96,8 +91,8 @@
     },
     {
       title: '联系人',
-      dataIndex: 'creator',
-      key: 'creator',
+      dataIndex: 'contact',
+      key: 'contact',
     },
     {
       title: '联系电话',
@@ -130,16 +125,16 @@
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
     listQuery.pageSize = pag.pageSize;
-    getIbcMangeListRequest();
+    getIdcMangeListRequest();
   };
-  // 获取机柜列表
-  async function getIbcMangeListRequest() {
+  // 获取机房列表
+  async function getIdcMangeListRequest() {
     try {
       if (spinning.value) {
         return;
       }
       spinning.value = true;
-      const data = await getIbcMangeList(listQuery);
+      const data = await getIdcMangeList(listQuery);
       spinning.value = false;
       list.value = data.results;
       total.value = data.count;
@@ -148,7 +143,7 @@
       console.error(error);
     }
   }
-  getIbcMangeListRequest();
+  getIdcMangeListRequest();
   const state = reactive<{
     selectedRowKeys: Key[];
     loading: boolean;
@@ -159,10 +154,10 @@
   const onSelectChange = (selectedRowKeys: Key[]) => {
     state.selectedRowKeys = selectedRowKeys;
   };
-  const onJumeTo = function (ids: number) {
-    // router.push({ name: 'addRack', query: { id: ids } });
+  const onJumeTo = function (id: number) {
+    router.push({ name: 'addEngineRoom', query: { id, type: 'view' } });
   };
   const onAddEngineRoom = function () {
-    // router.push({ name: 'addEngineRoom' });
+    router.push({ name: 'addEngineRoom', query: { type: 'add' } });
   };
 </script>

@@ -1,6 +1,6 @@
 <!-- 主机管理-列表详情-所属机柜-->
 <template>
-  <div v-if="JSON.stringify(rackInfo) === '{}'" class="flex">
+  <div v-if="!rackInfo.id" class="flex">
     <div class="w-full h-32 bg-gray-50 flex items-center">
       <div class="ml-4 text-[#FFA235] text-base"
         >请 <span class="text-blue-500">设置</span> 所在机柜</div
