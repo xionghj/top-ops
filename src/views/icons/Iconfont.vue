@@ -15,15 +15,4 @@
   /**
    * @description ant-design-vue配置阿里巴巴矢量图标库使用
    */
-  const state = reactive({
-    scriptUrl: '',
-    iconName: '',
-    visible: false,
-    imageUrl: '',
-  });
-
-  const showPreview = (e) => {
-    state.imageUrl = e.target.currentSrc;
-    state.visible = true;
-  };
 </script>

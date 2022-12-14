@@ -1,10 +1,5 @@
 <template>
   <div class="page-title-box">
-    <!-- <div class="breadcrumb">
-      <div v-for="(item, index) in arr" :key="index" class="breadcrumb-item">
-        <a href="#">{{ item.name }}</a>
-      </div>
-    </div> -->
     <div class="flex items-center">
       <slot name="left"></slot>
       <a-breadcrumb>
@@ -27,7 +22,7 @@
 
   const route = useRoute();
   const permissionStore = usePermissionStore();
-  const menus = ref([]);
+  const menus = ref<any>([]);
   // 获取当前路由的二级菜单
   function getSubMenus() {
     const menusList = permissionStore.backMenuList;
@@ -68,28 +63,6 @@
 
     :deep(.ant-breadcrumb) {
       font-size: 12px;
-    }
-  }
-  .breadcrumb {
-    display: flex;
-    .breadcrumb-item:before {
-      border: solid transparent;
-      content: ' ';
-      height: 0;
-      left: 100%; //根据三角形的位置，可以随意更改。
-      position: absolute;
-      width: 0;
-    }
-    .breadcrumb-item {
-      &::before {
-        font-family: Material Design Icons;
-        font-size: 15px;
-        line-height: 20px;
-        color: red;
-      }
-      > a {
-        color: #495057;
-      }
     }
   }
 </style>

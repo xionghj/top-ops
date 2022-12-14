@@ -220,7 +220,7 @@
     // Drag and drop sort
     const { initSortable } = useSortable(columnListEl, {
       handle: '.menus-icon-drop',
-      onEnd: (evt) => {
+      onEnd: (evt:any) => {
         const { oldIndex, newIndex } = evt;
 
         if (isNullAndUnDef(oldIndex) || isNullAndUnDef(newIndex) || oldIndex === newIndex) {

@@ -102,7 +102,7 @@
     editRack,
     getRackDetails,
   } from '@/api/resourceManage/infrastructure/rackManage';
-  import { getIbcMangeList } from '@/api/resourceManage/infrastructure/idcManage';
+  import { getIdcMangeList } from '@/api/resourceManage/infrastructure/idcManage';
   const router = useRouter();
   const route = useRoute();
   function onBack() {
@@ -115,7 +115,7 @@
     code: '',
     unum: '',
     free_unum: '',
-    status: null,
+    status: 1,
     description: '',
     priority: '',
     idc: '',
@@ -168,7 +168,7 @@
         page: 1,
         pageSize: 100,
       };
-      const data = await getIbcMangeList(params);
+      const data = await getIdcMangeList(params);
       ibcList.value = data.results;
       ibcList.value.forEach((item) => {
         item.bigId = item.id.toString();

@@ -29,8 +29,10 @@
     "vue-router": "^4.1.5"
   },
   "devDependencies": {
+    "@types/json-bigint": "^1.0.1",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.7.15",
+    "@types/nprogress": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^5.36.2",
     "@typescript-eslint/parser": "^5.36.2",
     "@vitejs/plugin-vue": "^3.1.0",

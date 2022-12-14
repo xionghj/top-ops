@@ -61,15 +61,16 @@
   const permissionStore = usePermissionStore();
   const { subMenus } = storeToRefs(permissionStore);
   const state = reactive({
-    openKeys: [] as string[],
+    openKeys: [] as any,
     selectedKeys: [currentRoute.name] as string[],
   });
   const handleClick: MenuProps['onClick'] = (e) => {
     console.log('click', e, state.selectedKeys, state.openKeys);
-    router.push({ name: e.key });
+    const nameKey:any = e.key;
+    router.push({ name: nameKey });
   };
   // 根据activeMenu获取指定的menu
-  const getTargetMenuByActiveMenuName = (activeMenu: string) => {
+  const getTargetMenuByActiveMenuName = (activeMenu: any) => {
     return router.getRoutes().find((n) => [n.name, n.path].includes(activeMenu));
   };
 
