@@ -66,7 +66,7 @@
   });
   const handleClick: MenuProps['onClick'] = (e) => {
     console.log('click', e, state.selectedKeys, state.openKeys);
-    const nameKey:any = e.key;
+    const nameKey: any = e.key;
     router.push({ name: nameKey });
   };
   // 根据activeMenu获取指定的menu

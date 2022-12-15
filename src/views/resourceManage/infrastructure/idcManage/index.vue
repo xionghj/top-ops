@@ -46,9 +46,19 @@
             <template v-if="column.key === 'name'">
               <span
                 class="text-blue-500 cursor-pointer hover:text-blue-700"
-                @click="onJumeTo(record.id)"
+                @click="onJumeToDetails(record.id)"
               >
                 {{ record.name }}
+              </span>
+            </template>
+            <template v-else-if="column.key === 'action'">
+              <span>
+                <span
+                  class="text-blue-500 cursor-pointer hover:text-blue-700"
+                  @click="onEditEngineRoom(record.id)"
+                >
+                  编辑
+                </span>
               </span>
             </template>
           </template>
@@ -109,6 +119,10 @@
       dataIndex: 'updated_at',
       key: 'updated_at',
     },
+    {
+      title: '操作',
+      key: 'action',
+    },
   ];
   const spinning = ref(false);
   const pagination = computed(() => ({
@@ -154,10 +168,14 @@
   const onSelectChange = (selectedRowKeys: Key[]) => {
     state.selectedRowKeys = selectedRowKeys;
   };
-  const onJumeTo = function (id: number) {
-    router.push({ name: 'addEngineRoom', query: { id, type: 'view' } });
+  const onEditEngineRoom = function (id: number) {
+    router.push({ name: 'addEngineRoom', query: { id, type: 'edit' } });
   };
   const onAddEngineRoom = function () {
     router.push({ name: 'addEngineRoom', query: { type: 'add' } });
+  };
+  // 跳转详情
+  const onJumeToDetails = function (id: number) {
+    router.push({ name: 'engineRoomDetails', query: { id } });
   };
 </script>

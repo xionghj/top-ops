@@ -1,6 +1,12 @@
 <template>
   <div class="page-title-box">
     <div class="flex items-center">
+      <ArrowLeftOutlined
+        v-if="showBack"
+        class="mr-2"
+        :style="{ fontSize: '14px', color: '#1e8eff' }"
+        @click="onBack"
+      />
       <slot name="left"></slot>
       <a-breadcrumb>
         <template #separator><span>></span></template>
@@ -15,13 +21,24 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { ref } from 'vue';
-  import { useRoute } from 'vue-router';
+  import { ref, toRefs } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+  import { ArrowLeftOutlined } from '@ant-design/icons-vue';
   import { Breadcrumb as ABreadcrumb, BreadcrumbItem as ABreadcrumbItem } from 'ant-design-vue';
   import { usePermissionStore } from '@/store/modules/permission';
-
   const route = useRoute();
+  const router = useRouter();
   const permissionStore = usePermissionStore();
+  const props = defineProps({
+    showBack: {
+      type: Boolean,
+      default: false,
+    },
+  });
+  const { showBack } = toRefs(props);
+  function onBack() {
+    router.go(-1);
+  }
   const menus = ref<any>([]);
   // 获取当前路由的二级菜单
   function getSubMenus() {

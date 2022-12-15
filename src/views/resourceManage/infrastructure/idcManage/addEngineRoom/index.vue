@@ -1,14 +1,7 @@
 <!-- 数据中心 -- 新增机房 -->
 <template>
   <div>
-    <Breadcrumb>
-      <template #left>
-        <ArrowLeftOutlined
-          class="mr-2"
-          :style="{ fontSize: '14px', color: '#1e8eff' }"
-          @click="onBack"
-        /> </template
-    ></Breadcrumb>
+    <Breadcrumb :show-back="true"></Breadcrumb>
     <div class="p-6 bg-white">
       <a-spin :spinning="idcInfoLoading">
         <a-form ref="formRef" :model="form" :rules="rules" layout="vertical">
@@ -89,7 +82,6 @@
   import { ref, onMounted } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { cloneDeep } from 'lodash-es';
-  import { ArrowLeftOutlined } from '@ant-design/icons-vue';
   import {
     Form as AForm,
     FormItem as AFormItem,
@@ -107,9 +99,6 @@
   import { addIdc, editIdc, getIdcDetails } from '@/api/resourceManage/infrastructure/idcManage';
   const router = useRouter();
   const route = useRoute();
-  function onBack() {
-    router.go(-1);
-  }
   const formRef = ref<FormInstance>();
   const type = ref('add');
   const form = ref({
@@ -180,7 +169,7 @@
   onMounted(async () => {
     const types: any = route.query && route.query.type;
     type.value = types;
-    if (types === 'view') {
+    if (types === 'edit') {
       getIdcInfo();
     }
   });

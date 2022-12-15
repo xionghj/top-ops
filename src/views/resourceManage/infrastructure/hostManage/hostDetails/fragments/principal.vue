@@ -17,7 +17,7 @@
         </a-select>
       </div>
       <a-table
-        :row-selection="{ selectedRowKeys: state.selectPrincipal, onChange: onSelectChange }"
+        :row-selection="{ selectedRowKeys: selectPrincipal, onChange: onSelectChange }"
         :columns="columns"
         :data-source="list"
         row-key="id"
@@ -135,15 +135,8 @@
     }
   }
   getHostOwnerRequest();
-  const state = reactive<{
-    selectPrincipal: Key[];
-  }>({
-    selectPrincipal: [],
-  });
-  const selectPrincipal = ref<any>([]);
+  const selectPrincipal = ref<Key[]>([]);
   const onSelectChange = (selectedRowKeys: Key[]) => {
-    console.log('selectedRowKeys changed: ', selectedRowKeys);
-    state.selectPrincipal = selectedRowKeys;
     selectPrincipal.value = selectedRowKeys;
   };
   defineExpose({ selectPrincipal, getHostOwnerRequest });

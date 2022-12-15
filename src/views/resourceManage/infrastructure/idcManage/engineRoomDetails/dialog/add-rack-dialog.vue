@@ -1,24 +1,29 @@
+<!-- 数据中心-添加机柜 -->
 <template>
   <div>
     <a-modal
-      v-model:visible="addOwnerShowDialog"
-      title="选择负责人"
+      v-model:visible="addRackShowDialog"
+      title="选择机柜"
       width="800px"
       @ok="handleOk"
       @cancel="handleCancel"
     >
       <div class="bg-white">
-        <div class="flex justify-between mb-4">
+        <div class="flex justify-between items-center mb-4">
           <div class="w-56">
             <a-input
               v-model:value="listQuery.search"
               placeholder="根据关键词搜索"
-              @change="getHostOwnerRequest()"
+              @change="getIdcRacksListRequest()"
             />
           </div>
+          <a-checkbox v-model:checked="relatedToMeChecked">与我有关</a-checkbox>
         </div>
         <a-table
-          :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+          :row-selection="{
+            selectedRowKeys: state.selectedRowKeys,
+            onChange: onSelectChange,
+          }"
           :columns="columns"
           :data-source="list"
           row-key="id"
@@ -38,7 +43,7 @@
       <template #footer>
         <div class="flex justify-between">
           <div>已选择 {{ state.selectedRowKeys.length }} 项</div>
-          <div>
+          <div class="flex items-center">
             <a-button key="back" @click="handleCancel">取消</a-button>
             <a-button key="submit" type="primary" @click="handleOk">确定</a-button>
           </div>
@@ -56,26 +61,27 @@
     Input as AInput,
     Tag as ATag,
     Button as AButton,
+    Checkbox as ACheckbox,
     message,
   } from 'ant-design-vue';
-  import { getHostOwner, hostOwner } from '@/api/resourceManage/infrastructure/hostManage';
+  import { getIdcRacksList, idcRacksSettings } from '@/api/resourceManage/infrastructure/idcManage';
   type Key = string | number;
   const props = defineProps({
-    addOwnerShowDialog: Boolean,
+    addRackShowDialog: Boolean,
   });
-  const { addOwnerShowDialog } = toRefs(props);
-  watch(addOwnerShowDialog, (bol) => {
+  const { addRackShowDialog } = toRefs(props);
+  watch(addRackShowDialog, (bol) => {
     if (bol) {
       state.selectedRowKeys = [];
-      getHostOwnerRequest();
+      getIdcRacksListRequest();
     }
   });
-  const emit = defineEmits(['onCloseAddOwnerShowDialog']);
+  const emit = defineEmits(['onCloseAddRackShowDialog']);
   const handleOk = () => {
-    addHostOwnerRequest();
+    addIdcRacksRequest();
   };
   const handleCancel = () => {
-    emit('onCloseAddOwnerShowDialog');
+    emit('onCloseAddRackShowDialog');
   };
   const route = useRoute();
   const list = ref<API.HostManageListItem[]>([]);
@@ -84,37 +90,31 @@
     page: 1,
     pageSize: 10,
     person: '',
-    role: 'first_owner',
   });
   const total = ref(0);
   const columns = [
     {
-      title: '用户名',
-      dataIndex: 'username',
-      key: 'username',
-    },
-    {
-      title: '花名',
+      title: '名称',
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: '邮箱',
-      dataIndex: 'email',
-      key: 'email',
+      title: '可用U数',
+      dataIndex: 'unum',
+      key: 'unum',
     },
     {
-      title: '状态',
-      dataIndex: 'mem_size',
-      key: 'mem_size',
+      title: '机柜编号',
+      dataIndex: 'code',
+      key: 'code',
     },
     {
-      title: '联系电话',
-      dataIndex: 'telephone',
-      key: 'telephone',
+      title: '备注',
+      dataIndex: 'description',
+      key: 'description',
     },
     {
-      title: '最近修改',
+      title: '最近更新',
       dataIndex: 'updated_at',
       key: 'updated_at',
     },
@@ -134,26 +134,26 @@
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
     listQuery.pageSize = pag.pageSize;
-    getHostOwnerRequest();
+    getIdcRacksListRequest();
   };
-  // 获取负责人列表
-  async function getHostOwnerRequest() {
+  // 获取允许添加机柜列表
+  async function getIdcRacksListRequest() {
     try {
       if (loading.value) {
         return;
       }
       loading.value = true;
       const id: any = route.query && route.query.id;
-      const data = await getHostOwner(id, listQuery);
+      const data = await getIdcRacksList(id, listQuery);
       loading.value = false;
-      list.value = data;
+      list.value = data.results;
       total.value = data.count;
     } catch (error) {
       loading.value = false;
       console.error(error);
     }
   }
-  // 添加负责人
+  // 添加机柜
   const state = reactive<{
     selectedRowKeys: Key[];
     addLoading: boolean;
@@ -161,9 +161,9 @@
     selectedRowKeys: [],
     addLoading: false,
   });
-  async function addHostOwnerRequest() {
+  async function addIdcRacksRequest() {
     if (state.selectedRowKeys.length == 0) {
-      message.warning('请至少勾选一个负责');
+      message.warning('请勾选一个机柜');
       return;
     }
     try {
@@ -174,10 +174,9 @@
       const id: any = route.query && route.query.id;
       const params = {
         action: 'add',
-        role: 'first_owner',
-        related_ids: state.selectedRowKeys,
+        instance_ids: state.selectedRowKeys,
       };
-      const data = await hostOwner(id, params);
+      const data = await idcRacksSettings(id, params);
       message.success(data.detail);
       handleCancel();
       state.addLoading = false;
@@ -189,4 +188,5 @@
   const onSelectChange = (selectedRowKeys: Key[]) => {
     state.selectedRowKeys = selectedRowKeys;
   };
+  const relatedToMeChecked = ref();
 </script>

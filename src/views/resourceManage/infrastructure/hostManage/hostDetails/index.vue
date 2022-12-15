@@ -1,14 +1,7 @@
 <!-- 主机管理-详情 -->
 <template>
   <div>
-    <Breadcrumb>
-      <template #left>
-        <ArrowLeftOutlined
-          class="mr-2"
-          :style="{ fontSize: '14px', color: '#1e8eff' }"
-          @click="onBack"
-        />
-      </template>
+    <Breadcrumb :show-back="true">
       <template #right>
         <div v-if="activeKey == '1'" class="flex">
           <div class="mr-2 cursor-pointer hover:text-blue-500">编辑</div>
@@ -65,7 +58,7 @@
         </div>
       </template>
     </Breadcrumb>
-    <div class="p-4 bg-white">
+    <div class="px-4 pb-4 bg-white">
       <a-spin :spinning="basicInfoLoading">
         <a-tabs v-model:activeKey="activeKey">
           <a-tab-pane key="1" tab="基本信息"
@@ -104,8 +97,7 @@
 </template>
 <script lang="ts" setup>
   import { ref } from 'vue';
-  import { useRouter, useRoute } from 'vue-router';
-  import { ArrowLeftOutlined } from '@ant-design/icons-vue';
+  import { useRoute } from 'vue-router';
   import {
     Tabs as ATabs,
     TabPane as ATabPane,
@@ -129,10 +121,6 @@
     hostRackSettings,
   } from '@/api/resourceManage/infrastructure/hostManage';
   const route = useRoute();
-  const router = useRouter();
-  function onBack() {
-    router.go(-1);
-  }
   const basicInfoExpand = ref(false);
   const activeKey = ref('1');
   const basicInfo = ref({});

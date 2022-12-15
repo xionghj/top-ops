@@ -53,7 +53,7 @@
             </template>
             <template v-if="column.key === 'idc'">
               <span>
-                {{ record.idc.name }}
+                {{ record.idc && record.idc.name }}
               </span>
             </template>
           </template>
