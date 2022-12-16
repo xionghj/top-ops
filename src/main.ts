@@ -8,7 +8,7 @@ import { setupStore } from '@/store';
 import './styles/index.less';
 import 'virtual:svg-icons-register';
 
-import 'ant-design-vue/dist/antd.css';
+import 'ant-design-vue/dist/antd.less';
 import './styles/public.less';
 import { setupCustomComponents } from '@/plugins';
 

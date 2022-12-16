@@ -11,6 +11,16 @@ export default defineConfig({
   resolve: {
     alias: [{ find: '@', replacement: resolve(__dirname, 'src') }],
   },
+  css: {
+    preprocessorOptions: {
+      less: {
+        javascriptEnabled: true,
+        modifyVars: {
+          'border-radius-base': '4px',
+        },
+      },
+    },
+  },
   plugins: [
     vue(),
     vueJsx({
