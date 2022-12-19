@@ -4,7 +4,7 @@
     <Breadcrumb>
       <template #right>
         <div class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onAddRack('add')"
+          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onAddBusiness('add')"
             >新建业务</div
           >
           <a-dropdown placement="bottom">
@@ -47,7 +47,7 @@
           <template v-if="column.key === 'name'">
             <span
               class="text-blue-500 cursor-pointer hover:text-blue-700"
-              @click="onJumeTo(record.id, 'view')"
+              @click="onJumeTo(record.id)"
             >
               {{ record.name }}
             </span>
@@ -163,10 +163,10 @@
   const onSelectChange = (selectedRowKeys: Key[]) => {
     state.selectedRowKeys = selectedRowKeys;
   };
-  const onJumeTo = function (id: number, type: string) {
-    router.push({ name: 'addRack', query: { id, type } });
+  const onJumeTo = function (id: number) {
+    router.push({ name: 'businessDetails', query: { id } });
   };
-  const onAddRack = function (type: string) {
-    router.push({ name: 'addRack', query: { type } });
+  const onAddBusiness = function (type: string) {
+    router.push({ name: 'addBusiness', query: { type } });
   };
 </script>

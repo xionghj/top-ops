@@ -122,11 +122,11 @@
   function onSubmit() {
     formRef.value &&
       formRef.value.validateFields().then(() => {
-        submitReuest();
+        submitRequest();
       });
   }
   // 保存
-  async function submitReuest() {
+  async function submitRequest() {
     if (loading.value) {
       return;
     }

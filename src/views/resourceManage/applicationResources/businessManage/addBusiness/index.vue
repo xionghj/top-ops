@@ -3,44 +3,63 @@
   <div>
     <Breadcrumb :show-back="true"></Breadcrumb>
     <div class="p-6 bg-white">
-      <a-spin :spinning="rackInfoLoading">
-        <a-form ref="formRef" :model="form" :rules="rules" layout="vertical">
+      <a-spin :spinning="businessLoading">
+        <a-form ref="formRef" :model="form" :rules="rules" :label-col="labelCol">
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="机柜名称" name="name">
-                <a-input v-model:value="form.name" placeholder="请输入机柜名称" />
+              <a-form-item label="名称" name="name">
+                <a-input v-model:value="form.name" placeholder="请输入" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="机柜U数" name="unum">
-                <a-input v-model:value="form.unum" placeholder="请输入机柜U数" />
+              <a-form-item label="业务类型" name="kind">
+                <a-radio-group v-model:value="form.kind" name="radioGroup">
+                  <a-radio value="1">产品线</a-radio>
+                  <a-radio value="2">子业务</a-radio>
+                </a-radio-group>
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="可用U数" name="free_unum">
-                <a-input v-model:value="form.free_unum" placeholder="请输入可用U数" />
+              <a-form-item label="备注" name="description">
+                <a-input v-model:value="form.description" placeholder="请输入备注" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="机柜编号" name="code">
-                <a-input v-model:value="form.code" placeholder="请输入机柜编号" />
+              <a-form-item label="应用" name="code">
+                <div class="flex flex-col">
+                  <span
+                    class="mt-[5px] cursor-pointer text-blue-500 hover:text-blue-700"
+                    @click="addApplicationShowDialog = true"
+                    >添加</span
+                  >
+                  <div class="mt-1">
+                    <a-table
+                      :columns="applicationColumns"
+                      :data-source="applicationList"
+                      row-key="id"
+                      :pagination="false"
+                      class="w-full"
+                    >
+                    </a-table>
+                  </div>
+                </div>
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="所属机房" name="idc">
-                <a-select v-model:value="form.idc" placeholder="请选择所属机房">
+              <a-form-item label="产品经理" name="pm">
+                <a-select v-model:value="form.pm" mode="multiple" placeholder="请选择">
                   <a-select-option
-                    v-for="(item, index) in ibcList"
+                    v-for="(item, index) in personOption"
                     :key="index"
-                    :value="item.bigId"
+                    :value="item.id"
                     >{{ item.name }}</a-select-option
                   >
                 </a-select>
@@ -49,18 +68,29 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="机柜状态" name="status">
-                <a-select v-model:value="form.status" placeholder="请选择机柜状态">
-                  <a-select-option :value="1">启用</a-select-option>
-                  <a-select-option :value="2">停用</a-select-option>
+              <a-form-item label="研发负责人" name="developer">
+                <a-select v-model:value="form.developer" mode="multiple" placeholder="请选择">
+                  <a-select-option
+                    v-for="(item, index) in personOption"
+                    :key="index"
+                    :value="item.id"
+                    >{{ item.name }}</a-select-option
+                  >
                 </a-select>
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="备注说明" name="description">
-                <a-input v-model:value="form.description" placeholder="请输入备注说明" />
+              <a-form-item label="测试负责人" name="tester">
+                <a-select v-model:value="form.tester" mode="multiple" placeholder="请选择">
+                  <a-select-option
+                    v-for="(item, index) in personOption"
+                    :key="index"
+                    :value="item.id"
+                    >{{ item.name }}</a-select-option
+                  >
+                </a-select>
               </a-form-item>
             </a-col>
           </a-row>
@@ -69,6 +99,10 @@
         <a-button type="primary" :loading="loading" @click="onSubmit">保存</a-button>
       </a-spin>
     </div>
+    <AddApplicationDialog
+      :add-application-show-dialog="addApplicationShowDialog"
+      @on-close-add-application-show-dialog="closeAddApplicationShowDialog"
+    />
   </div>
 </template>
 <script lang="ts" setup>
@@ -87,46 +121,83 @@
     SelectOption as ASelectOption,
     Spin as ASpin,
     message,
+    RadioGroup as ARadioGroup,
+    Radio as ARadio,
+    Table as ATable,
   } from 'ant-design-vue';
+  import AddApplicationDialog from './dialog/add-application-dialog.vue';
   import type { Rule, FormInstance } from 'ant-design-vue/es/form';
-  import {
-    addRack,
-    editRack,
-    getRackDetails,
-  } from '@/api/resourceManage/infrastructure/rackManage';
   import { getIdcMangeList } from '@/api/resourceManage/infrastructure/idcManage';
+  import {
+    addCMDBBusiness,
+    editCMDBBusiness,
+    getCMDBBusinessDetails,
+  } from '@/api/resourceManage/applicationResources/businessManage';
+  const labelCol = { style: { width: '100px' } };
+  const applicationColumns = [
+    {
+      title: '名称',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: '应用层级',
+      dataIndex: 'free_unum',
+      key: 'free_unum',
+    },
+    {
+      title: '应用别名',
+      dataIndex: 'unum',
+      key: 'unum',
+    },
+    {
+      title: '操作',
+      dataIndex: 'code',
+      key: 'cpu_count',
+    },
+  ];
+  const applicationList = ref([]);
   const router = useRouter();
   const route = useRoute();
   const formRef = ref<FormInstance>();
   const type = ref('add');
+  const personOption = [
+    {
+      name: 'corey',
+      id: 2,
+    },
+    {
+      name: 'xumiao',
+      id: 4,
+    },
+  ];
   const form = ref({
     name: '',
-    code: '',
-    unum: '',
-    free_unum: '',
-    status: 1,
+    kind: '1',
     description: '',
-    priority: '',
-    idc: '',
+    parent: '428350384709369295',
+    tester: [],
+    pm: [],
+    developer: [],
   });
   const loading = ref(false);
   const rules: Record<string, Rule[]> = {
-    name: [{ required: true, message: '请输入机柜名称' }],
-    code: [{ required: true, message: '请输入机柜编号' }],
-    unum: [{ required: true, message: '请输入机柜U数' }],
-    free_unum: [{ required: true, message: '请输入可用U数' }],
-    status: [{ required: true, message: '请输入机柜名称' }],
-    description: [{ required: true, message: '请输入备注说明' }],
-    idc: [{ required: true, message: '请输入机柜名称' }],
+    name: [{ required: true, message: '请输入' }],
+    kind: [{ required: true, message: '请输入' }],
+    description: [{ required: true, message: '请输入备注' }],
+    parent: [{ required: true, message: '请输入' }],
+    tester: [{ required: true, message: '请选择测试人员' }],
+    pm: [{ required: true, message: '请选择产品经理' }],
+    developer: [{ required: true, message: '请选择研发人员' }],
   };
   function onSubmit() {
     formRef.value &&
       formRef.value.validateFields().then(() => {
-        submitReuest();
+        submitRequest();
       });
   }
   // 保存
-  async function submitReuest() {
+  async function submitRequest() {
     if (loading.value) {
       return;
     }
@@ -134,12 +205,12 @@
     try {
       const params: any = cloneDeep(form.value);
       if (type.value == 'add') {
-        await addRack(params);
+        await addCMDBBusiness(params);
         message.success('添加成功');
       } else {
         delete params.creator;
         const id: any = route.query && route.query.id;
-        await editRack(id, params);
+        await editCMDBBusiness(id, params);
         message.success('编辑成功');
       }
       router.go(-1);
@@ -166,30 +237,50 @@
       console.error(error);
     }
   }
-  // 获取机柜信息
-  const rackInfoLoading = ref(false);
-  async function getRackInfo() {
+  // 获取详情信息
+  const businessLoading = ref(false);
+  async function getBusinessInfo() {
     try {
-      if (rackInfoLoading.value) {
+      if (businessLoading.value) {
         return;
       }
-      rackInfoLoading.value = true;
+      businessLoading.value = true;
       const id: any = route.query && route.query.id;
-      const data = await getRackDetails(id);
-      data.idc = data.idc && data.idc.id.toString();
+      const data = await getCMDBBusinessDetails(id);
+      const tester: any = [];
+      data.tester.forEach((item: any) => {
+        tester.push(item.id);
+      });
+      data.tester = tester;
+      const pm: any = [];
+      data.pm.forEach((item: any) => {
+        pm.push(item.id);
+      });
+      data.pm = pm;
+      const developer: any = [];
+      data.developer.forEach((item: any) => {
+        developer.push(item.id);
+      });
+      data.developer = developer;
+      data.parent = data.parent && data.parent.id;
       form.value = data;
-      rackInfoLoading.value = false;
+      businessLoading.value = false;
     } catch (error) {
-      rackInfoLoading.value = false;
+      businessLoading.value = false;
       console.error(error);
     }
+  }
+  // 是否显示应用弹出框
+  const addApplicationShowDialog = ref(false);
+  function closeAddApplicationShowDialog() {
+    addApplicationShowDialog.value = false;
   }
   onMounted(async () => {
     const types: any = route.query && route.query.type;
     type.value = types;
-    await getIbcMangeListRequest();
-    if (types === 'view') {
-      getRackInfo();
+    // await getIbcMangeListRequest();
+    if (types === 'edit') {
+      getBusinessInfo();
     }
   });
 </script>

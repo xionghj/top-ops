@@ -330,10 +330,10 @@
   function onSubmit() {
     formRef.value &&
       formRef.value.validateFields().then(() => {
-        submitReuest();
+        submitRequest();
       });
   }
-  async function submitReuest() {
+  async function submitRequest() {
     const params = cloneDeep(form);
     params.parent =
       form.parent && form.parent.length > 0 ? form.parent[form.parent.length - 1] : null;
