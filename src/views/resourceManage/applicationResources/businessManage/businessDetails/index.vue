@@ -17,24 +17,12 @@
           </a-dropdown>
         </div>
         <div v-if="activeKey == '2'" class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="addRackShowDialog = true"
-            >添加机柜</div
+          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="showAddParentDialogChange"
+            >添加父业务 {{ showAddParentDialog }}</div
           >
-          <a-dropdown placement="bottom">
-            <div class="cursor-pointer hover:text-blue-500" @click.prevent> 更多操作 </div>
-            <template #overlay>
-              <a-menu>
-                <a-menu-item>
-                  <a href="javascript:;">导入</a>
-                </a-menu-item>
-                <a-menu-item>
-                  <div class="cursor-pointer hover:text-blue-500" @click="deletIdcRackRequest"
-                    >移除机柜</div
-                  >
-                </a-menu-item>
-              </a-menu>
-            </template>
-          </a-dropdown>
+          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="addRackShowDialog = true"
+            >移除父业务</div
+          >
         </div>
         <div v-if="activeKey == '3'" class="flex">
           <div class="mr-2 cursor-pointer hover:text-blue-500">批量删除</div>
@@ -54,10 +42,14 @@
       :add-rack-show-dialog="addRackShowDialog"
       @on-close-add-rack-show-dialog="closeAddRackShowDialog"
     />
+    <AddParentVusinessDialog
+      :add-rack-show-dialog="showAddParentDialog"
+      @on-close-add-rack-show-dialog="closeAddRackShowDialog"
+    />
   </div>
 </template>
 <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { ref, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import {
     Tabs as ATabs,
@@ -73,7 +65,17 @@
   import FatherSonRelationship from './fragments/fatherSonRelationship/index.vue';
   import RouterList from './fragments/router-list.vue';
   import AddRackDialog from './dialog/add-rack-dialog.vue';
+  import AddParentVusinessDialog from './dialog/add-parent-business-dialog.vue';
+  import { useParentDialog } from './hooks/useParentDialog';
   import { idcRacksSettings } from '@/api/resourceManage/infrastructure/idcManage';
+  const { showAddParentDialog, showAddParentDialogChange } = useParentDialog();
+  watch(
+    () => showAddParentDialog.value,
+    (value) => {
+      console.log('监听数据', value);
+    },
+  );
+  console.log('获取的hooks', showAddParentDialog.value);
   const router = useRouter();
   const route = useRoute();
   function onBack() {
@@ -88,8 +90,9 @@
   const rackListRef: any = ref(null);
   const addRackShowDialog = ref(false);
   function closeAddRackShowDialog() {
-    addRackShowDialog.value = false;
-    rackListRef.value && rackListRef.value.getIdcRacksRequest();
+    // addRackShowDialog.value = false;
+    // rackListRef.value && rackListRef.value.getIdcRacksRequest();
+    showAddParentDialogChange();
   }
   // 删除机柜
   const deleteRackLoading = ref(false);
