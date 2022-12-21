@@ -31,3 +31,26 @@ export function getCMDBBusinessDetails(id: number) {
     method: 'get',
   });
 }
+
+// 业务管理-设置业务关系
+export function setBusinessRelation(id: number, data: API.PageParams) {
+  return request({
+    url: `/cmdb/business/${id}/relation/`,
+    method: 'post',
+    data,
+  });
+}
+// 业务管理-父子业务-获取父业务详情
+export function getParentBusinessDetails(id: number) {
+  return request({
+    url: `/cmdb/business/${id}/parent/`,
+    method: 'get',
+  });
+}
+// 业务管理-父子业务-获取子业务列表
+export function getChildrenBusinessList(id: number, data: API.PageParams) {
+  return request({
+    url: `/cmdb/business/${id}/list/`,
+    method: 'get',
+  });
+}

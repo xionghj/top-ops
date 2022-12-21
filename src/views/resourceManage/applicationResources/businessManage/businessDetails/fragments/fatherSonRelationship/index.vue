@@ -6,25 +6,30 @@
         v-for="(item, index) in menus"
         :key="index"
         class="flex items-center py-1 px-2 mb-1 rounded-sm cursor-pointer hover:bg-gray-200 hover:text-blue-500"
-        :class="[selectMenus === item.id ? 'bg-gray-200 text-blue-500' : '']"
-        @click="onSelectMenus(item.id)"
+        :class="[selctParentChidrenMeus === item.key ? 'bg-gray-200 text-blue-500' : '']"
+        @click="onSelectMenus(item.key)"
         >{{ item.name }}</div
       >
     </div>
     <div class="flex-1">
-      <Parent></Parent>
+      <Parent v-if="selctParentChidrenMeus === 'parent'"></Parent>
+      <children v-if="selctParentChidrenMeus === 'children'"></children>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
   import { ref } from 'vue';
+  import { useBusinessRelation } from '../../hooks/useBusinessRelation';
+
   import Parent from './fragments/parent.vue';
+  import children from './fragments/children.vue';
+
+  const { selctParentChidrenMeus } = useBusinessRelation();
   const menus = [
-    { name: '父业务', id: 1 },
-    { name: '子业务', id: 2 },
+    { name: '父业务', key: 'parent' },
+    { name: '子业务', key: 'children' },
   ];
-  const selectMenus = ref(1);
-  function onSelectMenus(id: number) {
-    selectMenus.value = id;
+  function onSelectMenus(key: string) {
+    selctParentChidrenMeus.value = key;
   }
 </script>

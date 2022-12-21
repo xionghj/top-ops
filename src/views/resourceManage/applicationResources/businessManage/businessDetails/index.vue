@@ -17,15 +17,51 @@
           </a-dropdown>
         </div>
         <div v-if="activeKey == '2'" class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="showAddParentDialogChange"
-            >添加父业务 {{ showAddParentDialog }}</div
-          >
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="addRackShowDialog = true"
-            >移除父业务</div
-          >
+          <template v-if="selctParentChidrenMeus == 'parent'">
+            <div
+              class="mr-2 cursor-pointer hover:text-blue-500"
+              @click="showAddBusinessDialogChange('parent')"
+              >添加父业务</div
+            >
+            <div class="cursor-pointer hover:text-blue-500" @click="deleteParentBusiness"
+              >移除父业务</div
+            >
+          </template>
+          <template v-else>
+            <div
+              class="mr-2 cursor-pointer hover:text-blue-500"
+              @click="showAddBusinessDialogChange('children')"
+              >添加子业务</div
+            >
+            <a-dropdown placement="bottom">
+              <div class="cursor-pointer hover:text-blue-500" @click.prevent> 更多操作 </div>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item>
+                    <a href="javascript:;">导入</a>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <div class="cursor-pointer hover:text-blue-500" @click="deleteParentBusiness"
+                      >移除子业务</div
+                    >
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
+          </template>
         </div>
         <div v-if="activeKey == '3'" class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500">批量删除</div>
+          <div class="mr-2 cursor-pointer hover:text-blue-500">添加应用</div>
+          <a-dropdown placement="bottom">
+            <div class="cursor-pointer hover:text-blue-500" @click.prevent> 更多操作 </div>
+            <template #overlay>
+              <a-menu>
+                <a-menu-item>
+                  <a href="javascript:;">导入</a>
+                </a-menu-item>
+              </a-menu>
+            </template>
+          </a-dropdown>
         </div>
       </template>
     </Breadcrumb>
@@ -35,22 +71,16 @@
         <a-tab-pane key="2" tab="父子业务"
           ><FatherSonRelationship v-if="activeKey === '2'"
         /></a-tab-pane>
-        <a-tab-pane key="3" tab="路由器"><RouterList v-if="activeKey === '3'" /></a-tab-pane>
+        <a-tab-pane key="3" tab="应用列表"><RouterList v-if="activeKey === '3'" /></a-tab-pane>
       </a-tabs>
     </div>
-    <AddRackDialog
-      :add-rack-show-dialog="addRackShowDialog"
-      @on-close-add-rack-show-dialog="closeAddRackShowDialog"
-    />
-    <AddParentVusinessDialog
-      :add-rack-show-dialog="showAddParentDialog"
-      @on-close-add-rack-show-dialog="closeAddRackShowDialog"
-    />
+    <AddBusinessDialog />
   </div>
 </template>
 <script lang="ts" setup>
-  import { ref, watch } from 'vue';
+  import { ref, onMounted } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
+
   import {
     Tabs as ATabs,
     TabPane as ATabPane,
@@ -64,69 +94,69 @@
   import BasicInfo from './fragments/basic-info.vue';
   import FatherSonRelationship from './fragments/fatherSonRelationship/index.vue';
   import RouterList from './fragments/router-list.vue';
-  import AddRackDialog from './dialog/add-rack-dialog.vue';
-  import AddParentVusinessDialog from './dialog/add-parent-business-dialog.vue';
-  import { useParentDialog } from './hooks/useParentDialog';
-  import { idcRacksSettings } from '@/api/resourceManage/infrastructure/idcManage';
-  const { showAddParentDialog, showAddParentDialogChange } = useParentDialog();
-  watch(
-    () => showAddParentDialog.value,
-    (value) => {
-      console.log('监听数据', value);
-    },
-  );
-  console.log('获取的hooks', showAddParentDialog.value);
+  import AddBusinessDialog from './dialog/add-business-dialog.vue';
+
+  import { useBusinessDialog } from './hooks/useBusinessDialog';
+  import { useBusinessRelation } from './hooks/useBusinessRelation';
+
+  import { setBusinessRelation } from '@/api/resourceManage/applicationResources/businessManage';
+
+  const { showAddBusinessDialogChange } = useBusinessDialog();
+  const { selctParentChidrenMeus, parentInfoId, selectChildren, isRefresh } = useBusinessRelation();
   const router = useRouter();
   const route = useRoute();
-  function onBack() {
-    router.go(-1);
-  }
   const activeKey = ref('1');
   const onEditbusiness = function () {
     const id: any = route.query && route.query.id;
     router.push({ name: 'addBusiness', query: { id, type: 'edit' } });
   };
-  // 添加机柜弹出框
-  const rackListRef: any = ref(null);
-  const addRackShowDialog = ref(false);
-  function closeAddRackShowDialog() {
-    // addRackShowDialog.value = false;
-    // rackListRef.value && rackListRef.value.getIdcRacksRequest();
-    showAddParentDialogChange();
-  }
-  // 删除机柜
-  const deleteRackLoading = ref(false);
-  async function deletIdcRackRequest() {
-    const selectRacksArr = rackListRef.value && rackListRef.value.selectRacks;
-    if (selectRacksArr.length == 0) {
-      message.warning('请先选择移除的机柜!');
-      return;
+  type Key = string | number;
+  const deleteLoading = ref(false);
+  // 删除父业务
+  function deleteParentBusiness() {
+    let titleInfo = '您确定要删除父业务吗？';
+    let relatedInstanceIds: Key[] = [];
+    if (selctParentChidrenMeus.value === 'parent') {
+      relatedInstanceIds.push(parentInfoId.value);
+    }
+    if (selctParentChidrenMeus.value === 'children') {
+      titleInfo = '您确定要移除选中的子业务吗？';
+      relatedInstanceIds = selectChildren.value;
+      if (relatedInstanceIds.length === 0) {
+        message.error('请至少勾选一个子业务');
+        return;
+      }
     }
     Modal.confirm({
-      title: '您确定要移除机柜吗？',
+      title: titleInfo,
       centered: true,
       okText: '确认',
       cancelText: '取消',
       onOk: async () => {
         try {
-          if (deleteRackLoading.value) {
+          if (deleteLoading.value) {
             return;
           }
-          deleteRackLoading.value = true;
+          deleteLoading.value = true;
           const id: any = route.query && route.query.id;
           const params = {
-            action: 'remove',
-            instance_ids: selectRacksArr,
+            action: selctParentChidrenMeus.value === 'parent' ? 'delete' : 'remove',
+            related_instance_ids: relatedInstanceIds,
           };
-          const data = await idcRacksSettings(id, params);
+          const data = await setBusinessRelation(id, params);
           message.success(data.detail);
-          rackListRef.value && rackListRef.value.getIdcRacksRequest();
-          deleteRackLoading.value = false;
+          deleteLoading.value = false;
+          isRefresh.value = !isRefresh.value;
         } catch (error) {
-          deleteRackLoading.value = false;
+          deleteLoading.value = false;
           console.error(error);
         }
       },
     });
   }
+  onMounted(() => {
+    selctParentChidrenMeus.value = 'parent';
+    selectChildren.value = [];
+    parentInfoId.value = '';
+  });
 </script>

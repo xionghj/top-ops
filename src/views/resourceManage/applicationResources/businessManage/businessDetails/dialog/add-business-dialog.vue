@@ -1,9 +1,9 @@
-<!-- 数据中心-添加机柜 -->
+<!-- 业务管理-选择业务弹出框 -->
 <template>
   <div>
     <a-modal
-      v-model:visible="addRackShowDialog"
-      title="选择机柜"
+      v-model:visible="showAddBusinessDialog"
+      title="选择业务"
       width="800px"
       @ok="handleOk"
       @cancel="handleCancel"
@@ -14,12 +14,10 @@
             <a-input
               v-model:value="listQuery.search"
               placeholder="根据关键词搜索"
-              @change="getIdcRacksListRequest()"
+              @change="getCMDBBusinessListRequest()"
             />
           </div>
-          <a-checkbox v-model:checked="relatedToMeChecked"
-            >与我有关 {{ addRackShowDialog }}</a-checkbox
-          >
+          <a-checkbox v-model:checked="relatedToMeChecked">与我有关</a-checkbox>
         </div>
         <a-table
           :row-selection="{
@@ -31,6 +29,7 @@
           row-key="id"
           :pagination="pagination"
           :loading="loading"
+          children-column-name="noChildren"
           @change="handleTableChange"
         >
           <template #bodyCell="{ column, record }">
@@ -55,8 +54,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { ref, toRefs, reactive, computed, onMounted, watch } from 'vue';
+  import { ref, reactive, computed, watch } from 'vue';
   import { useRoute } from 'vue-router';
+
   import {
     Modal as AModal,
     Table as ATable,
@@ -66,27 +66,29 @@
     Checkbox as ACheckbox,
     message,
   } from 'ant-design-vue';
-  import { useParentDialog } from '../hooks/useParentDialog';
-  import { getIdcRacksList, idcRacksSettings } from '@/api/resourceManage/infrastructure/idcManage';
-  const { closeAddParentDialogChange } = useParentDialog();
+  import { useBusinessDialog } from '../hooks/useBusinessDialog';
+  import {
+    getCMDBBusinessList,
+    setBusinessRelation,
+  } from '@/api/resourceManage/applicationResources/businessManage';
+  const { showAddBusinessDialog, operationType, closeAddBusinessDialogChange } =
+    useBusinessDialog();
+
   type Key = string | number;
-  const props = defineProps({
-    addRackShowDialog: Boolean,
-  });
-  const { addRackShowDialog } = toRefs(props);
-  watch(addRackShowDialog, (bol) => {
-    if (bol) {
-      state.selectedRowKeys = [];
-      getIdcRacksListRequest();
-    }
-  });
-  const emit = defineEmits(['onCloseAddRackShowDialog']);
+  watch(
+    () => showAddBusinessDialog.value,
+    (bol) => {
+      if (bol) {
+        state.selectedRowKeys = [];
+        getCMDBBusinessListRequest();
+      }
+    },
+  );
   const handleOk = () => {
-    addIdcRacksRequest();
+    addBusinessRequest();
   };
   const handleCancel = () => {
-    // closeAddParentDialogChange();
-    emit('onCloseAddRackShowDialog');
+    closeAddBusinessDialogChange();
   };
   const route = useRoute();
   const list = ref<API.HostManageListItem[]>([]);
@@ -104,14 +106,14 @@
       key: 'name',
     },
     {
-      title: '可用U数',
-      dataIndex: 'unum',
-      key: 'unum',
+      title: '业务类型',
+      dataIndex: 'kind',
+      key: 'kind',
     },
     {
-      title: '机柜编号',
-      dataIndex: 'code',
-      key: 'code',
+      title: '产品经理',
+      dataIndex: 'pm',
+      key: 'pm',
     },
     {
       title: '备注',
@@ -139,17 +141,16 @@
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
     listQuery.pageSize = pag.pageSize;
-    getIdcRacksListRequest();
+    getCMDBBusinessListRequest();
   };
-  // 获取允许添加机柜列表
-  async function getIdcRacksListRequest() {
+  // 获取业务列表
+  async function getCMDBBusinessListRequest() {
     try {
       if (loading.value) {
         return;
       }
       loading.value = true;
-      const id: any = route.query && route.query.id;
-      const data = await getIdcRacksList(id, listQuery);
+      const data = await getCMDBBusinessList(listQuery);
       loading.value = false;
       list.value = data.results;
       total.value = data.count;
@@ -158,7 +159,7 @@
       console.error(error);
     }
   }
-  // 添加机柜
+  // 添加业务
   const state = reactive<{
     selectedRowKeys: Key[];
     addLoading: boolean;
@@ -166,9 +167,9 @@
     selectedRowKeys: [],
     addLoading: false,
   });
-  async function addIdcRacksRequest() {
+  async function addBusinessRequest() {
     if (state.selectedRowKeys.length == 0) {
-      message.warning('请勾选一个机柜');
+      message.warning('请至少选择一个业务');
       return;
     }
     try {
@@ -178,10 +179,10 @@
       state.addLoading = true;
       const id: any = route.query && route.query.id;
       const params = {
-        action: 'add',
-        instance_ids: state.selectedRowKeys,
+        action: operationType.value == 'parent' ? 'set' : 'add',
+        related_instance_ids: state.selectedRowKeys,
       };
-      const data = await idcRacksSettings(id, params);
+      const data = await setBusinessRelation(id, params);
       message.success(data.detail);
       handleCancel();
       state.addLoading = false;
