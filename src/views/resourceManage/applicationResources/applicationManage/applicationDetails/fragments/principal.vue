@@ -1,0 +1,122 @@
+<!-- 应用管理-列表详情-负责人-->
+<template>
+  <div>
+    <div class="px-6 bg-white">
+      <div class="flex mb-4">
+        <div class="w-56 mr-3">
+          <a-input
+            v-model:value="listQuery.search"
+            placeholder="根据关键词搜索"
+            @change="getAppsOwnerListRequest()"
+          />
+        </div>
+      </div>
+      <a-table
+        :row-selection="{ selectedRowKeys: selectPrincipal, onChange: onSelectChange }"
+        :columns="columns"
+        :data-source="list"
+        row-key="id"
+        :pagination="pagination"
+        :loading="loading"
+        @change="handleTableChange"
+      >
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.key === 'is_active'">
+            <a-tag :color="'green'">
+              {{ record.is_active ? '激活' : '未激活' }}
+            </a-tag>
+          </template>
+        </template>
+      </a-table>
+    </div>
+  </div>
+</template>
+<script lang="ts" setup>
+  import { ref, reactive, computed } from 'vue';
+  import { useRouter, useRoute } from 'vue-router';
+  import { Table as ATable, Input as AInput, Tag as ATag } from 'ant-design-vue';
+  import { getAppsOwnerList } from '@/api/resourceManage/applicationResources/applicationManage';
+  type Key = string | number;
+  const router = useRouter();
+  const route = useRoute();
+  const list = ref<API.HostManageListItem[]>([]);
+  const listQuery = reactive({
+    search: '',
+    page: 1,
+    pageSize: 10,
+    role: 'developer',
+  });
+  const total = ref(0);
+  const columns = [
+    {
+      title: '用户名',
+      dataIndex: 'username',
+      key: 'username',
+    },
+    {
+      title: '花名',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: '邮箱',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: '状态',
+      dataIndex: 'is_active',
+      key: 'is_active',
+    },
+    {
+      title: '联系电话',
+      dataIndex: 'telephone',
+      key: 'telephone',
+    },
+    {
+      title: '最近修改',
+      dataIndex: 'updated_at',
+      key: 'updated_at',
+    },
+  ];
+  const loading = ref(false);
+  const pagination = computed(() => ({
+    total: total.value,
+    current: listQuery.page,
+    pageSize: listQuery.pageSize,
+    showTotal: (total: number) => `总共 ${total} 项`,
+    defaultPageSize: 10,
+    showSizeChanger: true, // 是否显示pagesize选择
+    showQuickJumper: true, // 是否显示跳转窗
+  }));
+
+  // 列表当前页更改
+  const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
+    listQuery.page = pag.current;
+    listQuery.pageSize = pag.pageSize;
+    getAppsOwnerListRequest();
+  };
+  // 获取负责人列表
+  async function getAppsOwnerListRequest() {
+    try {
+      if (loading.value) {
+        return;
+      }
+      loading.value = true;
+      const id: any = route.query && route.query.id;
+      const data = await getAppsOwnerList(id, listQuery);
+      loading.value = false;
+      list.value = data.results;
+      total.value = data.count;
+    } catch (error) {
+      loading.value = false;
+      console.error(error);
+    }
+  }
+  getAppsOwnerListRequest();
+  const selectPrincipal = ref<Key[]>([]);
+  const onSelectChange = (selectedRowKeys: Key[]) => {
+    selectPrincipal.value = selectedRowKeys;
+  };
+  defineExpose({ selectPrincipal, getAppsOwnerListRequest });
+</script>

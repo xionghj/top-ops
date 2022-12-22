@@ -52,7 +52,7 @@
           <div class="mr-2 cursor-pointer hover:text-blue-500" @click="addRackShowDialog = true"
             >设置机柜</div
           >
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="deletHostRackRequest"
+          <div class="cursor-pointer hover:text-blue-500" @click="deletHostRackRequest"
             >移除机柜</div
           >
         </div>
