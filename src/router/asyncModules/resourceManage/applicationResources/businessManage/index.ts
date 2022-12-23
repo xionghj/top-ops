@@ -1,4 +1,4 @@
-export const addBusiness = {
+const addBusiness = {
   title: '新增业务',
   name: 'addBusiness',
   activeMenu: 'BusinessManage',
@@ -10,7 +10,7 @@ export const addBusiness = {
   path: '/cmdb/addBusiness',
   component: '/resourceManage/applicationResources/businessManage/addBusiness/index',
 };
-export const businessDetails = {
+const businessDetails = {
   title: '详情',
   name: 'businessDetails',
   activeMenu: 'BusinessManage', // 父级选中

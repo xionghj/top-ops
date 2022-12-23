@@ -1,18 +1,23 @@
 import { ref } from 'vue';
-const showAddBusinessDialog = ref(false);
-// 操作类型
-const operationType = ref('parent');
+const isShowAddBusinessDialog = ref(false);
+const currentBusinessId = ref();
+const isRefresh = ref(false);
+// 应用管理-业务管理
 export const useBusinessDialog = () => {
-  const showAddBusinessDialogChange = (type: string) => {
-    operationType.value = type;
-    showAddBusinessDialog.value = !showAddBusinessDialog.value;
+  const showAddBusinessDialogChange = () => {
+    isShowAddBusinessDialog.value = !isShowAddBusinessDialog.value;
   };
   const closeAddBusinessDialogChange = () => {
-    showAddBusinessDialog.value = false;
+    isShowAddBusinessDialog.value = false;
+  };
+  const refresh = () => {
+    isRefresh.value = !isRefresh.value;
   };
   return {
-    showAddBusinessDialog,
-    operationType,
+    isShowAddBusinessDialog,
+    currentBusinessId,
+    isRefresh,
+    refresh,
     showAddBusinessDialogChange,
     closeAddBusinessDialogChange,
   };

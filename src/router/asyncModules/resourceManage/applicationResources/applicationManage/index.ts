@@ -1,4 +1,4 @@
-export const addApplication = {
+const addApplication = {
   title: '新增业务',
   name: 'addApplication',
   activeMenu: 'applicationManage',
@@ -10,7 +10,7 @@ export const addApplication = {
   path: '/cmdb/addApplication',
   component: '/resourceManage/applicationResources/applicationManage/addApplication/index',
 };
-export const applicationDetails = {
+const applicationDetails = {
   title: '详情',
   name: 'applicationDetails',
   activeMenu: 'applicationManage', // 父级选中

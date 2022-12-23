@@ -2,7 +2,7 @@
 <template>
   <div>
     <a-modal
-      v-model:visible="showAddBusinessDialog"
+      v-model:visible="isShowAddBusinessDialog"
       title="选择业务"
       width="800px"
       @ok="handleOk"
@@ -23,6 +23,7 @@
           :row-selection="{
             selectedRowKeys: state.selectedRowKeys,
             onChange: onSelectChange,
+            type: 'radio',
           }"
           :columns="columns"
           :data-source="list"
@@ -68,15 +69,14 @@
   } from 'ant-design-vue';
   import { useBusinessDialog } from '../hooks/useBusinessDialog';
   import {
-    getCMDBBusinessList,
-    setBusinessRelation,
-  } from '@/api/resourceManage/applicationResources/businessManage';
-  const { showAddBusinessDialog, operationType, closeAddBusinessDialogChange } =
-    useBusinessDialog();
+    getAppsBusinessList,
+    setAppsBusiness,
+  } from '@/api/resourceManage/applicationResources/applicationManage';
+  const { isShowAddBusinessDialog, refresh, closeAddBusinessDialogChange } = useBusinessDialog();
 
   type Key = string | number;
   watch(
-    () => showAddBusinessDialog.value,
+    () => isShowAddBusinessDialog.value,
     (bol) => {
       if (bol) {
         state.selectedRowKeys = [];
@@ -88,6 +88,7 @@
     addBusinessRequest();
   };
   const handleCancel = () => {
+    refresh();
     closeAddBusinessDialogChange();
   };
   const route = useRoute();
@@ -150,7 +151,8 @@
         return;
       }
       loading.value = true;
-      const data = await getCMDBBusinessList(listQuery);
+      const id: any = route.query && route.query.id;
+      const data = await getAppsBusinessList(id, listQuery);
       loading.value = false;
       list.value = data.results;
       total.value = data.count;
@@ -179,10 +181,9 @@
       state.addLoading = true;
       const id: any = route.query && route.query.id;
       const params = {
-        action: operationType.value == 'parent' ? 'set' : 'add',
-        related_instance_ids: state.selectedRowKeys,
+        related_instance_id: state.selectedRowKeys[0],
       };
-      const data = await setBusinessRelation(id, params);
+      const data = await setAppsBusiness(id, params);
       message.success(data.detail);
       handleCancel();
       state.addLoading = false;

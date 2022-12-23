@@ -49,18 +49,33 @@ export function setAppsOwner(id: number, data: API.PageParams) {
   });
 }
 
-// 应用管理-详情-负责人列表
+// 应用管理-详情-所属业务详情
 export function getAppsBusinessDetails(id: number) {
   return request({
     url: `/cmdb/apps/${id}/business/`,
     method: 'get',
   });
 }
+// 应用管理-详情-所属业务列表
+export function getAppsBusinessList(id: number, query: API.PageParams) {
+  return request({
+    url: `/cmdb/apps/${id}/business/list/`,
+    method: 'get',
+    params: query,
+  });
+}
 // 应用管理-详情-设置业务
 export function setAppsBusiness(id: number, data: API.PageParams) {
   return request({
-    url: `/cmdb/apps/${id}/owner/list/`,
+    url: `/cmdb/apps/${id}/business/`,
     method: 'post',
     data,
+  });
+}
+// 应用管理-详情-删除设置业务
+export function deleteAppsBusiness(id: number) {
+  return request({
+    url: `/cmdb/apps/${id}/business/`,
+    method: 'delete',
   });
 }

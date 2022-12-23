@@ -1,11 +1,11 @@
-<!-- 应用管理-列表 -->
+<!-- 集群管理-列表 -->
 <template>
   <div>
     <Breadcrumb>
       <template #right>
         <div class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onAddBusiness('add')"
-            >新建业务</div
+          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onAddCluster('add')"
+            >新建集群</div
           >
           <a-dropdown placement="bottom">
             <div class="cursor-pointer hover:text-blue-500" @click.prevent> 更多操作 </div>
@@ -29,7 +29,7 @@
           <a-input
             v-model:value="listQuery.search"
             placeholder="根据关键词搜索"
-            @change="getCMDBAppsListRequest()"
+            @change="getClusterListRequest()"
           />
         </div>
       </div>
@@ -52,19 +52,19 @@
               {{ record.name }}
             </span>
           </template>
-          <template v-if="column.key === 'business'">
-            <span v-for="(item, index) in record.business" :key="index">
-              {{ item.name }}{{ record.business.length - 1 != index ? '，' : '' }}
+          <template v-if="column.key === 'hosts'">
+            <span v-for="(item, index) in record.hosts" :key="index">
+              {{ item.ip }}{{ record.hosts.length - 1 != index ? '，' : '' }}
             </span>
           </template>
-          <template v-if="column.key === 'developer'">
-            <span v-for="(item, index) in record.developer" :key="index">
-              {{ item.username }}{{ record.developer.length - 1 != index ? '，' : '' }}
+          <template v-if="column.key === 'app'">
+            <span>
+              {{ record.app && record.app.name }}
             </span>
           </template>
-          <template v-if="column.key === 'tester'">
-            <span v-for="(item, index) in record.tester" :key="index">
-              {{ item.username }}{{ record.tester.length - 1 != index ? '，' : '' }}
+          <template v-if="column.key === 'creator'">
+            <span>
+              {{ record.creator && record.creator.username }}
             </span>
           </template>
         </template>
@@ -82,7 +82,8 @@
     Menu as AMenu,
     MenuItem as AMenuItem,
   } from 'ant-design-vue';
-  import { getCMDBAppsList } from '@/api/resourceManage/applicationResources/applicationManage';
+  import { getClusterList } from '@/api/resourceManage/applicationResources/clusterManage';
+
   type Key = string | number;
   const router = useRouter();
   const list = ref<API.RackManageListItem[]>([]);
@@ -99,24 +100,29 @@
       key: 'name',
     },
     {
-      title: '所属业务',
-      dataIndex: 'business',
-      key: 'business',
+      title: '集群环境',
+      dataIndex: 'description',
+      key: 'description',
     },
     {
-      title: '开发负责人',
-      dataIndex: 'developer',
-      key: 'developer',
+      title: '所属应用',
+      dataIndex: 'app',
+      key: 'app',
     },
     {
-      title: '运维负责人',
-      dataIndex: 'pm',
-      key: 'pm',
+      title: '关联主机',
+      dataIndex: 'hosts',
+      key: 'hosts',
     },
     {
-      title: '测试负责人',
-      dataIndex: 'tester',
-      key: 'tester',
+      title: '创建者',
+      dataIndex: 'creator',
+      key: 'creator',
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'updated_at',
+      key: 'updated_at',
     },
   ];
   const loading = ref(false);
@@ -134,16 +140,16 @@
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
     listQuery.pageSize = pag.pageSize;
-    getCMDBAppsListRequest();
+    getClusterListRequest();
   };
-  // 获取应用列表
-  async function getCMDBAppsListRequest() {
+  // 获取集群列表
+  async function getClusterListRequest() {
     try {
       if (loading.value) {
         return;
       }
       loading.value = true;
-      const data = await getCMDBAppsList(listQuery);
+      const data = await getClusterList(listQuery);
       loading.value = false;
       list.value = data.results;
       total.value = data.count;
@@ -152,7 +158,7 @@
       console.error(error);
     }
   }
-  getCMDBAppsListRequest();
+  getClusterListRequest();
   const state = reactive<{
     selectedRowKeys: Key[];
     loading: boolean;
@@ -164,9 +170,9 @@
     state.selectedRowKeys = selectedRowKeys;
   };
   const onJumeTo = function (id: number) {
-    router.push({ name: 'applicationDetails', query: { id } });
+    router.push({ name: 'clusterDetails', query: { id } });
   };
-  const onAddBusiness = function (type: string) {
-    router.push({ name: 'addApplication', query: { type } });
+  const onAddCluster = function (type: string) {
+    router.push({ name: 'addCluster', query: { type } });
   };
 </script>

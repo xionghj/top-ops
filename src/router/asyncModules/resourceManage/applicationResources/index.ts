@@ -1,5 +1,6 @@
 import businessManage from './businessManage/index';
 import applicationManage from './applicationManage/index';
-const applicationResources = [...businessManage, ...applicationManage];
+import clusterManage from './clusterManage/index';
+const applicationResources = [...businessManage, ...applicationManage, ...clusterManage];
 
 export default applicationResources;

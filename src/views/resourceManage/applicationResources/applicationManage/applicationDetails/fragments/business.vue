@@ -3,7 +3,7 @@
   <div v-if="!businessInfo.id" class="flex">
     <div class="w-full h-32 bg-gray-50 flex items-center">
       <div class="ml-4 text-[#FFA235] text-base"
-        >请 <span class="text-blue-500">设置</span> 所在机柜</div
+        >请 <span class="text-blue-500" @click="onBusiness">设置</span> 所在机柜</div
       >
     </div>
   </div>
@@ -57,7 +57,7 @@
   </template>
 </template>
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, watch } from 'vue';
   import { useRoute } from 'vue-router';
   import {
     Descriptions as ADescriptions,
@@ -65,9 +65,22 @@
     Table as ATable,
     Tag as ATag,
   } from 'ant-design-vue';
+
+  import { useBusinessDialog } from '../hooks/useBusinessDialog';
+
   import { getHostMangeList } from '@/api/resourceManage/infrastructure/hostManage';
   import { getAppsBusinessDetails } from '@/api/resourceManage/applicationResources/applicationManage';
+
   const route = useRoute();
+  const { currentBusinessId, isRefresh, showAddBusinessDialogChange } = useBusinessDialog();
+
+  watch(
+    () => isRefresh.value,
+    () => {
+      getAppsBusinessDetailsRequest();
+    },
+  );
+
   const businessLodding = ref(false);
   // 获取所属业务
   const businessInfo = ref({
@@ -90,6 +103,7 @@
       businessLodding.value = true;
       const id: any = route.query && route.query.id;
       const data = await getAppsBusinessDetails(id);
+      currentBusinessId.value = data.id;
       businessInfo.value = data;
       businessLodding.value = false;
     } catch (error) {
@@ -144,7 +158,10 @@
     }
   }
   // getHostMangeListRequest();
-  defineExpose({ getAppsBusinessDetailsRequest, businessInfo });
+  // 设置所属业务
+  function onBusiness() {
+    showAddBusinessDialogChange();
+  }
 </script>
 <style lang="less" scoped>
   :deep(.ant-descriptions-item-label) {

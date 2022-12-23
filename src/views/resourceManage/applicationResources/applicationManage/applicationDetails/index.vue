@@ -37,8 +37,8 @@
           </a-dropdown>
         </div>
         <div v-if="activeKey == '3'" class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500">设置业务</div>
-          <div class="cursor-pointer hover:text-blue-500">移除业务</div>
+          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onBusiness">设置业务</div>
+          <div class="cursor-pointer hover:text-blue-500" @click="onDeleteBusiness">移除业务</div>
         </div>
       </template>
     </Breadcrumb>
@@ -51,10 +51,11 @@
         <a-tab-pane key="3" tab="业务资源"><Business v-if="activeKey === '3'" /></a-tab-pane>
       </a-tabs>
     </div>
-    <addOwnerDialog
+    <AddOwnerDialog
       :add-owner-show-dialog="addOwnerShowDialog"
       @on-close-add-owner-show-dialog="closeAddOwnerShowDialog"
     />
+    <AddBusinessDialog />
   </div>
 </template>
 <script lang="ts" setup>
@@ -73,11 +74,21 @@
   import BasicInfo from './fragments/basic-info.vue';
   import Principal from './fragments/principal.vue';
   import Business from './fragments/business.vue';
-  import addOwnerDialog from './dialog/add-owner-dialog.vue';
+  import AddOwnerDialog from './dialog/add-owner-dialog.vue';
+  import AddBusinessDialog from './dialog/add-business-dialog.vue';
+
+  import { useBusinessDialog } from './hooks/useBusinessDialog';
+
   import { idcRacksSettings } from '@/api/resourceManage/infrastructure/idcManage';
-  import { setAppsOwner } from '@/api/resourceManage/applicationResources/applicationManage';
+  import {
+    setAppsOwner,
+    deleteAppsBusiness,
+  } from '@/api/resourceManage/applicationResources/applicationManage';
+
   const router = useRouter();
   const route = useRoute();
+  const { showAddBusinessDialogChange, currentBusinessId } = useBusinessDialog();
+
   function onBack() {
     router.go(-1);
   }
@@ -164,6 +175,34 @@
           const data = await setAppsOwner(id, params);
           message.success(data.detail);
           principalRef.value && principalRef.value.getHostOwnerRequest();
+          deletePrincipalLoading.value = false;
+        } catch (error) {
+          deletePrincipalLoading.value = false;
+          console.error(error);
+        }
+      },
+    });
+  }
+  // 设置所属业务
+  function onBusiness() {
+    showAddBusinessDialogChange();
+  }
+  // 移除所属业务
+  function onDeleteBusiness() {
+    Modal.confirm({
+      title: '您确定要删除该业务？',
+      centered: true,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          if (deletePrincipalLoading.value) {
+            return;
+          }
+          deletePrincipalLoading.value = true;
+          const id = parseInt(currentBusinessId.value);
+          const data = await deleteAppsBusiness(id);
+          message.success(data.detail);
           deletePrincipalLoading.value = false;
         } catch (error) {
           deletePrincipalLoading.value = false;
