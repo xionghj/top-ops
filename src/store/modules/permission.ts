@@ -576,6 +576,7 @@ export const usePermissionStore = defineStore({
         return arr[0];
       }
     },
+    // 增加菜单树
     addMenusTree(oriData: any) {
       const data = oriData;
       asyncRouterNode.forEach((node) => {
