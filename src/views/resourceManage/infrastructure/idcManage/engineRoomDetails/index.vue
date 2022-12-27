@@ -1,7 +1,7 @@
 <!-- 数据中心-详情 -->
 <template>
   <div>
-    <Breadcrumb :show-back="true">
+    <Breadcrumb :show-back="true" :breadcrumb-info="breadcrumbInfo">
       <template #right>
         <div v-if="activeKey == '1'" class="flex">
           <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onEditEngineRoom()"
@@ -81,6 +81,13 @@
   function onBack() {
     router.go(-1);
   }
+  // 面包屑信息
+  const breadcrumbInfo = [
+    { meta: { title: '资源管理' } },
+    { meta: { title: '基础设施' } },
+    { meta: { title: '数据中心' } },
+    { meta: { title: '详情' } },
+  ];
   const activeKey = ref('1');
   const onEditEngineRoom = function () {
     const id: any = route.query && route.query.id;

@@ -21,7 +21,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { ref, toRefs } from 'vue';
+  import { onMounted, ref, toRefs } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { ArrowLeftOutlined } from '@ant-design/icons-vue';
   import { Breadcrumb as ABreadcrumb, BreadcrumbItem as ABreadcrumbItem } from 'ant-design-vue';
@@ -34,6 +34,9 @@
       type: Boolean,
       default: false,
     },
+    breadcrumbInfo: {
+      type: Array,
+    },
   });
   const { showBack } = toRefs(props);
   function onBack() {
@@ -44,7 +47,7 @@
   function getSubMenus() {
     const menusList = permissionStore.backMenuList;
     const subMenus = getsubMenusParents(menusList, route.name);
-    console.log('获取二级菜单', subMenus);
+    console.log('获取二级菜单', subMenus, route.name);
     if (!subMenus) return;
     menus.value = subMenus.reverse();
   }
@@ -63,7 +66,13 @@
       }
     }
   }
-  getSubMenus();
+  onMounted(() => {
+    if (props.breadcrumbInfo && props.breadcrumbInfo.length > 0) {
+      menus.value = props.breadcrumbInfo;
+    } else {
+      getSubMenus();
+    }
+  });
 </script>
 <style lang="less" scoped>
   .page-title-box {

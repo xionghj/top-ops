@@ -3,16 +3,19 @@
     <Breadcrumb></Breadcrumb>
     <div class="flex">
       <div class="w-[300px] bg-white p-4 rounded-sm">
-        <a-input-search
+        <a-input
           v-model:value="searchValue"
           style="margin-bottom: 8px"
-          placeholder="Search"
+          placeholder="请输入关键字进行过滤"
         />
-        <a-tree
+        <a-directory-tree
           v-model:expandedKeys="expandedKeys"
           v-model:selectedKeys="selectedKeys"
+          :auto-expand-parent="autoExpandParent"
           :load-data="onLoadData"
           :tree-data="treeData"
+          @expand="onExpand"
+          @select="onSelect"
         >
           <template #title="{ title }">
             <span v-if="title.indexOf(searchValue) > -1">
@@ -22,27 +25,45 @@
             </span>
             <span v-else>{{ title }}</span>
           </template>
-        </a-tree>
+        </a-directory-tree>
       </div>
       <div class="flex flex-col flex-1 ml-4">
         <div class="bg-white rounded-sm p-4">
           <a-descriptions :column="2">
             <a-descriptions-item label="名称"> {{ basicInfo.name }}</a-descriptions-item>
-            <a-descriptions-item label="类型">{{ basicInfo.short_name }}</a-descriptions-item>
+            <a-descriptions-item label="类型">{{ basicInfo.kind }}</a-descriptions-item>
             <a-descriptions-item label="备注说明">{{ basicInfo.description }}</a-descriptions-item>
-            <a-descriptions-item label="运维负责人">{{ basicInfo.telephone }}</a-descriptions-item>
-            <a-descriptions-item label="产品经理">{{ basicInfo.address }}</a-descriptions-item>
-            <a-descriptions-item label="研发负责人">{{ basicInfo.address }}</a-descriptions-item>
+            <a-descriptions-item label="运维负责人"
+              ><span v-for="(item, index) in basicInfo.owner" :key="index">
+                {{ item.username }}{{ basicInfo.owner.length - 1 != index ? '，' : '' }}
+              </span></a-descriptions-item
+            >
+            <a-descriptions-item label="产品经理"
+              ><span v-for="(item, index) in basicInfo.pm" :key="index">
+                {{ item.username }}{{ basicInfo.pm.length - 1 != index ? '，' : '' }}
+              </span></a-descriptions-item
+            >
+            <a-descriptions-item label="研发负责人"
+              ><span
+                v-for="(item, index) in basicInfo.developer"
+                :key="index"
+                class="rounded-full py-0.5 px-4 bg-blue-500 text-white mr-1 flex items-center justify-center"
+              >
+                {{ item.username }}
+              </span></a-descriptions-item
+            >
           </a-descriptions>
         </div>
         <div class="bg-white rounded-sm mt-4 px-4 pb-4">
           <a-tabs v-model:activeKey="activeKey">
-            <a-tab-pane key="1" tab="应用列表"
-              ><ApplicationList v-if="activeKey === '1'"
+            <a-tab-pane key="applicationList" tab="应用列表"
+              ><ApplicationList v-if="activeKey === 'applicationList'" ref="applicationListRef"
             /></a-tab-pane>
-            <a-tab-pane key="2" tab="主机列表"><HostList v-if="activeKey === '2'" /></a-tab-pane>
-            <a-tab-pane key="3" tab="子业务列表"
-              ><subBusinessList v-if="activeKey === '3'"
+            <a-tab-pane key="hostList" tab="主机列表"
+              ><HostList v-if="activeKey === 'hostList'" ref="hostListRef"
+            /></a-tab-pane>
+            <a-tab-pane key="subBusinessList" tab="子业务列表"
+              ><SubBusinessList v-if="activeKey === 'subBusinessList'" ref="subBusinessListRef"
             /></a-tab-pane>
           </a-tabs>
         </div>
@@ -54,7 +75,8 @@
   import { ref, watch } from 'vue';
   import {
     Tree as ATree,
-    InputSearch as AInputSearch,
+    DirectoryTree as ADirectoryTree,
+    Input as AInput,
     Descriptions as ADescriptions,
     DescriptionsItem as ADescriptionsItem,
     Tabs as ATabs,
@@ -62,13 +84,14 @@
   } from 'ant-design-vue';
   import ApplicationList from './fragments/application-list.vue';
   import HostList from './fragments/host-list.vue';
-  import subBusinessList from './fragments/sub-business-list.vue';
+  import SubBusinessList from './fragments/sub-business-list.vue';
   import type { TreeProps } from 'ant-design-vue';
   const searchValue = ref<string>('');
   const expandedKeys = ref<string[]>([]);
   const selectedKeys = ref<string[]>([]);
+  const autoExpandParent = ref<boolean>(true);
   const treeData = ref<TreeProps['treeData']>([
-    { title: '业务一', key: '0', sub_business: [] },
+    { title: '业务一', key: '0', children: [{ title: '业务1-1', key: '1-1' }] },
     { title: '业务二', key: '1' },
     { title: '业务三', key: '2', isLeaf: true },
   ]);
@@ -77,25 +100,38 @@
     for (let i = 0; i < data.length; i++) {
       const node = data[i];
       const key = node.key;
-      dataList.push({ key, title: key });
-      if (node.sub_business) {
-        generateList(node.sub_business);
+      dataList.push({ key, title: node.title });
+      if (node.children) {
+        generateList(node.children);
       }
     }
   };
   generateList(treeData.value);
+  const onExpand = (keys: string[]) => {
+    expandedKeys.value = keys;
+    autoExpandParent.value = false;
+  };
+
+  const selectKeys = ref<string[]>([]);
+  const applicationListRef = ref(null);
+  const onSelect = (keys: string[]) => {
+    selectKeys.value = keys;
+    if (activeKey.value === 'applicationList') {
+      applicationListRef.value && applicationListRef.value.getApplicationListRequest();
+    }
+  };
   watch(searchValue, (value) => {
     const expanded = dataList
       .map((item: TreeProps['treeData'][number]) => {
         if (item.title.indexOf(value) > -1) {
-          return getParentKey(item.key, treeData.value);
+          return getParentKey(item.title, treeData.value);
         }
         return null;
       })
       .filter((item, i, self) => item && self.indexOf(item) === i);
     expandedKeys.value = expanded;
     searchValue.value = value;
-    // autoExpandParent.value = true;
+    autoExpandParent.value = true;
   });
   const getParentKey = (
     key: string | number,
@@ -105,7 +141,7 @@
     for (let i = 0; i < tree.length; i++) {
       const node = tree[i];
       if (node.children) {
-        if (node.children.some((item) => item.key === key)) {
+        if (node.children.some((item) => item.title === key)) {
           parentKey = node.key;
         } else if (getParentKey(key, node.children)) {
           parentKey = getParentKey(key, node.children);
@@ -251,11 +287,22 @@
           { title: '企微管家-消息存档2', key: `${treeNode.eventKey}-1` },
         ];
         treeData.value = [...treeData.value];
+        generateList(treeData.value);
         resolve();
       }, 1000);
     });
   };
-
-  const basicInfo = ref({});
-  const activeKey = ref('1');
+  // 基本信息
+  const basicInfo = ref({
+    name: '',
+    kind: '',
+    pm: [],
+    owner: [],
+    developer: [
+      { username: 'xiaoming', id: 1 },
+      { username: 'lisi', id: 2 },
+    ],
+    description: '',
+  });
+  const activeKey = ref('applicationList');
 </script>

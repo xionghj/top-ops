@@ -154,7 +154,8 @@
     z-index: 1;
     overflow: auto;
     overflow-x: hidden;
-    box-shadow: 0 2px 4px rgb(15 34 58 / 12%);
+    // box-shadow: 0 2px 4px rgb(15 34 58 / 12%);
+    box-shadow: 2px 0 8px #1d23290d;
     // :deep(.ant-menu-submenu-selected) {
     //   color: #1890ff;
     // }

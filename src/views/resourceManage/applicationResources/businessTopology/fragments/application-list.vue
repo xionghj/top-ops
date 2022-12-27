@@ -6,7 +6,7 @@
         <a-input
           v-model:value="listQuery.search"
           placeholder="根据关键词搜索"
-          @change="getCMDBAppsListRequest()"
+          @change="getApplicationListRequest()"
         />
       </div>
     </div>
@@ -103,10 +103,10 @@
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
     listQuery.pageSize = pag.pageSize;
-    getCMDBAppsListRequest();
+    getApplicationListRequest();
   };
   // 获取应用列表
-  async function getCMDBAppsListRequest() {
+  async function getApplicationListRequest() {
     try {
       if (loading.value) {
         return;
@@ -121,7 +121,7 @@
       console.error(error);
     }
   }
-  getCMDBAppsListRequest();
+  getApplicationListRequest();
   const state = reactive<{
     selectedRowKeys: Key[];
     loading: boolean;
@@ -132,4 +132,5 @@
   const onJumeTo = function (id: number) {
     router.push({ name: 'applicationDetails', query: { id } });
   };
+  defineExpose({ getApplicationListRequest });
 </script>
