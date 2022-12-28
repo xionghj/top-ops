@@ -41,7 +41,11 @@
       </div>
       <a-spin :spinning="spinning">
         <a-table
-          :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+          :row-selection="{
+            selectedRowKeys: state.selectedRowKeys,
+            onChange: onSelectChange,
+            columnWidth: 40,
+          }"
           :columns="columns"
           :data-source="list"
           row-key="id"
@@ -148,6 +152,7 @@
     total: total.value,
     current: listQuery.page,
     pageSize: listQuery.pageSize,
+    size: 'small',
     showTotal: (total: number) => `总共 ${total} 项`,
     defaultPageSize: 10,
     showSizeChanger: true, // 是否显示pagesize选择

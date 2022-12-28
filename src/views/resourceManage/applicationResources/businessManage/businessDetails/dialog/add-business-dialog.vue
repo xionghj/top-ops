@@ -23,6 +23,7 @@
           :row-selection="{
             selectedRowKeys: state.selectedRowKeys,
             onChange: onSelectChange,
+            columnWidth: 40,
           }"
           :columns="columns"
           :data-source="list"

@@ -17,7 +17,11 @@
         </a-select>
       </div>
       <a-table
-        :row-selection="{ selectedRowKeys: selectPrincipal, onChange: onSelectChange }"
+        :row-selection="{
+          selectedRowKeys: selectPrincipal,
+          onChange: onSelectChange,
+          columnWidth: 40,
+        }"
         :columns="columns"
         :data-source="list"
         row-key="id"

@@ -35,7 +35,11 @@
       </div>
       <a-spin :spinning="spinning">
         <a-table
-          :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+          :row-selection="{
+            selectedRowKeys: state.selectedRowKeys,
+            onChange: onSelectChange,
+            columnWidth: 40,
+          }"
           :columns="columns"
           :data-source="list"
           row-key="id"

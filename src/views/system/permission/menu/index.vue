@@ -12,11 +12,14 @@
       </div>
       <a-spin :spinning="spinning">
         <a-table
+          v-if="menusList.length > 0"
           :columns="columns"
           :data-source="menusList"
-          row-key="id"
+          row-key="code"
           :expand-icon="(props: any) => expandIcon(props)"
           :pagination="false"
+          :expanded-row-keys="expandedRowKeys"
+          @expand="onTableExpand"
         >
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'name'">
@@ -183,6 +186,15 @@
       key: 'action',
     },
   ];
+  // 展开行code
+  const expandedRowKeys = ref<string[]>([]);
+  function onTableExpand(expanded: any, record: any) {
+    if (expanded) {
+      expandedRowKeys.value.push(record.code);
+    } else {
+      expandedRowKeys.value.splice(expandedRowKeys.value.indexOf(record.code), 1);
+    }
+  }
   // 展开图标
   function expandIcon(pro: any) {
     if (!pro.record.children) {

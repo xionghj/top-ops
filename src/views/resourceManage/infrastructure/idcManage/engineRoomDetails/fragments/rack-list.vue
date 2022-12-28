@@ -12,7 +12,7 @@
         </div>
       </div>
       <a-table
-        :row-selection="{ selectedRowKeys: selectRacks, onChange: onSelectChange }"
+        :row-selection="{ selectedRowKeys: selectRacks, onChange: onSelectChange, columnWidth: 40 }"
         :columns="columns"
         :data-source="list"
         row-key="id"
