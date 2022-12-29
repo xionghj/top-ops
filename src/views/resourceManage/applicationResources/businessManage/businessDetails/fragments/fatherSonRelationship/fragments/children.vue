@@ -57,7 +57,7 @@
   import { useBusinessRelation } from '../../../hooks/useBusinessRelation';
   import { useBusinessDialog } from '../../../hooks/useBusinessDialog';
 
-  import { getChildrenBusinessList } from '@/api/resourceManage/applicationResources/businessManage';
+  import { getChildrenBusinessChildren } from '@/api/resourceManage/applicationResources/businessManage';
 
   const { showAddBusinessDialog } = useBusinessDialog();
   const { selectChildren, isRefresh } = useBusinessRelation();
@@ -83,7 +83,7 @@
   const listQuery = reactive({
     search: '',
     page: 1,
-    pageSize: 10,
+    page_size: 10,
   });
   const total = ref(0);
   const columns = [
@@ -127,7 +127,7 @@
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
-    pageSize: listQuery.pageSize,
+    pageSize: listQuery.page_size,
     showTotal: (total: number) => `总共 ${total} 项`,
     defaultPageSize: 10,
     showSizeChanger: true, // 是否显示pagesize选择
@@ -137,7 +137,7 @@
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
-    listQuery.pageSize = pag.pageSize;
+    listQuery.page_size = pag.pageSize;
     getChildrenBusinessListRequest();
   };
   // 获取列表
@@ -148,7 +148,7 @@
       }
       loading.value = true;
       const id: any = route.query && route.query.id;
-      const data = await getChildrenBusinessList(id, listQuery);
+      const data = await getChildrenBusinessChildren(id, listQuery);
       loading.value = false;
       list.value = data.results;
       total.value = data.count;

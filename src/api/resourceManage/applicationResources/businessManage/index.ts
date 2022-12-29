@@ -47,10 +47,19 @@ export function getParentBusinessDetails(id: number) {
     method: 'get',
   });
 }
-// 业务管理-父子业务-获取子业务列表
-export function getChildrenBusinessList(id: number, data: API.PageParams) {
+// 业务管理-父子业务-获取添加业务列表
+export function getChildrenBusinessList(id: number, query: API.PageParams) {
   return request({
     url: `/cmdb/business/${id}/list/`,
     method: 'get',
+    params: query,
+  });
+}
+// 业务管理-父子业务-获取子业务列表
+export function getChildrenBusinessChildren(id: number, query: API.PageParams) {
+  return request({
+    url: `/cmdb/business/${id}/children/`,
+    method: 'get',
+    params: query,
   });
 }

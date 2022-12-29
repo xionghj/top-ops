@@ -93,7 +93,7 @@
   const listQuery = reactive({
     search: '',
     page: 1,
-    pageSize: 10,
+    page_size: 5,
   });
   const total = ref(0);
   const columns = [
@@ -127,9 +127,9 @@
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
-    pageSize: listQuery.pageSize,
+    pageSize: listQuery.page_size,
     showTotal: (total: number) => `总共 ${total} 项`,
-    defaultPageSize: 10,
+    defaultPageSize: 5,
     showSizeChanger: true, // 是否显示pagesize选择
     showQuickJumper: true, // 是否显示跳转窗
   }));
@@ -137,7 +137,7 @@
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
-    listQuery.pageSize = pag.pageSize;
+    listQuery.page_size = pag.pageSize;
     getCMDBBusinessListRequest();
   };
   // 获取业务列表

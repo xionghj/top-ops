@@ -16,8 +16,8 @@
             <a-col :span="12">
               <a-form-item label="业务类型" name="kind">
                 <a-radio-group v-model:value="form.kind" name="radioGroup">
-                  <a-radio value="1">产品线</a-radio>
-                  <a-radio value="2">子业务</a-radio>
+                  <a-radio value="0">产品线</a-radio>
+                  <a-radio value="1">子业务</a-radio>
                 </a-radio-group>
               </a-form-item>
             </a-col>
@@ -173,7 +173,7 @@
   ];
   const form = ref({
     name: '',
-    kind: '1',
+    kind: '0',
     description: '',
     parent: '428350384709369295',
     tester: [],
