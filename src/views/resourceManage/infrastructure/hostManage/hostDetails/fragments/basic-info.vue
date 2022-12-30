@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-descriptions :column="2">
+    <a-descriptions :column="2" :label-style="{ width: '120px' }">
       <a-descriptions-item label="IP地址"> {{ basicInfo.ip }}</a-descriptions-item>
       <a-descriptions-item label="主机名"></a-descriptions-item>
       <a-descriptions-item label="主机环境"></a-descriptions-item>
@@ -22,7 +22,7 @@
     </a-descriptions>
   </div>
   <div class="mt-4">
-    <a-descriptions :column="2">
+    <a-descriptions :column="2" :label-style="{ width: '120px' }">
       <a-descriptions-item label="操作系统"></a-descriptions-item>
       <a-descriptions-item label="内核发行版本"></a-descriptions-item>
       <a-descriptions-item label="系统架构"></a-descriptions-item>
@@ -31,7 +31,7 @@
     </a-descriptions>
   </div>
   <div class="mt-4">
-    <a-descriptions :column="2">
+    <a-descriptions :column="2" :label-style="{ width: '120px' }">
       <a-descriptions-item label="CPU核数"></a-descriptions-item>
       <a-descriptions-item label="CPU型号"></a-descriptions-item>
       <a-descriptions-item label="CPU频率"></a-descriptions-item>
@@ -40,7 +40,7 @@
     </a-descriptions>
   </div>
   <div class="mt-4">
-    <a-descriptions :column="2">
+    <a-descriptions :column="2" :label-style="{ width: '120px' }">
       <a-descriptions-item label="资产编号"></a-descriptions-item>
       <a-descriptions-item label="Agent 版本"></a-descriptions-item>
       <a-descriptions-item label="数据中心"></a-descriptions-item>
@@ -52,7 +52,7 @@
   </div>
   <div v-if="basicInfoExpand">
     <div class="mt-4">
-      <a-descriptions>
+      <a-descriptions :label-style="{ width: '120px' }">
         <a-descriptions-item label="磁盘信息" :span="3">
           <a-table
             :columns="diskColumns"
@@ -74,7 +74,7 @@
       </a-descriptions>
     </div>
     <div class="mt-4">
-      <a-descriptions>
+      <a-descriptions :label-style="{ width: '120px' }">
         <a-descriptions-item label="网卡信息" :span="3">
           <a-table
             :columns="networkCardColumns"
@@ -96,7 +96,7 @@
       </a-descriptions>
     </div>
     <div class="mt-4">
-      <a-descriptions>
+      <a-descriptions :label-style="{ width: '120px' }">
         <a-descriptions-item label="服务信息" :span="3">
           <a-table
             :columns="serveColumns"
@@ -263,11 +263,3 @@
     },
   ];
 </script>
-<style lang="less" scoped>
-  :deep(.ant-descriptions-item-label) {
-    width: 120px;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 2px;
-  }
-</style>

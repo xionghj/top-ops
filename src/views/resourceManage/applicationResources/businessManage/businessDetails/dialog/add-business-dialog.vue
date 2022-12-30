@@ -1,4 +1,4 @@
-<!-- 业务管理-选择业务弹出框 -->
+<!-- 业务管理-详情-选择业务弹出框 -->
 <template>
   <div>
     <a-modal
@@ -14,10 +14,12 @@
             <a-input
               v-model:value="listQuery.search"
               placeholder="根据关键词搜索"
-              @change="getCMDBBusinessListRequest()"
+              @change="onQuery()"
             />
           </div>
-          <a-checkbox v-model:checked="relatedToMeChecked">与我有关</a-checkbox>
+          <a-checkbox v-model:checked="relatedToMeChecked" @change="getCMDBBusinessListRequest()"
+            >与我有关</a-checkbox
+          >
         </div>
         <a-table
           :row-selection="{
@@ -57,6 +59,8 @@
 <script lang="ts" setup>
   import { ref, reactive, computed, watch } from 'vue';
   import { useRoute } from 'vue-router';
+  import { debounce } from 'lodash-es';
+  import { storeToRefs } from 'pinia';
 
   import {
     Modal as AModal,
@@ -68,11 +72,16 @@
     message,
   } from 'ant-design-vue';
   import { useBusinessDialog } from '../hooks/useBusinessDialog';
+  import { useUserStore } from '@/store/modules/user';
+
   import {
     getCMDBBusinessList,
     getChildrenBusinessList,
     setBusinessRelation,
   } from '@/api/resourceManage/applicationResources/businessManage';
+
+  const userStore = useUserStore();
+  const { userInfo } = storeToRefs(userStore);
   const { showAddBusinessDialog, operationType, closeAddBusinessDialogChange } =
     useBusinessDialog();
 
@@ -98,7 +107,7 @@
     search: '',
     page: 1,
     page_size: 5,
-    person: '',
+    owner: '',
   });
   const total = ref(0);
   const columns = [
@@ -128,6 +137,8 @@
       key: 'updated_at',
     },
   ];
+  // 与我有关
+  const relatedToMeChecked = ref();
   const loading = ref(false);
   const pagination = computed(() => ({
     total: total.value,
@@ -139,6 +150,8 @@
     showQuickJumper: true, // 是否显示跳转窗
   }));
 
+  // 防抖查询
+  const onQuery = debounce(getCMDBBusinessListRequest, 500);
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
@@ -152,6 +165,11 @@
         return;
       }
       loading.value = true;
+      if (relatedToMeChecked.value) {
+        listQuery.owner = userInfo.value.user_id || '';
+      } else {
+        listQuery.owner = '';
+      }
       const id: any = route.query && route.query.id;
       const data = await getChildrenBusinessList(id, listQuery);
       loading.value = false;
@@ -197,5 +215,4 @@
   const onSelectChange = (selectedRowKeys: Key[]) => {
     state.selectedRowKeys = selectedRowKeys;
   };
-  const relatedToMeChecked = ref();
 </script>

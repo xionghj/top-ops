@@ -1,7 +1,7 @@
 <!-- 业务管理-父子关系-->
 <template>
   <div class="w-full bg-white flex">
-    <div class="px-3 pt-3 w-[200px] bg-gray-50">
+    <div class="p-[15px] w-[220px] bg-gray-50">
       <div
         v-for="(item, index) in menus"
         :key="index"

@@ -57,7 +57,7 @@
   import { useBusinessRelation } from '../../../hooks/useBusinessRelation';
   import { useBusinessDialog } from '../../../hooks/useBusinessDialog';
 
-  import { getChildrenBusinessChildren } from '@/api/resourceManage/applicationResources/businessManage';
+  import { getBusinessChildrenList } from '@/api/resourceManage/applicationResources/businessManage';
 
   const { showAddBusinessDialog } = useBusinessDialog();
   const { selectChildren, isRefresh } = useBusinessRelation();
@@ -148,7 +148,7 @@
       }
       loading.value = true;
       const id: any = route.query && route.query.id;
-      const data = await getChildrenBusinessChildren(id, listQuery);
+      const data = await getBusinessChildrenList(id, listQuery);
       loading.value = false;
       list.value = data.results;
       total.value = data.count;

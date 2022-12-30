@@ -1,8 +1,9 @@
+<!-- 业务拓扑 -->
 <template>
   <div>
     <Breadcrumb></Breadcrumb>
     <div class="flex">
-      <div class="w-[260px] bg-white p-4 rounded-sm">
+      <div class="w-[260px] bg-white p-4 rounded">
         <a-input v-model:value="searchValue" placeholder="请输入关键字进行过滤" />
         <div class="my-3">所有业务系统</div>
         <a-tree
@@ -37,33 +38,41 @@
         </a-tree>
       </div>
       <div class="flex flex-col flex-1 ml-4">
-        <div class="bg-white rounded-sm p-4">
-          <a-descriptions :column="2">
+        <div class="bg-white rounded p-4">
+          <a-descriptions :column="2" :label-style="{ width: '90px' }">
             <a-descriptions-item label="名称"> {{ basicInfo.name }}</a-descriptions-item>
             <a-descriptions-item label="类型">{{ basicInfo.kind }}</a-descriptions-item>
             <a-descriptions-item label="备注说明">{{ basicInfo.description }}</a-descriptions-item>
-            <a-descriptions-item label="运维负责人"
-              ><span v-for="(item, index) in basicInfo.owner" :key="index">
-                {{ item.username }}{{ basicInfo.owner.length - 1 != index ? '，' : '' }}
+            <a-descriptions-item label="测试负责人"
+              ><span
+                v-for="(item, index) in basicInfo.tester"
+                :key="index"
+                class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+              >
+                {{ item.username }}
               </span></a-descriptions-item
             >
             <a-descriptions-item label="产品经理"
-              ><span v-for="(item, index) in basicInfo.pm" :key="index">
-                {{ item.username }}{{ basicInfo.pm.length - 1 != index ? '，' : '' }}
+              ><span
+                v-for="(item, index) in basicInfo.pm"
+                :key="index"
+                class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+              >
+                {{ item.username }}
               </span></a-descriptions-item
             >
             <a-descriptions-item label="研发负责人"
               ><span
                 v-for="(item, index) in basicInfo.developer"
                 :key="index"
-                class="rounded-full py-0.5 px-4 bg-blue-500 text-white mr-1 flex items-center justify-center"
+                class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
               >
                 {{ item.username }}
               </span></a-descriptions-item
             >
           </a-descriptions>
         </div>
-        <div class="bg-white rounded-sm mt-4 px-4 pb-4">
+        <div class="bg-white rounded mt-4 px-4 pb-4">
           <a-tabs v-model:activeKey="activeKey" @change="tabsChange">
             <a-tab-pane key="applicationList" tab="应用列表"
               ><ApplicationList v-if="activeKey === 'applicationList'" ref="applicationListRef"
@@ -82,18 +91,9 @@
 </template>
 <script lang="ts" setup>
   import { ref, watch, nextTick } from 'vue';
-  import { useRoute } from 'vue-router';
-  import {
-    CarryOutOutlined,
-    SmileTwoTone,
-    FolderFilled,
-    DownOutlined,
-    FolderOpenFilled,
-    FileFilled,
-  } from '@ant-design/icons-vue';
+  import { FolderFilled, FolderOpenFilled, FileFilled } from '@ant-design/icons-vue';
   import {
     Tree as ATree,
-    DirectoryTree as ADirectoryTree,
     Input as AInput,
     Descriptions as ADescriptions,
     DescriptionsItem as ADescriptionsItem,
@@ -111,8 +111,6 @@
   } from '@/api/resourceManage/applicationResources/businessTopology';
   import { getCMDBBusinessDetails } from '@/api/resourceManage/applicationResources/businessManage';
 
-  const route = useRoute();
-
   const searchValue = ref<string>('');
   const expandedKeys = ref<TreeProps['expandedKeys']>([]);
   const selectedKeys = ref<TreeProps['selectedKeys']>([]);
@@ -124,24 +122,29 @@
     try {
       const data = await getCMDBBusinessTree({});
       treeData.value = data.results;
+      if (treeData.value && treeData.value.length > 0) {
+        selectedKeys.value = [treeData.value[0].id.toString()];
+        getBusinessDetails();
+        tabsChange();
+      }
       generateList(treeData.value);
     } catch (error) {
       console.error(error);
     }
   }
   getCMDBBusinessTreeRequest();
+  // 处理树数据
   const generateList = (data: TreeProps['treeData']) => {
     if (data?.length) {
       for (let i = 0; i < data.length; i++) {
         const node = data[i];
         const key = node.id.toString();
         data[i].id = data[i].id.toString();
-        if (data[i].children && data[i].children.length > 0) {
+        if (data[i].children?.length) {
           data[i].isLeaf = false;
         } else {
           data[i].isLeaf = true;
         }
-        // data[i].children = [];
         dataList.push({ key, name: node.name });
         if (node.children) {
           generateList(node.children);
@@ -154,13 +157,19 @@
     autoExpandParent.value = false;
   };
 
-  const applicationListRef = ref(null);
+  const applicationListRef = ref();
+  const subBusinessListRef = ref();
+  const hostListRef = ref();
   const onSelect = (keys: TreeProps['selectedKeys']) => {
     if (keys && keys.length > 0) {
-      getBusinessDetails(keys[0]);
-    }
-    if (activeKey.value === 'applicationList') {
-      applicationListRef.value && applicationListRef.value.refresh(keys[0]);
+      getBusinessDetails();
+      if (activeKey.value === 'applicationList') {
+        applicationListRef.value && applicationListRef.value.refresh(keys[0]);
+      } else if (activeKey.value === 'subBusinessList') {
+        subBusinessListRef.value && subBusinessListRef.value.refresh(keys[0]);
+      } else if (activeKey.value === 'hostList') {
+        hostListRef.value && hostListRef.value.refresh(keys[0]);
+      }
     }
   };
   watch(searchValue, (value) => {
@@ -204,48 +213,32 @@
   const onLoadData: TreeProps['loadData'] = (treeNode) => {
     if (treeNode.dataRef) {
       return getCMDBBusinessTreeChildren(treeNode.dataRef.id).then((data) => {
-        treeNode.dataRef.children = data.results;
+        if (treeNode.dataRef) {
+          treeNode.dataRef.children = data.results;
+        }
         treeData.value = [...treeData.value];
-        generateTree(treeData.value);
+        generateTreeData(treeData.value);
       });
     } else {
       return new Promise((resolve) => {
         resolve();
       });
     }
-
-    // return new Promise((resolve) => {
-    //   console.log('展开了', treeNode);
-    //   // if (treeNode.dataRef.children) {
-    //   //   resolve();
-    //   //   return;
-    //   // }
-    //   setTimeout(() => {
-    //     treeNode.dataRef.children = [
-    //       { name: '企微管家-消息存档1', id: `${treeNode.eventKey}-0` },
-    //       { name: '企微管家-消息存档2', id: `${treeNode.eventKey}-1` },
-    //     ];
-    //     treeData.value = [...treeData.value];
-    //     console.log('获取数据', treeData.value);
-    //     // generateList(treeData.value);
-    //     resolve();
-    //   }, 1000);
-    // });
   };
-  const generateTree = (data: TreeProps['treeData']) => {
+  const generateTreeData = (data: TreeProps['treeData']) => {
     if (data?.length) {
       for (let i = 0; i < data.length; i++) {
         const node = data[i];
         const key = node.id.toString();
         data[i].id = data[i].id.toString();
-        if (data[i].children && data[i].children.length > 0) {
+        if (data[i].children?.length) {
           data[i].isLeaf = false;
         } else {
           data[i].isLeaf = true;
         }
         dataList.push({ key, name: node.name });
         if (node.children) {
-          generateTree(node.children);
+          generateTreeData(node.children);
         }
       }
     }
@@ -255,33 +248,40 @@
     name: '',
     kind: '',
     pm: [] as any,
-    owner: [] as any,
+    tester: [] as any,
     developer: [] as any,
     description: '',
   });
   // 获取业务基本信息
-  async function getBusinessDetails(id: any) {
+  async function getBusinessDetails() {
     try {
+      const id: any = selectedKeys.value && selectedKeys.value[0];
       const data = await getCMDBBusinessDetails(id);
       basicInfo.value = data;
     } catch (error) {
       console.error(error);
     }
   }
-  //
+
   const activeKey = ref('applicationList');
-  //
+  // tabs点击
   function tabsChange() {
-    if (activeKey.value === 'applicationList' && selectedKeys.value.length > 0) {
-      nextTick(() => {
-        applicationListRef.value && applicationListRef.value.refresh(selectedKeys.value[0]);
-      });
-    }
+    nextTick(() => {
+      if (selectedKeys.value && selectedKeys.value.length > 0) {
+        if (activeKey.value === 'applicationList') {
+          applicationListRef.value && applicationListRef.value.refresh(selectedKeys.value[0]);
+        } else if (activeKey.value === 'subBusinessList') {
+          subBusinessListRef.value && subBusinessListRef.value.refresh(selectedKeys.value[0]);
+        } else if (activeKey.value === 'hostList') {
+          hostListRef.value && hostListRef.value.refresh(selectedKeys.value[0]);
+        }
+      }
+    });
   }
 </script>
 <style lang="less" scoped>
+  // 隐藏tree图标
   :deep(.ant-tree-switcher-noop) {
-    // display: none;
     color: transparent;
   }
   :deep(.ant-tree .ant-tree-node-content-wrapper) {

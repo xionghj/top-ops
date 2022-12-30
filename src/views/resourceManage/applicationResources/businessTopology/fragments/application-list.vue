@@ -6,7 +6,7 @@
         <a-input
           v-model:value="listQuery.search"
           placeholder="根据关键词搜索"
-          @change="getApplicationListRequest()"
+          @change="onQuery()"
         />
       </div>
     </div>
@@ -22,7 +22,7 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'name'">
           <span
-            class="text-blue-500 cursor-pointer hover:text-blue-700"
+            class="text-[#3D78E3] cursor-pointer hover:text-[#3D78E3]"
             @click="onJumeTo(record.id)"
           >
             {{ record.name }}
@@ -30,17 +30,17 @@
         </template>
         <template v-if="column.key === 'business'">
           <span v-for="(item, index) in record.business" :key="index">
-            {{ item.name }}{{ record.business.length - 1 != index ? '，' : '' }}
+            {{ item.name }}{{ record.business.length - 1 != index ? ';' : '' }}
           </span>
         </template>
         <template v-if="column.key === 'developer'">
           <span v-for="(item, index) in record.developer" :key="index">
-            {{ item.username }}{{ record.developer.length - 1 != index ? '，' : '' }}
+            {{ item.username }}{{ record.developer.length - 1 != index ? ';' : '' }}
           </span>
         </template>
         <template v-if="column.key === 'tester'">
           <span v-for="(item, index) in record.tester" :key="index">
-            {{ item.username }}{{ record.tester.length - 1 != index ? '，' : '' }}
+            {{ item.username }}{{ record.tester.length - 1 != index ? ';' : '' }}
           </span>
         </template>
       </template>
@@ -50,6 +50,7 @@
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
   import { useRouter } from 'vue-router';
+  import { debounce } from 'lodash-es';
   import { Table as ATable, Input as AInput } from 'ant-design-vue';
   import { getCMDBAppsList } from '@/api/resourceManage/applicationResources/applicationManage';
   type Key = string | number;
@@ -100,6 +101,7 @@
     showQuickJumper: true, // 是否显示跳转窗
   }));
 
+  const onQuery = debounce(getApplicationListRequest, 500);
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
@@ -127,13 +129,6 @@
     listQuery.business = businessId;
     getApplicationListRequest();
   }
-  const state = reactive<{
-    selectedRowKeys: Key[];
-    loading: boolean;
-  }>({
-    selectedRowKeys: [],
-    loading: false,
-  });
   const onJumeTo = function (id: number) {
     router.push({ name: 'applicationDetails', query: { id } });
   };

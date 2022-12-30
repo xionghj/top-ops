@@ -6,7 +6,7 @@
         <a-input
           v-model:value="listQuery.search"
           placeholder="根据关键词搜索"
-          @change="getCMDBAppsListRequest()"
+          @change="onQuery()"
         />
       </div>
     </div>
@@ -20,28 +20,32 @@
       @change="handleTableChange"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'name'">
+        <template v-if="column.key === 'ip'">
           <span
             class="text-blue-500 cursor-pointer hover:text-blue-700"
             @click="onJumeTo(record.id)"
           >
-            {{ record.name }}
+            {{ record.ip }}
           </span>
         </template>
-        <template v-if="column.key === 'business'">
-          <span v-for="(item, index) in record.business" :key="index">
-            {{ item.name }}{{ record.business.length - 1 != index ? '，' : '' }}
+        <template v-if="column.key === 'first_owner'">
+          <span v-for="(item, index) in record.first_owner" :key="index">
+            {{ item.username }}{{ record.first_owner.length - 1 != index ? '，' : '' }}
           </span>
         </template>
-        <template v-if="column.key === 'developer'">
-          <span v-for="(item, index) in record.developer" :key="index">
-            {{ item.username }}{{ record.developer.length - 1 != index ? '，' : '' }}
-          </span>
-        </template>
-        <template v-if="column.key === 'tester'">
-          <span v-for="(item, index) in record.tester" :key="index">
-            {{ item.username }}{{ record.tester.length - 1 != index ? '，' : '' }}
-          </span>
+        <template v-if="column.key === 'agent_status'">
+          <div class="flex items-center">
+            <ExclamationCircleFilled
+              v-if="record.agent_status == 'not_install'"
+              :style="{ fontSize: '14px', color: '#e38306' }"
+            />
+            <CheckCircleFilled v-else :style="{ fontSize: '14px', color: '#52c41a' }" />
+            <span
+              class="ml-[7px]"
+              :class="[record.agent_status == 'not_install' ? 'text-[#e38306]' : 'text-[#52c41a]']"
+              >{{ agentStatusMap[record.agent_status] }}</span
+            >
+          </div>
         </template>
       </template>
     </a-table>
@@ -49,75 +53,84 @@
 </template>
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
+  import { CheckCircleFilled, ExclamationCircleFilled } from '@ant-design/icons-vue';
   import { useRouter } from 'vue-router';
+  import { debounce } from 'lodash-es';
   import { Table as ATable, Input as AInput } from 'ant-design-vue';
-  import { getCMDBAppsList } from '@/api/resourceManage/applicationResources/applicationManage';
-  type Key = string | number;
+  import { getHostMangeList } from '@/api/resourceManage/infrastructure/hostManage';
   const router = useRouter();
-  const list = ref<API.RackManageListItem[]>([]);
+  const list = ref<API.HostManageListItem[]>([]);
   const listQuery = reactive({
     search: '',
     page: 1,
-    pageSize: 10,
+    page_size: 5,
+    business: '',
   });
   const total = ref(0);
+  const agentStatusMap: any = {
+    normal: '正常',
+    abnormal: '异常',
+    not_install: '未安装',
+  };
   const columns = [
     {
-      title: 'IP',
-      dataIndex: 'name',
-      key: 'name',
+      title: 'IP 地址',
+      dataIndex: 'ip',
+      key: 'ip',
     },
     {
       title: '主机名',
-      dataIndex: 'business',
-      key: 'business',
+      dataIndex: 'hostname',
+      key: 'hostname',
     },
     {
-      title: 'CPU核数',
-      dataIndex: 'developer',
-      key: 'developer',
+      title: 'CPU 核数',
+      dataIndex: 'cpu_count',
+      key: 'cpu_count',
     },
     {
       title: '内存大小',
-      dataIndex: 'pm',
-      key: 'pm',
+      dataIndex: 'mem_size',
+      key: 'mem_size',
     },
     {
       title: '运维负责人',
-      dataIndex: 'tester',
-      key: 'tester',
+      dataIndex: 'first_owner',
+      key: 'first_owner',
     },
     {
       title: 'Agent 状态',
-      dataIndex: 'tester',
-      key: 'tester',
+      dataIndex: 'agent_status',
+      key: 'agent_status',
     },
   ];
   const loading = ref(false);
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
-    pageSize: listQuery.pageSize,
+    pageSize: listQuery.page_size,
     showTotal: (total: number) => `总共 ${total} 项`,
-    defaultPageSize: 10,
+    defaultPageSize: 5,
     showSizeChanger: true, // 是否显示pagesize选择
     showQuickJumper: true, // 是否显示跳转窗
   }));
 
+  // 防抖查询
+  const onQuery = debounce(getHostMangeListRequest, 500);
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
-    listQuery.pageSize = pag.pageSize;
-    getCMDBAppsListRequest();
+    listQuery.page_size = pag.pageSize;
+    getHostMangeListRequest();
   };
-  // 获取应用列表
-  async function getCMDBAppsListRequest() {
+  // 获取主机列表
+  async function getHostMangeListRequest() {
     try {
       if (loading.value) {
         return;
       }
       loading.value = true;
-      const data = await getCMDBAppsList(listQuery);
+      const data = await getHostMangeList(listQuery);
       loading.value = false;
       list.value = data.results;
       total.value = data.count;
@@ -126,15 +139,13 @@
       console.error(error);
     }
   }
-  getCMDBAppsListRequest();
-  const state = reactive<{
-    selectedRowKeys: Key[];
-    loading: boolean;
-  }>({
-    selectedRowKeys: [],
-    loading: false,
-  });
-  const onJumeTo = function (id: number) {
-    router.push({ name: 'applicationDetails', query: { id } });
+  const onJumeTo = function (ids: number) {
+    router.push({ name: 'hostDetails', query: { id: ids } });
   };
+  // 刷新列表
+  function refresh(businessId: string) {
+    listQuery.business = businessId;
+    getHostMangeListRequest();
+  }
+  defineExpose({ refresh });
 </script>

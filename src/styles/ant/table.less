@@ -16,17 +16,21 @@
   cursor: pointer;
   color: #c7c7c7 !important;
 }
-.ant-tabs-tab {
-  padding: 12px 6px !important;
+.ant-table {
+  color: #262626 !important;
 }
+// 列表头高度
 .ant-table-thead > tr > th {
-  padding: 13.5px 16px !important;
+  padding: 12.5px 12px !important;
+  background: #f3f6f9 !important;
+  color: #262626 !important;
 }
-
-// .ant-tree.ant-tree-directory .ant-tree-treenode-selected:hover::before, .ant-tree.ant-tree-directory .ant-tree-treenode-selected::before {
-//   background: #bae7ff !important;
-//   border-radius: 3px;
-// }
-// .ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected {
-//   color: rgba(0, 0, 0, 0.85);
-// }
+.ant-table-tbody > tr > td, .ant-table tfoot > tr > th, .ant-table tfoot > tr > td {
+  padding: 16px 12px !important;
+}
+.ant-table-container table > thead > tr:first-child th:first-child {
+  border-top-left-radius: 0 !important;
+}
+.ant-table-container table > thead > tr:first-child th:last-child {
+  border-top-right-radius: 0 !important;
+}

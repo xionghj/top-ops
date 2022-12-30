@@ -6,7 +6,7 @@
         <a-input
           v-model:value="listQuery.search"
           placeholder="根据关键词搜索"
-          @change="getCMDBAppsListRequest()"
+          @change="onQuery()"
         />
       </div>
     </div>
@@ -28,19 +28,19 @@
             {{ record.name }}
           </span>
         </template>
-        <template v-if="column.key === 'business'">
-          <span v-for="(item, index) in record.business" :key="index">
-            {{ item.name }}{{ record.business.length - 1 != index ? '，' : '' }}
+        <template v-if="column.key === 'pm'">
+          <span v-for="(item, index) in record.pm" :key="index">
+            {{ item.username }}{{ record.pm.length - 1 != index ? '，' : '' }}
           </span>
         </template>
-        <template v-if="column.key === 'developer'">
-          <span v-for="(item, index) in record.developer" :key="index">
-            {{ item.username }}{{ record.developer.length - 1 != index ? '，' : '' }}
+        <template v-if="column.key === 'children'">
+          <span v-for="(item, index) in record.children" :key="index">
+            {{ item.username }}{{ record.children.length - 1 != index ? '，' : '' }}
           </span>
         </template>
-        <template v-if="column.key === 'tester'">
-          <span v-for="(item, index) in record.tester" :key="index">
-            {{ item.username }}{{ record.tester.length - 1 != index ? '，' : '' }}
+        <template v-if="column.key === 'parent'">
+          <span>
+            {{ record.parent && record.parent.name }}
           </span>
         </template>
       </template>
@@ -50,15 +50,16 @@
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
   import { useRouter } from 'vue-router';
+  import { debounce } from 'lodash-es';
   import { Table as ATable, Input as AInput } from 'ant-design-vue';
-  import { getCMDBAppsList } from '@/api/resourceManage/applicationResources/applicationManage';
-  type Key = string | number;
+  import { getBusinessChildrenList } from '@/api/resourceManage/applicationResources/businessManage';
+
   const router = useRouter();
   const list = ref<API.RackManageListItem[]>([]);
   const listQuery = reactive({
     search: '',
     page: 1,
-    pageSize: 10,
+    page_size: 5,
   });
   const total = ref(0);
   const columns = [
@@ -69,50 +70,50 @@
     },
     {
       title: '业务类型',
-      dataIndex: 'business',
-      key: 'business',
+      dataIndex: 'kind',
+      key: 'kind',
     },
     {
       title: '产品经理',
-      dataIndex: 'developer',
-      key: 'developer',
-    },
-    {
-      title: '子业务',
       dataIndex: 'pm',
       key: 'pm',
     },
     {
+      title: '子业务',
+      dataIndex: 'children',
+      key: 'children',
+    },
+    {
       title: '父业务',
-      dataIndex: 'tester',
-      key: 'tester',
+      dataIndex: 'parent',
+      key: 'parent',
     },
   ];
   const loading = ref(false);
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
-    pageSize: listQuery.pageSize,
+    pageSize: listQuery.page_size,
     showTotal: (total: number) => `总共 ${total} 项`,
-    defaultPageSize: 10,
+    defaultPageSize: 5,
     showSizeChanger: true, // 是否显示pagesize选择
     showQuickJumper: true, // 是否显示跳转窗
   }));
-
+  const onQuery = debounce(getBusinessChildrenListRequest, 500);
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
-    listQuery.pageSize = pag.pageSize;
-    getCMDBAppsListRequest();
+    listQuery.page_size = pag.pageSize;
+    getBusinessChildrenListRequest();
   };
-  // 获取应用列表
-  async function getCMDBAppsListRequest() {
+  // 获取子业务列表
+  async function getBusinessChildrenListRequest() {
     try {
       if (loading.value) {
         return;
       }
       loading.value = true;
-      const data = await getCMDBAppsList(listQuery);
+      const data = await getBusinessChildrenList(businessId.value, listQuery);
       loading.value = false;
       list.value = data.results;
       total.value = data.count;
@@ -121,15 +122,15 @@
       console.error(error);
     }
   }
-  getCMDBAppsListRequest();
-  const state = reactive<{
-    selectedRowKeys: Key[];
-    loading: boolean;
-  }>({
-    selectedRowKeys: [],
-    loading: false,
-  });
+  // 业务id
+  const businessId = ref();
+  // 刷新列表
+  function refresh(id: number) {
+    businessId.value = id;
+    getBusinessChildrenListRequest();
+  }
   const onJumeTo = function (id: number) {
     router.push({ name: 'applicationDetails', query: { id } });
   };
+  defineExpose({ refresh });
 </script>

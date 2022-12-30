@@ -152,7 +152,6 @@
     total: total.value,
     current: listQuery.page,
     pageSize: listQuery.pageSize,
-    size: 'small',
     showTotal: (total: number) => `总共 ${total} 项`,
     defaultPageSize: 10,
     showSizeChanger: true, // 是否显示pagesize选择

@@ -56,7 +56,7 @@ export function getChildrenBusinessList(id: number, query: API.PageParams) {
   });
 }
 // 业务管理-父子业务-获取子业务列表
-export function getChildrenBusinessChildren(id: number, query: API.PageParams) {
+export function getBusinessChildrenList(id: number, query: API.PageParams) {
   return request({
     url: `/cmdb/business/${id}/children/`,
     method: 'get',
