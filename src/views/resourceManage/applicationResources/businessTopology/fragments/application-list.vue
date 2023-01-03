@@ -21,10 +21,7 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'name'">
-          <span
-            class="text-[#3D78E3] cursor-pointer hover:text-[#3D78E3]"
-            @click="onJumeTo(record.id)"
-          >
+          <span class="text-[#3D78E3] cursor-pointer" @click="onJumeTo(record.id)">
             {{ record.name }}
           </span>
         </template>
@@ -53,9 +50,8 @@
   import { debounce } from 'lodash-es';
   import { Table as ATable, Input as AInput } from 'ant-design-vue';
   import { getCMDBAppsList } from '@/api/resourceManage/applicationResources/applicationManage';
-  type Key = string | number;
   const router = useRouter();
-  const list = ref<API.RackManageListItem[]>([]);
+  const list = ref([]);
   const listQuery = reactive({
     search: '',
     page: 1,

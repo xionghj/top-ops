@@ -1,35 +1,13 @@
-<!-- 业务管理-列表 -->
+<!-- 业务管理-列表详情-应用列表-->
 <template>
   <div>
-    <Breadcrumb>
-      <template #right>
-        <div class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onAddBusiness('add')"
-            >新建业务</div
-          >
-          <a-dropdown placement="bottom">
-            <div class="cursor-pointer hover:text-blue-500" @click.prevent> 更多操作 </div>
-            <template #overlay>
-              <a-menu>
-                <a-menu-item>
-                  <a href="javascript:;">导入</a>
-                </a-menu-item>
-                <a-menu-item>
-                  <a href="javascript:;">手工导入</a>
-                </a-menu-item>
-              </a-menu>
-            </template>
-          </a-dropdown>
-        </div>
-      </template>
-    </Breadcrumb>
-    <div class="p-6 bg-white">
+    <div class="px-6 bg-white">
       <div class="flex justify-between mb-4">
         <div class="w-56">
           <a-input
             v-model:value="listQuery.search"
             placeholder="根据关键词搜索"
-            @change="getCMDBBusinessListRequest()"
+            @change="onQuery()"
           />
         </div>
       </div>
@@ -43,7 +21,6 @@
         :data-source="list"
         row-key="id"
         :pagination="pagination"
-        children-column-name="noChildren"
         :loading="loading"
         @change="handleTableChange"
       >
@@ -56,19 +33,24 @@
               {{ record.name }}
             </span>
           </template>
-          <template v-if="column.key === 'pm'">
-            <span v-for="(item, index) in record.pm" :key="index">
-              {{ item.username }}{{ record.pm.length - 1 != index ? ';' : '' }}
+          <template v-if="column.key === 'business'">
+            <span v-for="(item, index) in record.business" :key="index">
+              {{ item.name }}{{ record.business.length - 1 != index ? '; ' : '' }}
             </span>
           </template>
-          <template v-if="column.key === 'children'">
-            <span v-for="(item, index) in record.children" :key="index">
-              {{ item.name }}{{ record.children.length - 1 != index ? ';' : '' }}
+          <template v-if="column.key === 'developer'">
+            <span v-for="(item, index) in record.developer" :key="index">
+              {{ item.username }}{{ record.developer.length - 1 != index ? '; ' : '' }}
             </span>
           </template>
-          <template v-if="column.key === 'parent'">
-            <span>
-              {{ record.parent && record.parent.name }}
+          <template v-if="column.key === 'owner'">
+            <span v-for="(item, index) in record.owner" :key="index">
+              {{ item.username }}{{ record.owner.length - 1 != index ? '; ' : '' }}
+            </span>
+          </template>
+          <template v-if="column.key === 'tester'">
+            <span v-for="(item, index) in record.tester" :key="index">
+              {{ item.username }}{{ record.tester.length - 1 != index ? '; ' : '' }}
             </span>
           </template>
         </template>
@@ -78,49 +60,53 @@
 </template>
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
-  import { useRouter } from 'vue-router';
-  import {
-    Table as ATable,
-    Input as AInput,
-    Dropdown as ADropdown,
-    Menu as AMenu,
-    MenuItem as AMenuItem,
-  } from 'ant-design-vue';
-  import { getCMDBBusinessList } from '@/api/resourceManage/applicationResources/businessManage';
+  import { useRouter, useRoute } from 'vue-router';
+  import { debounce } from 'lodash-es';
+  import { Table as ATable, Input as AInput } from 'ant-design-vue';
+  import { getCMDBAppsList } from '@/api/resourceManage/applicationResources/applicationManage';
   type Key = string | number;
   const router = useRouter();
-  const list = ref<API.RackManageListItem[]>([]);
+  const route = useRoute();
+
+  const list = ref<API.HostManageListItem[]>([]);
   const listQuery = reactive({
     search: '',
     page: 1,
     page_size: 5,
+    business: '',
   });
   const total = ref(0);
   const columns = [
     {
-      title: '名称',
+      title: '应用名',
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: '业务类型',
-      dataIndex: 'kind',
-      key: 'kind',
+      title: '所属业务',
+      dataIndex: 'business',
+      key: 'business',
     },
     {
-      title: '产品经理',
-      dataIndex: 'pm',
-      key: 'pm',
+      title: '开发负责人',
+      dataIndex: 'developer',
+      key: 'developer',
     },
     {
-      title: '子业务',
-      dataIndex: 'children',
-      key: 'children',
+      title: '运维负责人',
+      dataIndex: 'owner',
+      key: 'owner',
     },
     {
-      title: '父业务',
-      dataIndex: 'parent',
-      key: 'parent',
+      title: '测试负责人',
+      dataIndex: 'tester',
+      key: 'tester',
+      width: 100,
+    },
+    {
+      title: '最近更新',
+      dataIndex: 'updated_at',
+      key: 'updated_at',
     },
   ];
   const loading = ref(false);
@@ -134,20 +120,23 @@
     showQuickJumper: true, // 是否显示跳转窗
   }));
 
+  const onQuery = debounce(getCMDBAppsListRequest, 500);
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
     listQuery.page_size = pag.pageSize;
-    getCMDBBusinessListRequest();
+    getCMDBAppsListRequest();
   };
-  // 获取业务列表
-  async function getCMDBBusinessListRequest() {
+  // 获取应用列表
+  async function getCMDBAppsListRequest() {
     try {
       if (loading.value) {
         return;
       }
       loading.value = true;
-      const data = await getCMDBBusinessList(listQuery);
+      const id: any = route.query && route.query.id;
+      listQuery.business = id;
+      const data = await getCMDBAppsList(listQuery);
       loading.value = false;
       list.value = data.results;
       total.value = data.count;
@@ -156,21 +145,19 @@
       console.error(error);
     }
   }
-  getCMDBBusinessListRequest();
+  getCMDBAppsListRequest();
   const state = reactive<{
     selectedRowKeys: Key[];
     loading: boolean;
   }>({
-    selectedRowKeys: [],
+    selectedRowKeys: [], // Check here to configure the default column
     loading: false,
   });
   const onSelectChange = (selectedRowKeys: Key[]) => {
+    console.log('selectedRowKeys changed: ', selectedRowKeys);
     state.selectedRowKeys = selectedRowKeys;
   };
   const onJumeTo = function (id: number) {
-    router.push({ name: 'businessDetails', query: { id } });
-  };
-  const onAddBusiness = function (type: string) {
-    router.push({ name: 'addBusiness', query: { type } });
+    router.push({ name: 'applicationDetails', query: { id } });
   };
 </script>

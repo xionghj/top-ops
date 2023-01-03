@@ -6,36 +6,36 @@
       <a-spin :spinning="businessLoading">
         <a-form ref="formRef" :model="form" :rules="rules" :label-col="labelCol">
           <a-row :gutter="16">
-            <a-col :span="12">
+            <a-col :span="14">
               <a-form-item label="名称" name="name">
                 <a-input v-model:value="form.name" placeholder="请输入" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="12">
+            <a-col :span="14">
               <a-form-item label="业务类型" name="kind">
                 <a-radio-group v-model:value="form.kind" name="radioGroup">
-                  <a-radio value="0">产品线</a-radio>
-                  <a-radio value="1">子业务</a-radio>
+                  <a-radio :value="0">产品线</a-radio>
+                  <a-radio :value="1">子业务</a-radio>
                 </a-radio-group>
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="12">
+            <a-col :span="14">
               <a-form-item label="备注" name="description">
                 <a-input v-model:value="form.description" placeholder="请输入备注" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="12">
+            <a-col :span="14">
               <a-form-item label="应用" name="code">
                 <div class="flex flex-col">
                   <span
                     class="mt-[5px] cursor-pointer text-blue-500 hover:text-blue-700"
-                    @click="addApplicationShowDialog = true"
+                    @click="openAddApplicationShowDialog"
                     >添加</span
                   >
                   <div class="mt-1">
@@ -46,6 +46,13 @@
                       :pagination="false"
                       class="w-full"
                     >
+                      <template #bodyCell="{ column, record }">
+                        <template v-if="column.key === 'action'">
+                          <a-popconfirm title="确定删除该应用吗?" @confirm="onDelete(record.id)">
+                            <span class="text-[#3D78E3] cursor-pointer"> 删除 </span>
+                          </a-popconfirm>
+                        </template>
+                      </template>
                     </a-table>
                   </div>
                 </div>
@@ -53,7 +60,7 @@
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="12">
+            <a-col :span="14">
               <a-form-item label="产品经理" name="pm">
                 <a-select v-model:value="form.pm" mode="multiple" placeholder="请选择">
                   <a-select-option
@@ -67,7 +74,7 @@
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="12">
+            <a-col :span="14">
               <a-form-item label="研发负责人" name="developer">
                 <a-select v-model:value="form.developer" mode="multiple" placeholder="请选择">
                   <a-select-option
@@ -81,7 +88,7 @@
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="12">
+            <a-col :span="14">
               <a-form-item label="测试负责人" name="tester">
                 <a-select v-model:value="form.tester" mode="multiple" placeholder="请选择">
                   <a-select-option
@@ -100,8 +107,8 @@
       </a-spin>
     </div>
     <AddApplicationDialog
-      :add-application-show-dialog="addApplicationShowDialog"
-      @on-close-add-application-show-dialog="closeAddApplicationShowDialog"
+      ref="addApplicationDialogRef"
+      @on-add-application-confirm="addApplicationConfirm"
     />
   </div>
 </template>
@@ -124,15 +131,16 @@
     RadioGroup as ARadioGroup,
     Radio as ARadio,
     Table as ATable,
+    Popconfirm as APopconfirm,
   } from 'ant-design-vue';
   import AddApplicationDialog from './dialog/add-application-dialog.vue';
   import type { Rule, FormInstance } from 'ant-design-vue/es/form';
-  import { getIdcMangeList } from '@/api/resourceManage/infrastructure/idcManage';
   import {
     addCMDBBusiness,
     editCMDBBusiness,
     getCMDBBusinessDetails,
   } from '@/api/resourceManage/applicationResources/businessManage';
+  import { getCMDBAppsList } from '@/api/resourceManage/applicationResources/applicationManage';
   const labelCol = { style: { width: '100px' } };
   const applicationColumns = [
     {
@@ -142,21 +150,20 @@
     },
     {
       title: '应用层级',
-      dataIndex: 'free_unum',
-      key: 'free_unum',
+      dataIndex: 'hierarchy',
+      key: 'hierarchy',
     },
     {
       title: '应用别名',
-      dataIndex: 'unum',
-      key: 'unum',
+      dataIndex: 'alias_name',
+      key: 'alias_name',
     },
     {
       title: '操作',
-      dataIndex: 'code',
-      key: 'cpu_count',
+      dataIndex: 'action',
+      key: 'action',
     },
   ];
-  const applicationList = ref([]);
   const router = useRouter();
   const route = useRoute();
   const formRef = ref<FormInstance>();
@@ -173,9 +180,10 @@
   ];
   const form = ref({
     name: '',
-    kind: '0',
+    kind: 0,
     description: '',
-    parent: '428350384709369295',
+    parent: null,
+    apps: [],
     tester: [],
     pm: [],
     developer: [],
@@ -204,6 +212,11 @@
     loading.value = true;
     try {
       const params: any = cloneDeep(form.value);
+      const apps: number[] = [];
+      applicationList.value.forEach((item) => {
+        apps.push(item.id);
+      });
+      params.apps = apps;
       if (type.value == 'add') {
         await addCMDBBusiness(params);
         message.success('添加成功');
@@ -217,24 +230,6 @@
       loading.value = false;
     } catch (error) {
       loading.value = false;
-    }
-  }
-  // 获取数据中心列表
-  const ibcList = ref<API.IbcManageListItem[]>([]);
-  async function getIbcMangeListRequest() {
-    try {
-      const params = {
-        search: '',
-        page: 1,
-        pageSize: 100,
-      };
-      const data = await getIdcMangeList(params);
-      ibcList.value = data.results;
-      ibcList.value.forEach((item) => {
-        item.bigId = item.id.toString();
-      });
-    } catch (error) {
-      console.error(error);
     }
   }
   // 获取详情信息
@@ -270,17 +265,64 @@
       console.error(error);
     }
   }
-  // 是否显示应用弹出框
-  const addApplicationShowDialog = ref(false);
-  function closeAddApplicationShowDialog() {
-    addApplicationShowDialog.value = false;
+  // 应用弹出框
+  const addApplicationDialogRef = ref();
+  function openAddApplicationShowDialog() {
+    const apps: string[] = [];
+    applicationList.value.forEach((item) => {
+      apps.push(item.id.toString());
+    });
+    addApplicationDialogRef.value && addApplicationDialogRef.value.openDialog(apps);
+  }
+  type Creator = {
+    id: number;
+    username: string;
+    name: string;
+  };
+  interface ApplicationList {
+    alias_name: string;
+    business: [];
+    creator: Creator;
+    description: string;
+    developer: [];
+    hierarchy: string;
+    id: number;
+    name: string;
+    owner: [];
+    tester: [];
+    updated_at: string;
+  }
+  const applicationList = ref<ApplicationList[]>([]);
+  // 选择应用确认
+  function addApplicationConfirm(selectedList: ApplicationList[]) {
+    applicationList.value = selectedList;
+  }
+  // 应用删除
+  const onDelete = (id: number) => {
+    applicationList.value = applicationList.value.filter((item) => item.id !== id);
+  };
+  // 获取应用列表
+  async function getApplicationListRequest() {
+    const id: any = route.query && route.query.id;
+    try {
+      const params = {
+        search: '',
+        page: 1,
+        page_size: 100,
+        business: id,
+      };
+      const data = await getCMDBAppsList(params);
+      applicationList.value = data.results;
+    } catch (error) {
+      console.error(error);
+    }
   }
   onMounted(async () => {
     const types: any = route.query && route.query.type;
     type.value = types;
-    // await getIbcMangeListRequest();
     if (types === 'edit') {
       getBusinessInfo();
+      getApplicationListRequest();
     }
   });
 </script>

@@ -21,10 +21,7 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'name'">
-          <span
-            class="text-blue-500 cursor-pointer hover:text-blue-700"
-            @click="onJumeTo(record.id)"
-          >
+          <span class="text-[#3D78E3] cursor-pointer" @click="onJumeTo(record.id)">
             {{ record.name }}
           </span>
         </template>
@@ -55,7 +52,7 @@
   import { getBusinessChildrenList } from '@/api/resourceManage/applicationResources/businessManage';
 
   const router = useRouter();
-  const list = ref<API.RackManageListItem[]>([]);
+  const list = ref([]);
   const listQuery = reactive({
     search: '',
     page: 1,
@@ -130,7 +127,7 @@
     getBusinessChildrenListRequest();
   }
   const onJumeTo = function (id: number) {
-    router.push({ name: 'applicationDetails', query: { id } });
+    router.push({ name: 'businessDetails', query: { id } });
   };
   defineExpose({ refresh });
 </script>

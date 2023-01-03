@@ -17,6 +17,7 @@ export default defineConfig({
         javascriptEnabled: true,
         modifyVars: {
           'border-radius-base': '4px',
+          'primary-color': '#1a73e8',
         },
       },
     },

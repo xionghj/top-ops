@@ -174,14 +174,14 @@
   };
   watch(searchValue, (value) => {
     const expanded = dataList
-      .map((item: TreeProps['treeData'][number]) => {
+      .map((item) => {
         if (item.name.indexOf(value) > -1) {
           return getParentKey(item.name, treeData.value);
         }
         return null;
       })
       .filter((item, i, self) => item && self.indexOf(item) === i);
-    expandedKeys.value = expanded;
+    expandedKeys.value = expanded as TreeProps['expandedKeys'];
     searchValue.value = value;
     autoExpandParent.value = true;
   });
@@ -216,7 +216,7 @@
         if (treeNode.dataRef) {
           treeNode.dataRef.children = data.results;
         }
-        treeData.value = [...treeData.value];
+        treeData.value = [...(treeData.value as any)];
         generateTreeData(treeData.value);
       });
     } else {
@@ -243,13 +243,30 @@
       }
     }
   };
+  type Person = {
+    email: string;
+    id: number;
+    is_active: boolean;
+    name: string | null;
+    telephone: string | null;
+    updated_at: string;
+    username: string;
+  };
+  interface BasicInfo {
+    name: string;
+    kind: string;
+    pm: Person[];
+    tester: Person[];
+    developer: Person[];
+    description: string;
+  }
   // 基本信息
-  const basicInfo = ref({
+  const basicInfo = ref<BasicInfo>({
     name: '',
     kind: '',
-    pm: [] as any,
-    tester: [] as any,
-    developer: [] as any,
+    pm: [],
+    tester: [],
+    developer: [],
     description: '',
   });
   // 获取业务基本信息

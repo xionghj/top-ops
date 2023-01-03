@@ -71,7 +71,7 @@
         <a-tab-pane key="2" tab="父子业务"
           ><FatherSonRelationship v-if="activeKey === '2'"
         /></a-tab-pane>
-        <a-tab-pane key="3" tab="应用列表"><RouterList v-if="activeKey === '3'" /></a-tab-pane>
+        <a-tab-pane key="3" tab="应用列表"><ApplicationList v-if="activeKey === '3'" /></a-tab-pane>
       </a-tabs>
     </div>
     <AddBusinessDialog />
@@ -93,7 +93,7 @@
   } from 'ant-design-vue';
   import BasicInfo from './fragments/basic-info.vue';
   import FatherSonRelationship from './fragments/fatherSonRelationship/index.vue';
-  import RouterList from './fragments/router-list.vue';
+  import ApplicationList from './fragments/application-list.vue';
   import AddBusinessDialog from './dialog/add-business-dialog.vue';
 
   import { useBusinessDialog } from './hooks/useBusinessDialog';

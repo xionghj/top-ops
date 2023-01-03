@@ -21,10 +21,7 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'ip'">
-          <span
-            class="text-blue-500 cursor-pointer hover:text-blue-700"
-            @click="onJumeTo(record.id)"
-          >
+          <span class="text-[#3D78E3] cursor-pointer" @click="onJumeTo(record.id)">
             {{ record.ip }}
           </span>
         </template>
@@ -35,14 +32,10 @@
         </template>
         <template v-if="column.key === 'agent_status'">
           <div class="flex items-center">
-            <ExclamationCircleFilled
-              v-if="record.agent_status == 'not_install'"
-              :style="{ fontSize: '14px', color: '#e38306' }"
-            />
-            <CheckCircleFilled v-else :style="{ fontSize: '14px', color: '#52c41a' }" />
             <span
-              class="ml-[7px]"
-              :class="[record.agent_status == 'not_install' ? 'text-[#e38306]' : 'text-[#52c41a]']"
+              class="rounded text-white px-2 flex items-center"
+              :class="agentStatusColorMap[record.agent_status]"
+              ><span class="w-[4px] h-[4px] rounded-full bg-white block mr-1.5"></span
               >{{ agentStatusMap[record.agent_status] }}</span
             >
           </div>
@@ -53,7 +46,6 @@
 </template>
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
-  import { CheckCircleFilled, ExclamationCircleFilled } from '@ant-design/icons-vue';
   import { useRouter } from 'vue-router';
   import { debounce } from 'lodash-es';
   import { Table as ATable, Input as AInput } from 'ant-design-vue';
@@ -71,6 +63,11 @@
     normal: '正常',
     abnormal: '异常',
     not_install: '未安装',
+  };
+  const agentStatusColorMap: any = {
+    normal: 'bg-[#52c41a]',
+    abnormal: 'bg-[#e38306]',
+    not_install: 'bg-[#73818f]',
   };
   const columns = [
     {

@@ -1,8 +1,8 @@
 <template>
   <div class="w-full flex flex-col">
-    <div v-if="!parentInfo.id" class="w-full h-32 flex items-center px-4">
+    <div v-if="!parentInfo.id" class="w-full min-h-[271px] flex mt-6 px-4">
       <div
-        class="w-full text-[#FFA235] h-[100px] bg-[#fcf8f2] flex items-center px-4 border-l-[3px] border-[#ffa235]"
+        class="w-full text-[#FFA235] h-[80px] bg-[#fcf8f2] flex items-center px-4 border-l-[3px] border-[#ffa235]"
         >请
         <span
           class="cursor-pointer text-blue-500 px-1"

@@ -1,18 +1,42 @@
 <!-- 业务管理-列表详情-基本信息-->
 <template>
   <div>
-    <a-descriptions :column="2">
+    <a-descriptions :column="2" :label-style="{ width: '100px' }">
       <a-descriptions-item label="名称"> {{ basicInfo.name }}</a-descriptions-item>
-      <a-descriptions-item label="类型">{{ basicInfo.short_name }}</a-descriptions-item>
+      <a-descriptions-item label="类型">{{ basicInfo.kind }}</a-descriptions-item>
       <a-descriptions-item label="备注说明">{{ basicInfo.description }}</a-descriptions-item>
-      <a-descriptions-item label="运维负责人">{{ basicInfo.telephone }}</a-descriptions-item>
-      <a-descriptions-item label="产品经理">{{ basicInfo.address }}</a-descriptions-item>
-      <a-descriptions-item label="研发负责人">{{ basicInfo.address }}</a-descriptions-item>
+      <a-descriptions-item label="研发负责人"
+        ><span
+          v-for="(item, index) in basicInfo.developer"
+          :key="index"
+          class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+        >
+          {{ item.username }}
+        </span></a-descriptions-item
+      >
+      <a-descriptions-item label="产品经理"
+        ><span
+          v-for="(item, index) in basicInfo.pm"
+          :key="index"
+          class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+        >
+          {{ item.username }}
+        </span></a-descriptions-item
+      >
+      <a-descriptions-item label="测试负责人"
+        ><span
+          v-for="(item, index) in basicInfo.tester"
+          :key="index"
+          class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+        >
+          {{ item.username }}
+        </span></a-descriptions-item
+      >
     </a-descriptions>
   </div>
   <div>
     <div class="mt-4">
-      <a-descriptions>
+      <a-descriptions :label-style="{ width: '100px' }">
         <a-descriptions-item label="关联应用" :span="3">
           <a-table
             :columns="applicationColumns"
@@ -29,45 +53,80 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { ref, reactive, toRefs } from 'vue';
-  import { useRouter, useRoute } from 'vue-router';
+  import { ref } from 'vue';
+  import { useRoute } from 'vue-router';
   import {
     Descriptions as ADescriptions,
     DescriptionsItem as ADescriptionsItem,
     Table as ATable,
-    Tag as ATag,
   } from 'ant-design-vue';
-  import { getIdcDetails, getIdcRacks } from '@/api/resourceManage/infrastructure/idcManage';
   import { getCMDBBusinessDetails } from '@/api/resourceManage/applicationResources/businessManage';
+  import { getCMDBAppsList } from '@/api/resourceManage/applicationResources/applicationManage';
   const route = useRoute();
+
+  type Creator = {
+    id: number | string;
+    username: string;
+    name: string;
+  };
+  type Person = {
+    email: string;
+    id: number;
+    is_active: boolean;
+    name: string | null;
+    telephone: string | null;
+    updated_at: string;
+    username: string;
+  };
+  interface BasicInfo {
+    creator: Creator;
+    description: string;
+    id: string;
+    kind: string;
+    name: string;
+    parent: string;
+    apps: string[];
+    pm: Person[];
+    children: [];
+    developer: Person[];
+    tester: Person[];
+  }
   // 获取基本信息
-  const basicInfo = ref({
-    name: '',
-    short_name: '',
-    contact: '',
-    telephone: '',
-    address: '',
-    status: 1,
+  const basicInfo = ref<BasicInfo>({
+    creator: {
+      id: '',
+      username: '',
+      name: '',
+    },
     description: '',
+    id: '',
+    kind: '',
+    name: '',
+    parent: '',
+    apps: [],
+    pm: [],
+    children: [],
+    developer: [],
+    tester: [],
   });
-  const idcInfoLoading = ref(false);
+  const detailsLoading = ref(false);
   async function getBusinessDetails() {
     try {
-      if (idcInfoLoading.value) {
+      if (detailsLoading.value) {
         return;
       }
-      idcInfoLoading.value = true;
+      detailsLoading.value = true;
       const id: any = route.query && route.query.id;
       const data = await getCMDBBusinessDetails(id);
       basicInfo.value = data;
-      idcInfoLoading.value = false;
+      detailsLoading.value = false;
     } catch (error) {
-      idcInfoLoading.value = false;
+      detailsLoading.value = false;
       console.error(error);
     }
   }
   getBusinessDetails();
-  // 获取所属机柜
+  // 关联
   const applicationColumns = [
     {
       title: '名称',
@@ -76,30 +135,37 @@
     },
     {
       title: '应用层级',
-      dataIndex: 'free_unum',
-      key: 'free_unum',
+      dataIndex: 'hierarchy',
+      key: 'hierarchy',
     },
     {
-      title: '中文别名',
-      dataIndex: 'unum',
-      key: 'unum',
+      title: '应用别名',
+      dataIndex: 'alias_name',
+      key: 'alias_name',
     },
     {
       title: '备注',
-      dataIndex: 'code',
-      key: 'cpu_count',
+      dataIndex: 'description',
+      key: 'description',
     },
   ];
   const applicationList = ref([]);
   const applicationLodding = ref(false);
-  async function getIdcRacksRequest() {
+  // 获取应用列表
+  async function getApplicationListRequest() {
     try {
       if (applicationLodding.value) {
         return;
       }
       applicationLodding.value = true;
       const id: any = route.query && route.query.id;
-      const data = await getIdcRacks(id);
+      const params = {
+        business: id,
+        search: '',
+        page: 1,
+        page_size: 100,
+      };
+      const data = await getCMDBAppsList(params);
       applicationList.value = data.results;
       applicationLodding.value = false;
     } catch (error) {
@@ -107,13 +173,5 @@
       console.error(error);
     }
   }
-  // getIdcRacksRequest();
+  getApplicationListRequest();
 </script>
-<style lang="less" scoped>
-  :deep(.ant-descriptions-item-label) {
-    width: 120px;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 2px;
-  }
-</style>

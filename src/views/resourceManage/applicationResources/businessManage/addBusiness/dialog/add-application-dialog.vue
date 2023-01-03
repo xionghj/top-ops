@@ -4,7 +4,7 @@
     <a-modal
       v-model:visible="addApplicationShowDialog"
       title="从 CMDB 中筛选应用"
-      width="800px"
+      width="900px"
       @ok="handleOk"
       @cancel="handleCancel"
     >
@@ -14,14 +14,16 @@
             <a-input
               v-model:value="listQuery.search"
               placeholder="根据关键词搜索"
-              @change="getIdcRacksListRequest()"
+              @change="onQuery()"
             />
           </div>
-          <a-checkbox v-model:checked="relatedToMeChecked">与我有关</a-checkbox>
+          <a-checkbox v-model:checked="relatedToMeChecked" @change="getCMDBAppsListRequest()"
+            >与我有关</a-checkbox
+          >
         </div>
         <a-table
           :row-selection="{
-            selectedRowKeys: state.selectedRowKeys,
+            selectedRowKeys: selectedRowKeysArr,
             onChange: onSelectChange,
             columnWidth: 40,
           }"
@@ -33,17 +35,32 @@
           @change="handleTableChange"
         >
           <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'agent_status'">
-              <a-tag :color="'green'">
-                {{ record.agent_status }}
-              </a-tag>
+            <template v-if="column.key === 'business'">
+              <span v-for="(item, index) in record.business" :key="index">
+                {{ item.name }}{{ record.business.length - 1 != index ? ';' : '' }}
+              </span>
+            </template>
+            <template v-if="column.key === 'developer'">
+              <span v-for="(item, index) in record.developer" :key="index">
+                {{ item.username }}{{ record.developer.length - 1 != index ? ';' : '' }}
+              </span>
+            </template>
+            <template v-if="column.key === 'owner'">
+              <span v-for="(item, index) in record.owner" :key="index">
+                {{ item.username }}{{ record.owner.length - 1 != index ? ';' : '' }}
+              </span>
+            </template>
+            <template v-if="column.key === 'tester'">
+              <span v-for="(item, index) in record.tester" :key="index">
+                {{ item.username }}{{ record.tester.length - 1 != index ? ';' : '' }}
+              </span>
             </template>
           </template>
         </a-table>
       </div>
       <template #footer>
         <div class="flex justify-between">
-          <div>已选择 {{ state.selectedRowKeys.length }} 项</div>
+          <div>已选择 {{ selectedRowKeysArr.length }} 项</div>
           <div class="flex items-center">
             <a-button key="back" @click="handleCancel">取消</a-button>
             <a-button key="submit" type="primary" @click="handleOk">确定</a-button>
@@ -54,43 +71,89 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { ref, toRefs, reactive, computed, onMounted, watch } from 'vue';
-  import { useRoute } from 'vue-router';
+  import { ref, reactive, computed, watch } from 'vue';
+  import { debounce } from 'lodash-es';
+  import { storeToRefs } from 'pinia';
   import {
     Modal as AModal,
     Table as ATable,
     Input as AInput,
-    Tag as ATag,
     Button as AButton,
     Checkbox as ACheckbox,
     message,
   } from 'ant-design-vue';
-  import { getIdcRacksList, idcRacksSettings } from '@/api/resourceManage/infrastructure/idcManage';
+  import { getCMDBAppsList } from '@/api/resourceManage/applicationResources/applicationManage';
+
+  import { useUserStore } from '@/store/modules/user';
+
   type Key = string | number;
-  const props = defineProps({
-    addApplicationShowDialog: Boolean,
-  });
-  const { addApplicationShowDialog } = toRefs(props);
+  const userStore = useUserStore();
+  const { userInfo } = storeToRefs(userStore);
+
+  const addApplicationShowDialog = ref(false);
+  // 选择应用的key
+  const selectedRowKeysArr = ref<Key[]>([]);
+
+  // 与我有关
+  const relatedToMeChecked = ref();
+
   watch(addApplicationShowDialog, (bol) => {
     if (bol) {
-      state.selectedRowKeys = [];
-      getIdcRacksListRequest();
+      getCMDBAppsListRequest();
     }
   });
-  const emit = defineEmits(['onCloseAddApplicationShowDialog']);
+  const emit = defineEmits(['onAddApplicationConfirm']);
+  async function openDialog(selectedRowKeys: Key[]) {
+    selectedRowKeysArr.value = selectedRowKeys;
+    addApplicationShowDialog.value = true;
+  }
+  type Creator = {
+    id: number;
+    username: string;
+    name: string;
+  };
+  interface ApplicationList {
+    alias_name: string;
+    business: [];
+    creator: Creator;
+    description: string;
+    developer: [];
+    hierarchy: string;
+    id: number;
+    name: string;
+    owner: [];
+    tester: [];
+    updated_at: string;
+  }
+
+  // 确认
   const handleOk = () => {
-    addIdcRacksRequest();
+    if (selectedRowKeysArr.value.length == 0) {
+      message.warning('请勾选一个应用');
+      return;
+    }
+    const selectItem: ApplicationList[] = [];
+    list.value.forEach((listItem) => {
+      selectedRowKeysArr.value.forEach((item) => {
+        if (listItem.id === item) {
+          selectItem.push(listItem);
+        }
+      });
+    });
+    emit('onAddApplicationConfirm', selectItem);
+    addApplicationShowDialog.value = false;
   };
+
+  // 取消
   const handleCancel = () => {
-    emit('onCloseAddApplicationShowDialog');
+    addApplicationShowDialog.value = false;
   };
-  const route = useRoute();
-  const list = ref<API.HostManageListItem[]>([]);
+  const list = ref<ApplicationList[]>([]);
   const listQuery = reactive({
     search: '',
     page: 1,
-    pageSize: 10,
-    person: '',
+    page_size: 5,
+    owner: '',
   });
   const total = ref(0);
   const columns = [
@@ -101,23 +164,24 @@
     },
     {
       title: '所属业务',
-      dataIndex: 'unum',
-      key: 'unum',
+      dataIndex: 'business',
+      key: 'business',
     },
     {
       title: '开发负责人',
-      dataIndex: 'code',
-      key: 'code',
+      dataIndex: 'developer',
+      key: 'developer',
     },
     {
       title: '运维负责人',
-      dataIndex: 'description',
-      key: 'description',
+      dataIndex: 'owner',
+      key: 'owner',
     },
     {
       title: '测试负责人',
-      dataIndex: 'description',
-      key: 'description',
+      dataIndex: 'tester',
+      key: 'tester',
+      width: 100,
     },
     {
       title: '最近更新',
@@ -129,29 +193,37 @@
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
-    pageSize: listQuery.pageSize,
+    pageSize: listQuery.page_size,
     showTotal: (total: number) => `总共 ${total} 项`,
-    defaultPageSize: 10,
+    defaultPageSize: 5,
     showSizeChanger: true, // 是否显示pagesize选择
     showQuickJumper: true, // 是否显示跳转窗
   }));
 
+  const onQuery = debounce(getCMDBAppsListRequest, 500);
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
-    listQuery.pageSize = pag.pageSize;
-    getIdcRacksListRequest();
+    listQuery.page_size = pag.pageSize;
+    getCMDBAppsListRequest();
   };
-  // 获取允许添加机柜列表
-  async function getIdcRacksListRequest() {
+  // 获取应用列表
+  async function getCMDBAppsListRequest() {
     try {
       if (loading.value) {
         return;
       }
       loading.value = true;
-      const id: any = route.query && route.query.id;
-      const data = await getIdcRacksList(id, listQuery);
+      if (relatedToMeChecked.value) {
+        listQuery.owner = userInfo.value.user_id || '';
+      } else {
+        listQuery.owner = '';
+      }
+      const data = await getCMDBAppsList(listQuery);
       loading.value = false;
+      data.results.forEach((item: any) => {
+        item.id = item.id.toString();
+      });
       list.value = data.results;
       total.value = data.count;
     } catch (error) {
@@ -159,40 +231,9 @@
       console.error(error);
     }
   }
-  // 添加机柜
-  const state = reactive<{
-    selectedRowKeys: Key[];
-    addLoading: boolean;
-  }>({
-    selectedRowKeys: [],
-    addLoading: false,
-  });
-  async function addIdcRacksRequest() {
-    if (state.selectedRowKeys.length == 0) {
-      message.warning('请勾选一个机柜');
-      return;
-    }
-    try {
-      if (state.addLoading) {
-        return;
-      }
-      state.addLoading = true;
-      const id: any = route.query && route.query.id;
-      const params = {
-        action: 'add',
-        instance_ids: state.selectedRowKeys,
-      };
-      const data = await idcRacksSettings(id, params);
-      message.success(data.detail);
-      handleCancel();
-      state.addLoading = false;
-    } catch (error) {
-      state.addLoading = false;
-      console.error(error);
-    }
-  }
+  // 勾选
   const onSelectChange = (selectedRowKeys: Key[]) => {
-    state.selectedRowKeys = selectedRowKeys;
+    selectedRowKeysArr.value = selectedRowKeys;
   };
-  const relatedToMeChecked = ref();
+  defineExpose({ openDialog });
 </script>
