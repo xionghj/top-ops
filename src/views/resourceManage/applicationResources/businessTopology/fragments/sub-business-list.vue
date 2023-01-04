@@ -25,6 +25,11 @@
             {{ record.name }}
           </span>
         </template>
+        <template v-if="column.key === 'kind'">
+          <span>
+            {{ record.kind && record.kind.name }}
+          </span>
+        </template>
         <template v-if="column.key === 'pm'">
           <span v-for="(item, index) in record.pm" :key="index">
             {{ item.username }}{{ record.pm.length - 1 != index ? '，' : '' }}

@@ -26,18 +26,23 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'name'">
-          <span class="text-blue-500">
+          <span class="text-[#3D78E3] cursor-pointer" @click="onJumeTo(record.id)">
             {{ record.name }}
+          </span>
+        </template>
+        <template v-if="column.key === 'kind'">
+          <span>
+            {{ record.kind && record.kind.name }}
           </span>
         </template>
         <template v-if="column.key === 'pm'">
           <span v-for="(item, index) in record.pm" :key="index">
-            {{ item.username }}{{ record.pm.length - 1 != index ? '，' : '' }}
+            {{ item.username }}{{ record.pm.length - 1 != index ? '; ' : '' }}
           </span>
         </template>
         <template v-if="column.key === 'children'">
           <span v-for="(item, index) in record.children" :key="index">
-            {{ item.name }}{{ record.children.length - 1 != index ? '，' : '' }}
+            {{ item.name }}{{ record.children.length - 1 != index ? '; ' : '' }}
           </span>
         </template>
         <template v-if="column.key === 'parent'">
@@ -51,7 +56,7 @@
 </template>
 <script lang="ts" setup>
   import { ref, reactive, computed, watch } from 'vue';
-  import { useRoute } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
 
   import { Table as ATable, Input as AInput } from 'ant-design-vue';
   import { useBusinessRelation } from '../../../hooks/useBusinessRelation';
@@ -63,6 +68,7 @@
   const { selectChildren, isRefresh } = useBusinessRelation();
 
   const route = useRoute();
+  const router = useRouter();
 
   type Key = string | number;
   watch(
@@ -83,7 +89,7 @@
   const listQuery = reactive({
     search: '',
     page: 1,
-    page_size: 10,
+    page_size: 5,
   });
   const total = ref(0);
   const columns = [
@@ -129,7 +135,7 @@
     current: listQuery.page,
     pageSize: listQuery.page_size,
     showTotal: (total: number) => `总共 ${total} 项`,
-    defaultPageSize: 10,
+    defaultPageSize: 5,
     showSizeChanger: true, // 是否显示pagesize选择
     showQuickJumper: true, // 是否显示跳转窗
   }));
@@ -160,5 +166,9 @@
   getChildrenBusinessListRequest();
   const onSelectChange = (selectedRowKeys: Key[]) => {
     selectChildren.value = selectedRowKeys;
+  };
+
+  const onJumeTo = function (id: number) {
+    router.push({ name: 'businessDetails', query: { id } });
   };
 </script>

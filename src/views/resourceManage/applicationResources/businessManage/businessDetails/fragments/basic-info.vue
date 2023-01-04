@@ -3,7 +3,9 @@
   <div>
     <a-descriptions :column="2" :label-style="{ width: '100px' }">
       <a-descriptions-item label="名称"> {{ basicInfo.name }}</a-descriptions-item>
-      <a-descriptions-item label="类型">{{ basicInfo.kind }}</a-descriptions-item>
+      <a-descriptions-item label="类型">{{
+        basicInfo.kind && basicInfo.kind.name
+      }}</a-descriptions-item>
       <a-descriptions-item label="备注说明">{{ basicInfo.description }}</a-descriptions-item>
       <a-descriptions-item label="研发负责人"
         ><span
@@ -46,6 +48,13 @@
             :loading="applicationLodding"
             class="w-full"
           >
+            <template #bodyCell="{ column, record }">
+              <template v-if="column.key === 'hierarchy'">
+                <span>
+                  {{ record.hierarchy && record.hierarchy.name }}
+                </span>
+              </template>
+            </template>
           </a-table>
         </a-descriptions-item>
       </a-descriptions>
@@ -78,11 +87,15 @@
     updated_at: string;
     username: string;
   };
+  type Kind = {
+    id: '';
+    name: '';
+  };
   interface BasicInfo {
     creator: Creator;
     description: string;
     id: string;
-    kind: string;
+    kind: Kind;
     name: string;
     parent: string;
     apps: string[];
@@ -100,7 +113,10 @@
     },
     description: '',
     id: '',
-    kind: '',
+    kind: {
+      id: '',
+      name: '',
+    },
     name: '',
     parent: '',
     apps: [],
@@ -126,7 +142,7 @@
     }
   }
   getBusinessDetails();
-  // 关联
+  // 关联应用
   const applicationColumns = [
     {
       title: '名称',

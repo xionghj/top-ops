@@ -41,7 +41,9 @@
         <div class="bg-white rounded p-4">
           <a-descriptions :column="2" :label-style="{ width: '90px' }">
             <a-descriptions-item label="名称"> {{ basicInfo.name }}</a-descriptions-item>
-            <a-descriptions-item label="类型">{{ basicInfo.kind }}</a-descriptions-item>
+            <a-descriptions-item label="类型">{{
+              basicInfo.kind && basicInfo.kind.name
+            }}</a-descriptions-item>
             <a-descriptions-item label="备注说明">{{ basicInfo.description }}</a-descriptions-item>
             <a-descriptions-item label="测试负责人"
               ><span
@@ -252,9 +254,13 @@
     updated_at: string;
     username: string;
   };
+  type Kind = {
+    id: string;
+    name: string;
+  };
   interface BasicInfo {
     name: string;
-    kind: string;
+    kind: Kind;
     pm: Person[];
     tester: Person[];
     developer: Person[];
@@ -263,7 +269,10 @@
   // 基本信息
   const basicInfo = ref<BasicInfo>({
     name: '',
-    kind: '',
+    kind: {
+      id: '',
+      name: '',
+    },
     pm: [],
     tester: [],
     developer: [],

@@ -4,7 +4,7 @@
     <Breadcrumb>
       <template #right>
         <div class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onAddBusiness('add')"
+          <div class="mr-5 cursor-pointer hover:text-blue-500" @click="onAddBusiness('add')"
             >新建业务</div
           >
           <a-dropdown placement="bottom">
@@ -56,14 +56,19 @@
               {{ record.name }}
             </span>
           </template>
+          <template v-if="column.key === 'kind'">
+            <span>
+              {{ record.kind && record.kind.name }}
+            </span>
+          </template>
           <template v-if="column.key === 'pm'">
             <span v-for="(item, index) in record.pm" :key="index">
-              {{ item.username }}{{ record.pm.length - 1 != index ? ';' : '' }}
+              {{ item.username }}{{ record.pm.length - 1 != index ? '; ' : '' }}
             </span>
           </template>
           <template v-if="column.key === 'children'">
             <span v-for="(item, index) in record.children" :key="index">
-              {{ item.name }}{{ record.children.length - 1 != index ? ';' : '' }}
+              {{ item.name }}{{ record.children.length - 1 != index ? '; ' : '' }}
             </span>
           </template>
           <template v-if="column.key === 'parent'">

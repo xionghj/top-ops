@@ -93,7 +93,7 @@
   const listQuery = reactive({
     search: '',
     page: 1,
-    pageSize: 10,
+    pageSize: 5,
   });
   const total = ref(0);
   const columns = [
@@ -129,7 +129,7 @@
     current: listQuery.page,
     pageSize: listQuery.pageSize,
     showTotal: (total: number) => `总共 ${total} 项`,
-    defaultPageSize: 10,
+    defaultPageSize: 5,
     showSizeChanger: true, // 是否显示pagesize选择
     showQuickJumper: true, // 是否显示跳转窗
   }));

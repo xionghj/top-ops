@@ -13,7 +13,7 @@
       </div>
       <a-table
         :row-selection="{
-          selectedRowKeys: state.selectedRowKeys,
+          selectedRowKeys: selectApplicationIds,
           onChange: onSelectChange,
           columnWidth: 40,
         }"
@@ -26,16 +26,13 @@
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'name'">
-            <span
-              class="text-blue-500 cursor-pointer hover:text-blue-700"
-              @click="onJumeTo(record.id)"
-            >
+            <span class="text-[#3D78E3] cursor-pointer" @click="onJumeTo(record.id)">
               {{ record.name }}
             </span>
           </template>
           <template v-if="column.key === 'business'">
             <span v-for="(item, index) in record.business" :key="index">
-              {{ item.name }}{{ record.business.length - 1 != index ? '; ' : '' }}
+              {{ item.name }}{{ record.business.length - 1 != index ? '/' : '' }}
             </span>
           </template>
           <template v-if="column.key === 'developer'">
@@ -146,18 +143,13 @@
     }
   }
   getCMDBAppsListRequest();
-  const state = reactive<{
-    selectedRowKeys: Key[];
-    loading: boolean;
-  }>({
-    selectedRowKeys: [], // Check here to configure the default column
-    loading: false,
-  });
+  const selectApplicationIds = ref<Key[]>([]);
   const onSelectChange = (selectedRowKeys: Key[]) => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
-    state.selectedRowKeys = selectedRowKeys;
+    selectApplicationIds.value = selectedRowKeys;
   };
   const onJumeTo = function (id: number) {
     router.push({ name: 'applicationDetails', query: { id } });
   };
+  defineExpose({ getCMDBAppsListRequest, selectApplicationIds });
 </script>

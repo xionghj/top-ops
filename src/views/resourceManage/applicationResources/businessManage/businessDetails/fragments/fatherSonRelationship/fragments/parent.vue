@@ -15,30 +15,44 @@
     <div v-else class="px-6 py-4">
       <a-spin :spinning="loading">
         <div>
-          <a-descriptions :column="2">
+          <a-descriptions :column="2" :label-style="{ width: '90px' }">
             <a-descriptions-item label="名称"> {{ parentInfo.name }}</a-descriptions-item>
-            <a-descriptions-item label="类型">{{ parentInfo.kind }}</a-descriptions-item>
+            <a-descriptions-item label="类型">{{
+              parentInfo.kind && parentInfo.kind.name
+            }}</a-descriptions-item>
             <a-descriptions-item label="备注说明">{{ parentInfo.description }}</a-descriptions-item>
-            <a-descriptions-item label="运维负责人">
-              <span v-for="(item, index) in parentInfo.tester" :key="index">
-                {{ item.username }}{{ parentInfo.tester.length - 1 != index ? '，' : '' }}
+            <a-descriptions-item label="测试负责人">
+              <span
+                v-for="(item, index) in parentInfo.tester"
+                :key="index"
+                class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+              >
+                {{ item.username }}
               </span>
             </a-descriptions-item>
             <a-descriptions-item label="产品经理">
-              <span v-for="(item, index) in parentInfo.pm" :key="index">
-                {{ item.username }}{{ parentInfo.pm.length - 1 != index ? '，' : '' }}
+              <span
+                v-for="(item, index) in parentInfo.pm"
+                :key="index"
+                class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+              >
+                {{ item.username }}
               </span>
             </a-descriptions-item>
             <a-descriptions-item label="研发负责人">
-              <span v-for="(item, index) in parentInfo.developer" :key="index">
-                {{ item.username }}{{ parentInfo.developer.length - 1 != index ? '，' : '' }}
+              <span
+                v-for="(item, index) in parentInfo.developer"
+                :key="index"
+                class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+              >
+                {{ item.username }}
               </span>
             </a-descriptions-item>
           </a-descriptions>
         </div>
         <div>
           <div class="mt-4">
-            <a-descriptions>
+            <a-descriptions :label-style="{ width: '90px' }">
               <a-descriptions-item label="关联应用" :span="3">
                 <a-table
                   :columns="applicationColumns"
@@ -48,6 +62,13 @@
                   :loading="applicationLodding"
                   class="w-full"
                 >
+                  <template #bodyCell="{ column, record }">
+                    <template v-if="column.key === 'hierarchy'">
+                      <span>
+                        {{ record.hierarchy && record.hierarchy.name }}
+                      </span>
+                    </template>
+                  </template>
                 </a-table>
               </a-descriptions-item>
             </a-descriptions>
@@ -58,7 +79,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { ref, watch } from 'vue';
+  import { ref, watch, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
   import {
     Descriptions as ADescriptions,
@@ -69,6 +90,7 @@
   import { useBusinessDialog } from '../../../hooks/useBusinessDialog';
   import { useBusinessRelation } from '../../../hooks/useBusinessRelation';
   import { getParentBusinessDetails } from '@/api/resourceManage/applicationResources/businessManage';
+  import { getCMDBAppsList } from '@/api/resourceManage/applicationResources/applicationManage';
 
   const { showAddBusinessDialogChange, showAddBusinessDialog } = useBusinessDialog();
   const { parentInfoId, isRefresh } = useBusinessRelation();
@@ -88,7 +110,7 @@
       getParentBusinessDetailsRequest();
     },
   );
-  // 获取所属机柜
+  // 关联应用
   const applicationColumns = [
     {
       title: '名称',
@@ -97,27 +119,51 @@
     },
     {
       title: '应用层级',
-      dataIndex: 'free_unum',
-      key: 'free_unum',
+      dataIndex: 'hierarchy',
+      key: 'hierarchy',
     },
     {
-      title: '中文别名',
-      dataIndex: 'unum',
-      key: 'unum',
+      title: '应用别名',
+      dataIndex: 'alias_name',
+      key: 'alias_name',
     },
     {
       title: '备注',
-      dataIndex: 'code',
-      key: 'cpu_count',
+      dataIndex: 'description',
+      key: 'description',
     },
   ];
   const applicationList = ref([]);
   const applicationLodding = ref(false);
+  // 获取应用列表
+  async function getApplicationListRequest() {
+    try {
+      if (applicationLodding.value) {
+        return;
+      }
+      applicationLodding.value = true;
+      const params = {
+        business: parentInfo.value.id.toString(),
+        search: '',
+        page: 1,
+        page_size: 100,
+      };
+      const data = await getCMDBAppsList(params);
+      applicationList.value = data.results;
+      applicationLodding.value = false;
+    } catch (error) {
+      applicationLodding.value = false;
+      console.error(error);
+    }
+  }
 
   const parentInfo = ref({
     id: '',
     name: '',
-    kind: '',
+    kind: {
+      id: '',
+      name: '',
+    },
     description: '',
     developer: {} as any,
     pm: {} as any,
@@ -140,13 +186,8 @@
       console.error(error);
     }
   }
-  getParentBusinessDetailsRequest();
+  onMounted(async () => {
+    await getParentBusinessDetailsRequest();
+    getApplicationListRequest();
+  });
 </script>
-<style lang="less" scoped>
-  :deep(.ant-descriptions-item-label) {
-    width: 90px;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 2px;
-  }
-</style>

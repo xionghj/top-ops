@@ -6,14 +6,14 @@
       <a-spin :spinning="businessLoading">
         <a-form ref="formRef" :model="form" :rules="rules" :label-col="labelCol">
           <a-row :gutter="16">
-            <a-col :span="14">
+            <a-col :xs="18" :sm="18" :md="18" :lg="18" :xl="14">
               <a-form-item label="名称" name="name">
                 <a-input v-model:value="form.name" placeholder="请输入" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="14">
+            <a-col :xs="18" :sm="18" :md="18" :lg="18" :xl="14">
               <a-form-item label="业务类型" name="kind">
                 <a-radio-group v-model:value="form.kind" name="radioGroup">
                   <a-radio :value="0">产品线</a-radio>
@@ -23,18 +23,18 @@
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="14">
+            <a-col :xs="18" :sm="18" :md="18" :lg="18" :xl="14">
               <a-form-item label="备注" name="description">
                 <a-input v-model:value="form.description" placeholder="请输入备注" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="14">
+            <a-col :xs="18" :sm="18" :md="18" :lg="18" :xl="14">
               <a-form-item label="应用" name="code">
                 <div class="flex flex-col">
                   <span
-                    class="mt-[5px] cursor-pointer text-blue-500 hover:text-blue-700"
+                    class="block mt-[5px] cursor-pointer text-blue-500 hover:text-blue-700"
                     @click="openAddApplicationShowDialog"
                     >添加</span
                   >
@@ -47,6 +47,11 @@
                       class="w-full"
                     >
                       <template #bodyCell="{ column, record }">
+                        <template v-if="column.key === 'hierarchy'">
+                          <span>
+                            {{ record.hierarchy && record.hierarchy.name }}
+                          </span>
+                        </template>
                         <template v-if="column.key === 'action'">
                           <a-popconfirm title="确定删除该应用吗?" @confirm="onDelete(record.id)">
                             <span class="text-[#3D78E3] cursor-pointer"> 删除 </span>
@@ -60,7 +65,7 @@
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="14">
+            <a-col :xs="18" :sm="18" :md="18" :lg="18" :xl="14">
               <a-form-item label="产品经理" name="pm">
                 <a-select v-model:value="form.pm" mode="multiple" placeholder="请选择">
                   <a-select-option
@@ -74,7 +79,7 @@
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="14">
+            <a-col :xs="18" :sm="18" :md="18" :lg="18" :xl="14">
               <a-form-item label="研发负责人" name="developer">
                 <a-select v-model:value="form.developer" mode="multiple" placeholder="请选择">
                   <a-select-option
@@ -88,7 +93,7 @@
             </a-col>
           </a-row>
           <a-row :gutter="16">
-            <a-col :span="14">
+            <a-col :xs="18" :sm="18" :md="18" :lg="18" :xl="14">
               <a-form-item label="测试负责人" name="tester">
                 <a-select v-model:value="form.tester" mode="multiple" placeholder="请选择">
                   <a-select-option
@@ -258,6 +263,7 @@
       });
       data.developer = developer;
       data.parent = data.parent && data.parent.id;
+      data.kind = data.kind && data.kind.id;
       form.value = data;
       businessLoading.value = false;
     } catch (error) {

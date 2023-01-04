@@ -63,3 +63,12 @@ export function getBusinessChildrenList(id: number, query: API.PageParams) {
     params: query,
   });
 }
+
+// 业务管理-业务详情-应用列表-设置应用
+export function setBusinessAppsRelation(id: number, data: API.PageParams) {
+  return request({
+    url: `/cmdb/business/${id}/apps/relation/`,
+    method: 'post',
+    data,
+  });
+}
