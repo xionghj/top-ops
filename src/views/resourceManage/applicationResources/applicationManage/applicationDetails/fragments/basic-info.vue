@@ -7,28 +7,42 @@
         <a-descriptions :column="2">
           <a-descriptions-item label="名  称"> {{ basicInfo.name }}</a-descriptions-item>
           <a-descriptions-item label="简  写">{{ basicInfo.alias_name }}</a-descriptions-item>
-          <a-descriptions-item label="应用层级">{{ basicInfo.hierarchy }}</a-descriptions-item>
+          <a-descriptions-item label="应用层级">{{
+            basicInfo.hierarchy && basicInfo.hierarchy.name
+          }}</a-descriptions-item>
           <a-descriptions-item label="备  注">{{ basicInfo.description }}</a-descriptions-item>
           <a-descriptions-item label="所属业务">
             <span v-for="(item, index) in basicInfo.business" :key="index">
-              {{ item.name }}{{ basicInfo.business.length - 1 != index ? '，' : '' }}
+              {{ item.name }}{{ basicInfo.business.length - 1 != index ? '/' : '' }}
             </span>
           </a-descriptions-item>
           <a-descriptions-item label="运维负责人">
-            <span v-for="(item, index) in basicInfo.owner" :key="index">
-              {{ item.username }}{{ basicInfo.owner.length - 1 != index ? '，' : '' }}
+            <span
+              v-for="(item, index) in basicInfo.owner"
+              :key="index"
+              class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+            >
+              {{ item.username }}
             </span>
           </a-descriptions-item>
           <a-descriptions-item label="Git 地址">{{ basicInfo.repository }}</a-descriptions-item>
           <a-descriptions-item label="开发负责人">
-            <span v-for="(item, index) in basicInfo.developer" :key="index">
-              {{ item.username }}{{ basicInfo.developer.length - 1 != index ? '，' : '' }}
+            <span
+              v-for="(item, index) in basicInfo.developer"
+              :key="index"
+              class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+            >
+              {{ item.username }}
             </span>
           </a-descriptions-item>
           <a-descriptions-item label="开发语言">{{ basicInfo.language }}</a-descriptions-item>
           <a-descriptions-item label="测试负责人">
-            <span v-for="(item, index) in basicInfo.tester" :key="index">
-              {{ item.username }}{{ basicInfo.tester.length - 1 != index ? '，' : '' }}
+            <span
+              v-for="(item, index) in basicInfo.tester"
+              :key="index"
+              class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+            >
+              {{ item.username }}
             </span>
           </a-descriptions-item>
         </a-descriptions>
@@ -105,7 +119,10 @@
   const basicInfo = ref({
     name: '',
     alias_name: '',
-    hierarchy: '',
+    hierarchy: {
+      id: '',
+      name: '',
+    },
     description: '',
     business: [] as any,
     owner: [] as any,

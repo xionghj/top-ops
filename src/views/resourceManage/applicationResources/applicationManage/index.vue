@@ -58,17 +58,22 @@
           </template>
           <template v-if="column.key === 'business'">
             <span v-for="(item, index) in record.business" :key="index">
-              {{ item.name }}{{ record.business.length - 1 != index ? '，' : '' }}
+              {{ item.name }}{{ record.business.length - 1 != index ? '/' : '' }}
             </span>
           </template>
           <template v-if="column.key === 'developer'">
             <span v-for="(item, index) in record.developer" :key="index">
-              {{ item.username }}{{ record.developer.length - 1 != index ? '，' : '' }}
+              {{ item.username }}{{ record.developer.length - 1 != index ? '; ' : '' }}
+            </span>
+          </template>
+          <template v-if="column.key === 'owner'">
+            <span v-for="(item, index) in record.owner" :key="index">
+              {{ item.username }}{{ record.owner.length - 1 != index ? '; ' : '' }}
             </span>
           </template>
           <template v-if="column.key === 'tester'">
             <span v-for="(item, index) in record.tester" :key="index">
-              {{ item.username }}{{ record.tester.length - 1 != index ? '，' : '' }}
+              {{ item.username }}{{ record.tester.length - 1 != index ? '; ' : '' }}
             </span>
           </template>
         </template>
@@ -114,8 +119,8 @@
     },
     {
       title: '运维负责人',
-      dataIndex: 'pm',
-      key: 'pm',
+      dataIndex: 'owner',
+      key: 'owner',
     },
     {
       title: '测试负责人',

@@ -11,21 +11,35 @@
     <div>
       <a-descriptions :column="2">
         <a-descriptions-item label="名称"> {{ businessInfo.name }}</a-descriptions-item>
-        <a-descriptions-item label="类型">{{ businessInfo.kind }}</a-descriptions-item>
+        <a-descriptions-item label="类型">{{
+          businessInfo.kind && businessInfo.kind.name
+        }}</a-descriptions-item>
         <a-descriptions-item label="备注说明">{{ businessInfo.description }}</a-descriptions-item>
-        <a-descriptions-item label="运维负责人">
-          <span v-for="(item, index) in businessInfo.tester" :key="index">
-            {{ item.username }}{{ businessInfo.tester.length - 1 != index ? '，' : '' }}
+        <a-descriptions-item label="测试负责人">
+          <span
+            v-for="(item, index) in businessInfo.tester"
+            :key="index"
+            class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+          >
+            {{ item.username }}
           </span>
         </a-descriptions-item>
         <a-descriptions-item label="产品经理">
-          <span v-for="(item, index) in businessInfo.pm" :key="index">
-            {{ item.username }}{{ businessInfo.pm.length - 1 != index ? '，' : '' }}
+          <span
+            v-for="(item, index) in businessInfo.pm"
+            :key="index"
+            class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+          >
+            {{ item.username }}
           </span>
         </a-descriptions-item>
         <a-descriptions-item label="研发负责人">
-          <span v-for="(item, index) in businessInfo.developer" :key="index">
-            {{ item.username }}{{ businessInfo.developer.length - 1 != index ? '，' : '' }}
+          <span
+            v-for="(item, index) in businessInfo.developer"
+            :key="index"
+            class="rounded-[50rem] px-[6px] pb-[3px] h-[19px] bg-[#3D78E3] text-white mr-1 flex items-center justify-center"
+          >
+            {{ item.username }}
           </span>
         </a-descriptions-item>
       </a-descriptions>
@@ -87,7 +101,10 @@
     id: null,
     children: [],
     creator: {},
-    kind: '',
+    kind: {
+      id: '',
+      name: '',
+    },
     name: '',
     parent: null,
     pm: [] as any,

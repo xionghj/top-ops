@@ -4,7 +4,7 @@
     <Breadcrumb :show-back="true">
       <template #right>
         <div v-if="activeKey == '1'" class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onEditApps()">编辑</div>
+          <div class="mr-5 cursor-pointer hover:text-blue-500" @click="onEditApps()">编辑</div>
           <a-dropdown placement="bottom">
             <div class="cursor-pointer hover:text-blue-500" @click.prevent> 更多操作 </div>
             <template #overlay>
@@ -17,7 +17,10 @@
           </a-dropdown>
         </div>
         <div v-if="activeKey == '2'" class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="addOwnerShowDialog = true"
+          <div class="cursor-pointer hover:text-blue-500">添加集群</div>
+        </div>
+        <div v-if="activeKey == '3'" class="flex">
+          <div class="mr-5 cursor-pointer hover:text-blue-500" @click="addOwnerShowDialog = true"
             >添加负责人</div
           >
           <a-dropdown placement="bottom">
@@ -36,8 +39,8 @@
             </template>
           </a-dropdown>
         </div>
-        <div v-if="activeKey == '3'" class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onBusiness">设置业务</div>
+        <div v-if="activeKey == '4'" class="flex">
+          <div class="mr-5 cursor-pointer hover:text-blue-500" @click="onBusiness">设置业务</div>
           <div class="cursor-pointer hover:text-blue-500" @click="onDeleteBusiness">移除业务</div>
         </div>
       </template>
@@ -45,10 +48,11 @@
     <div class="px-4 pb-4 bg-white">
       <a-tabs v-model:activeKey="activeKey">
         <a-tab-pane key="1" tab="基本信息"><BasicInfo v-if="activeKey === '1'" /></a-tab-pane>
-        <a-tab-pane key="2" tab="负责人"
-          ><Principal v-if="activeKey === '2'" ref="principalRef"
+        <a-tab-pane key="2" tab="应用集群"><AppsCluster v-if="activeKey === '2'" /></a-tab-pane>
+        <a-tab-pane key="3" tab="负责人"
+          ><Principal v-if="activeKey === '3'" ref="principalRef"
         /></a-tab-pane>
-        <a-tab-pane key="3" tab="业务资源"><Business v-if="activeKey === '3'" /></a-tab-pane>
+        <a-tab-pane key="4" tab="所属业务"><Business v-if="activeKey === '4'" /></a-tab-pane>
       </a-tabs>
     </div>
     <AddOwnerDialog
@@ -72,6 +76,7 @@
     Modal,
   } from 'ant-design-vue';
   import BasicInfo from './fragments/basic-info.vue';
+  import AppsCluster from './fragments/apps-cluster.vue';
   import Principal from './fragments/principal.vue';
   import Business from './fragments/business.vue';
   import AddOwnerDialog from './dialog/add-owner-dialog.vue';
