@@ -49,11 +49,11 @@
         <a-descriptions>
           <a-descriptions-item label="关联应用" :span="3">
             <a-table
-              :columns="associateAppsColumns"
-              :data-source="associateAppsList"
+              :columns="applicationColumns"
+              :data-source="appsList"
               row-key="id"
               :pagination="false"
-              :loading="associateAppsLoading"
+              :loading="appsLoading"
               class="w-full"
             >
               <template #bodyCell="{ column, record }">
@@ -71,7 +71,7 @@
   </template>
 </template>
 <script lang="ts" setup>
-  import { ref, reactive, watch } from 'vue';
+  import { ref, reactive, watch, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
   import {
     Descriptions as ADescriptions,
@@ -83,7 +83,10 @@
   import { useBusinessDialog } from '../hooks/useBusinessDialog';
 
   import { getHostMangeList } from '@/api/resourceManage/infrastructure/hostManage';
-  import { getAppsBusinessDetails } from '@/api/resourceManage/applicationResources/applicationManage';
+  import {
+    getAppsBusinessDetails,
+    getCMDBAppsList,
+  } from '@/api/resourceManage/applicationResources/applicationManage';
 
   const route = useRoute();
   const { currentBusinessId, isRefresh, showAddBusinessDialogChange } = useBusinessDialog();
@@ -128,57 +131,60 @@
       console.error(error);
     }
   }
-  getAppsBusinessDetailsRequest();
-  const associateAppsList = ref<API.HostManageListItem[]>([]);
-  const diskListQuery = reactive({
-    search: '',
-    page: 1,
-    pageSize: 10,
-  });
-  // 所属机房
-  const associateAppsColumns = [
+  // 关联应用
+  const applicationColumns = [
     {
       title: '名称',
-      dataIndex: 'ip',
-      key: 'ip',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: '应用层级',
-      dataIndex: 'hostname',
-      key: 'hostname',
+      dataIndex: 'hierarchy',
+      key: 'hierarchy',
     },
     {
-      title: '中文别名',
-      dataIndex: 'cpu_count',
-      key: 'cpu_count',
+      title: '应用别名',
+      dataIndex: 'alias_name',
+      key: 'alias_name',
     },
     {
       title: '备注',
-      dataIndex: 'cpu_count',
-      key: 'cpu_count',
+      dataIndex: 'description',
+      key: 'description',
     },
   ];
-  const associateAppsLoading = ref(false);
-  // 获取主机列表
-  async function getHostMangeListRequest() {
+  const appsLoading = ref(false);
+  const appsList = ref([]);
+  // 获取应用列表
+  async function getCMDBAppsListRequest() {
     try {
-      if (associateAppsLoading.value) {
+      if (appsLoading.value) {
         return;
       }
-      associateAppsLoading.value = true;
-      const data = await getHostMangeList(diskListQuery);
-      associateAppsLoading.value = false;
-      associateAppsList.value = data.results;
+      appsLoading.value = true;
+      const params = {
+        search: '',
+        page: 1,
+        page_size: 100,
+        business: currentBusinessId.value,
+      };
+      const data = await getCMDBAppsList(params);
+      appsLoading.value = false;
+      appsList.value = data.results;
     } catch (error) {
-      associateAppsLoading.value = false;
+      appsLoading.value = false;
       console.error(error);
     }
   }
-  // getHostMangeListRequest();
   // 设置所属业务
   function onBusiness() {
     showAddBusinessDialogChange();
   }
+  onMounted(async () => {
+    await getAppsBusinessDetailsRequest();
+    getCMDBAppsListRequest();
+  });
 </script>
 <style lang="less" scoped>
   :deep(.ant-descriptions-item-label) {

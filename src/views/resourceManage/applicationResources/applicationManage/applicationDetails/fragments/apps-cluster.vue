@@ -7,7 +7,7 @@
           <a-input
             v-model:value="listQuery.search"
             placeholder="根据关键词搜索"
-            @change="getAppsOwnerListRequest()"
+            @change="getClusterListRequest()"
           />
         </div>
       </div>
@@ -31,35 +31,59 @@
           columnWidth: 40,
           checkStrictly: false,
         }"
+        row-key="id"
         :columns="columns"
-        :data-source="data"
+        :data-source="list"
         :pagination="pagination"
         :loading="loading"
+        children-column-name="hosts"
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'is_active'">
-            <a-tag :color="'green'">
-              {{ record.is_active ? '激活' : '未激活' }}
-            </a-tag>
+          <template v-if="column.key === 'ip'">
+            <template v-if="record.is_auto === false || record.is_auto === true">
+              {{ record.name }}
+            </template>
+            <template v-else>
+              {{ record.ip }}
+            </template>
+          </template>
+          <template v-if="column.key === 'agent_status'">
+            <template v-if="record.is_auto === false || record.is_auto === true"></template>
+            <template v-else>
+              <div class="flex items-center">
+                <span
+                  class="rounded text-white px-2 flex items-center"
+                  :class="agentStatusColorMap[record.agent_status]"
+                  ><span class="w-[4px] h-[4px] rounded-full bg-white block mr-1.5"></span
+                  >{{ agentStatusMap[record.agent_status] }}</span
+                >
+              </div>
+            </template>
           </template>
           <template v-if="column.key === 'action'">
-            <template v-if="record.children && record.children.length > 0">
-              <a-button size="small" class="mr-2">添加主机</a-button>
+            <template v-if="record.is_auto === false || record.is_auto === true">
+              <span
+                class="text-[#3D78E3] mr-2 cursor-pointer"
+                @click="openAddClusterHostDialog(record.id)"
+                >添加主机</span
+              >
               <a-dropdown placement="bottomRight">
-                <a-button size="small">更多操作</a-button>
+                <span class="text-[#3D78E3] cursor-pointer">更多操作</span>
                 <template #overlay>
                   <a-menu>
                     <a-menu-item>
-                      <div class="cursor-pointer" @click="deleteHost(record.children)"
+                      <div class="cursor-pointer" @click="onEditCluster(record)">编辑集群</div>
+                    </a-menu-item>
+                    <a-menu-item>
+                      <div class="text-red-500 cursor-pointer" @click="onDeleteHost(record)"
                         >移除主机</div
                       >
                     </a-menu-item>
                     <a-menu-item>
-                      <div class="cursor-pointer">编辑集群</div>
-                    </a-menu-item>
-                    <a-menu-item>
-                      <div class="cursor-pointer">删除集群</div>
+                      <div class="text-red-500 cursor-pointer" @click="onDeleteCluster(record)"
+                        >删除集群</div
+                      >
                     </a-menu-item>
                   </a-menu>
                 </template>
@@ -68,27 +92,66 @@
           </template>
         </template>
       </a-table>
+      <AppsClusterDialog
+        ref="appsClusterDialogRef"
+        @on-apps-cluster-confirm="getClusterListRequest"
+      />
+      <AddClusterHostDialog
+        ref="addClusterHostDialogRef"
+        @on-add-host-confirm="getClusterListRequest"
+      />
+      <a-modal v-model:visible="deleteHostDialogVisible" title="删除主机" @ok="deleteHostRequest">
+        <p
+          >确定要移除所选的
+          <span class="text-red-500">{{ deleteHostIdArr.length }}</span> 台主机吗？</p
+        >
+      </a-modal>
+      <a-modal
+        v-model:visible="deleteClusterDialogVisible"
+        title="删除集群"
+        @ok="deleteClusterRequest"
+      >
+        <p
+          >确定要删除 <span class="text-red-500">{{ deleteClusterInfo.name }}</span> 集群吗？</p
+        >
+      </a-modal>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
-  import { useRouter, useRoute } from 'vue-router';
+  import { useRoute } from 'vue-router';
   import {
     Table as ATable,
     Input as AInput,
-    Tag as ATag,
-    Button as AButton,
     Dropdown as ADropdown,
     Menu as AMenu,
     MenuItem as AMenuItem,
+    Modal as AModal,
     message,
   } from 'ant-design-vue';
-  import { getAppsOwnerList } from '@/api/resourceManage/applicationResources/applicationManage';
+
+  import AppsClusterDialog from '../dialog/apps-cluster-dialog.vue';
+  import AddClusterHostDialog from '../dialog/add-cluster-host-dialog.vue';
+
+  import {
+    getClusterList,
+    setClusterHost,
+    deleteCluster,
+  } from '@/api/resourceManage/applicationResources/clusterManage';
   type Key = string | number;
-  const router = useRouter();
   const route = useRoute();
 
+  const agentStatusMap: any = {
+    normal: '正常',
+    abnormal: '异常',
+    not_install: '未安装',
+  };
+  const agentStatusColorMap: any = {
+    normal: 'bg-[#52c41a]',
+    abnormal: 'bg-[#e38306]',
+    not_install: 'bg-[#73818f]',
+  };
   const environmentArr = [
     {
       name: '生产环境',
@@ -116,62 +179,39 @@
     }
   }
 
-  const data = [
-    {
-      key: 1,
-      name: 'John Brown sr.',
-      age: 60,
-      address: 'New York No. 1 Lake Park',
-      children: [
-        {
-          key: 11,
-          name: 'John Brown',
-          age: 42,
-          address: 'New York No. 2 Lake Park',
-        },
-      ],
-    },
-    {
-      key: 2,
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-    },
-  ];
-
-  const list = ref<API.HostManageListItem[]>([]);
+  const list = ref([]);
   const listQuery = reactive({
     search: '',
     page: 1,
     pageSize: 10,
-    role: 'developer',
+    app: '',
   });
   const total = ref(0);
   const columns = [
     {
       title: 'IP',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'ip',
+      key: 'ip',
     },
     {
       title: '主机名',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'hostname',
+      key: 'hostname',
     },
     {
       title: 'CPU 核数（个）',
-      dataIndex: 'email',
-      key: 'email',
+      dataIndex: 'cpu_count',
+      key: 'cpu_count',
     },
     {
       title: '内存(G)',
-      dataIndex: 'memory',
-      key: 'memory',
+      dataIndex: 'mem_size',
+      key: 'mem_size',
     },
     {
       title: 'Agent 状态',
-      dataIndex: 'is_active',
-      key: 'is_active',
+      dataIndex: 'agent_status',
+      key: 'agent_status',
     },
     {
       title: '操作',
@@ -195,17 +235,18 @@
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
     listQuery.pageSize = pag.pageSize;
-    getAppsOwnerListRequest();
+    getClusterListRequest();
   };
-  // 获取负责人列表
-  async function getAppsOwnerListRequest() {
+  // 获取集群列表
+  async function getClusterListRequest() {
     try {
       if (loading.value) {
         return;
       }
       loading.value = true;
       const id: any = route.query && route.query.id;
-      const data = await getAppsOwnerList(id, listQuery);
+      listQuery.app = id;
+      const data = await getClusterList(listQuery);
       loading.value = false;
       list.value = data.results;
       total.value = data.count;
@@ -214,22 +255,31 @@
       console.error(error);
     }
   }
-  getAppsOwnerListRequest();
+  getClusterListRequest();
   const selectedRowKeysArr = ref<Key[]>([]);
   const onSelectChange = (selectedRowKeys: Key[]) => {
     selectedRowKeysArr.value = selectedRowKeys;
   };
 
+  // 添加主机
+  const addClusterHostDialogRef = ref();
+  function openAddClusterHostDialog(id: string) {
+    addClusterHostDialogRef.value && addClusterHostDialogRef.value.openDialog(id);
+  }
+  const deleteHostDialogVisible = ref(false);
+  // 选择删除的主机
+  const deleteHostIdArr = ref<string[]>([]);
+  const clusterId = ref();
   // 移除主机
-  function deleteHost(children: any) {
-    if (children.length == 0) {
+  function onDeleteHost(row: any) {
+    if ((row.hosts && row.hosts.length == 0) || row.hosts === null) {
       message.error('暂无可删除的主机');
       return;
     }
     const deleteHostIds: string[] = [];
     selectedRowKeysArr.value.forEach((item: any) => {
-      children.forEach((childrenItem: any) => {
-        if (item == childrenItem.key) {
+      row.hosts.forEach((childrenItem: any) => {
+        if (item == childrenItem.id) {
           deleteHostIds.push(item);
         }
       });
@@ -238,8 +288,68 @@
       message.error('请先勾选删除的主机');
       return;
     }
-    console.log('移除主机', deleteHostIds);
+    clusterId.value = row.id;
+    deleteHostIdArr.value = deleteHostIds;
+    deleteHostDialogVisible.value = true;
   }
+  const deleteHostLoading = ref(false);
+  // 移除主机请求
+  async function deleteHostRequest() {
+    try {
+      if (deleteHostLoading.value) {
+        return;
+      }
+      deleteHostLoading.value = true;
+      const params = {
+        action: 'remove',
+        related_ids: deleteHostIdArr.value,
+      };
+      const data = await setClusterHost(clusterId.value, params);
+      message.success(data.detail);
+      deleteHostLoading.value = false;
+      deleteHostDialogVisible.value = false;
+      getClusterListRequest();
+    } catch (error) {
+      deleteHostLoading.value = false;
+      console.error(error);
+    }
+  }
+
+  // 添加集群
+  const appsClusterDialogRef = ref();
+  function onEditCluster(row: any) {
+    appsClusterDialogRef.value && appsClusterDialogRef.value.openClusterEditDialog(row);
+  }
+  // 删除集群
+  const deleteClusterDialogVisible = ref(false);
+  const deleteClusterInfo = reactive({
+    name: '',
+    id: '',
+  });
+  const deleteClusterLoading = ref(false);
+  function onDeleteCluster(row: any) {
+    deleteClusterInfo.id = row.id;
+    deleteClusterInfo.name = row.name;
+    deleteClusterDialogVisible.value = true;
+  }
+  async function deleteClusterRequest() {
+    try {
+      if (deleteClusterLoading.value) {
+        return;
+      }
+      deleteClusterLoading.value = true;
+      await deleteCluster(deleteClusterInfo.id);
+      message.success('移除成功');
+      deleteClusterLoading.value = false;
+      deleteClusterDialogVisible.value = false;
+      getClusterListRequest();
+    } catch (error) {
+      deleteClusterLoading.value = false;
+      console.error(error);
+    }
+  }
+
+  defineExpose({ getClusterListRequest });
 </script>
 <style lang="less" scoped>
   .environment-box {

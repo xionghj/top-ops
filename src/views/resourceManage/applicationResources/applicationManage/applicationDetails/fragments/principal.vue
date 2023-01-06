@@ -1,7 +1,17 @@
 <!-- 应用管理-列表详情-负责人-->
 <template>
-  <div>
-    <div class="px-6 bg-white">
+  <div class="w-full bg-white flex">
+    <div class="p-[15px] w-[220px] bg-gray-50">
+      <div
+        v-for="(item, index) in menus"
+        :key="index"
+        class="flex items-center py-1 px-2 mb-1 rounded-sm cursor-pointer hover:bg-gray-200 hover:text-blue-500"
+        :class="[currentPrincipal === item.key ? 'bg-gray-200 text-blue-500' : '']"
+        @click="onSelectMenus(item.key)"
+        >{{ item.name }}</div
+      >
+    </div>
+    <div class="px-4 bg-white flex-1">
       <div class="flex mb-4">
         <div class="w-56 mr-3">
           <a-input
@@ -40,15 +50,27 @@
   import { useRouter, useRoute } from 'vue-router';
   import { Table as ATable, Input as AInput, Tag as ATag } from 'ant-design-vue';
   import { getAppsOwnerList } from '@/api/resourceManage/applicationResources/applicationManage';
+
   type Key = string | number;
   const router = useRouter();
   const route = useRoute();
+  const currentPrincipal = ref('developer');
+  const menus = [
+    { name: '开发负责人', key: 'developer' },
+    { name: '运维负责人', key: 'owner' },
+    { name: '测试负责人', key: 'tester' },
+  ];
+  function onSelectMenus(key: string) {
+    currentPrincipal.value = key;
+    getAppsOwnerListRequest();
+  }
+
   const list = ref<API.HostManageListItem[]>([]);
   const listQuery = reactive({
     search: '',
     page: 1,
-    pageSize: 10,
-    role: 'developer',
+    page_size: 5,
+    role: '',
   });
   const total = ref(0);
   const columns = [
@@ -87,9 +109,9 @@
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
-    pageSize: listQuery.pageSize,
+    pageSize: listQuery.page_size,
     showTotal: (total: number) => `总共 ${total} 项`,
-    defaultPageSize: 10,
+    defaultPageSize: 5,
     showSizeChanger: true, // 是否显示pagesize选择
     showQuickJumper: true, // 是否显示跳转窗
   }));
@@ -97,7 +119,7 @@
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
-    listQuery.pageSize = pag.pageSize;
+    listQuery.page_size = pag.pageSize;
     getAppsOwnerListRequest();
   };
   // 获取负责人列表
@@ -108,6 +130,7 @@
       }
       loading.value = true;
       const id: any = route.query && route.query.id;
+      listQuery.role = currentPrincipal.value;
       const data = await getAppsOwnerList(id, listQuery);
       loading.value = false;
       list.value = data.results;

@@ -2,15 +2,15 @@
 <template>
   <div class="px-4">
     <div>
-      <div class="my-4">应用基本信息</div>
-      <div class="bg-[#f7f8fa] p-4 rounded-sm">
+      <div class="my-4">基本信息</div>
+      <div class="px-[15px]">
         <a-descriptions :column="2">
-          <a-descriptions-item label="名  称"> {{ basicInfo.name }}</a-descriptions-item>
-          <a-descriptions-item label="简  写">{{ basicInfo.alias_name }}</a-descriptions-item>
+          <a-descriptions-item label="应用名称"> {{ basicInfo.name }}</a-descriptions-item>
+          <a-descriptions-item label="中文别名">{{ basicInfo.alias_name }}</a-descriptions-item>
           <a-descriptions-item label="应用层级">{{
             basicInfo.hierarchy && basicInfo.hierarchy.name
           }}</a-descriptions-item>
-          <a-descriptions-item label="备  注">{{ basicInfo.description }}</a-descriptions-item>
+          <a-descriptions-item label="备注">{{ basicInfo.description }}</a-descriptions-item>
           <a-descriptions-item label="所属业务">
             <span v-for="(item, index) in basicInfo.business" :key="index">
               {{ item.name }}{{ basicInfo.business.length - 1 != index ? '/' : '' }}
@@ -48,6 +48,7 @@
         </a-descriptions>
       </div>
     </div>
+    <a-divider />
     <div class="mt-4">
       <div>实例分布</div>
       <div class="environment-box mt-4">
@@ -84,7 +85,7 @@
     Descriptions as ADescriptions,
     DescriptionsItem as ADescriptionsItem,
     Table as ATable,
-    Tag as ATag,
+    Divider as ADivider,
   } from 'ant-design-vue';
   import { getIdcRacks } from '@/api/resourceManage/infrastructure/idcManage';
   import { getCMDBAppsDetails } from '@/api/resourceManage/applicationResources/applicationManage';
@@ -200,13 +201,6 @@
   }
 </script>
 <style lang="less" scoped>
-  :deep(.ant-descriptions-item-label) {
-    // width: 120px;
-    // display: flex;
-    // justify-content: flex-end;
-    padding-right: 2px;
-    color: #86909c;
-  }
   .environment-box {
     margin-bottom: 12px;
     .environment {

@@ -4,8 +4,8 @@
     <Breadcrumb>
       <template #right>
         <div class="flex">
-          <div class="mr-2 cursor-pointer hover:text-blue-500" @click="onAddBusiness('add')"
-            >新建业务</div
+          <div class="mr-5 cursor-pointer hover:text-blue-500" @click="onAddBusiness('add')"
+            >新建应用</div
           >
           <a-dropdown placement="bottom">
             <div class="cursor-pointer hover:text-blue-500" @click.prevent> 更多操作 </div>
