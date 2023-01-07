@@ -98,7 +98,6 @@
       title: '测试负责人',
       dataIndex: 'tester',
       key: 'tester',
-      width: 100,
     },
     {
       title: '最近更新',

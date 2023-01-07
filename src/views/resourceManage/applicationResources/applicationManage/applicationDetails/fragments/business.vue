@@ -1,15 +1,15 @@
 <!-- 应用管理-列表详情-所属业务-->
 <template>
-  <div v-if="!businessInfo.id" class="flex">
+  <div v-if="!businessInfo.id" class="flex py-8">
     <div class="w-full h-32 bg-gray-50 flex items-center">
-      <div class="ml-4 text-[#FFA235] text-base"
-        >请 <span class="text-blue-500" @click="onBusiness">设置</span> 所在机柜</div
+      <div class="ml-4 text-[#FFA235]"
+        >请 <span class="cursor-pointer text-blue-500" @click="onBusiness">设置</span> 所在机柜</div
       >
     </div>
   </div>
   <template v-else>
     <div>
-      <a-descriptions :column="2">
+      <a-descriptions :column="2" :label-style="{ width: '100px' }">
         <a-descriptions-item label="名称"> {{ businessInfo.name }}</a-descriptions-item>
         <a-descriptions-item label="类型">{{
           businessInfo.kind && businessInfo.kind.name
@@ -46,7 +46,7 @@
     </div>
     <div>
       <div class="mt-4">
-        <a-descriptions>
+        <a-descriptions :label-style="{ width: '100px' }">
           <a-descriptions-item label="关联应用" :span="3">
             <a-table
               :columns="applicationColumns"
@@ -57,10 +57,10 @@
               class="w-full"
             >
               <template #bodyCell="{ column, record }">
-                <template v-if="column.key === 'agent_status'">
-                  <a-tag :color="'green'">
-                    {{ record.agent_status }}
-                  </a-tag>
+                <template v-if="column.key === 'hierarchy'">
+                  <span>
+                    {{ record.hierarchy && record.hierarchy.name }}
+                  </span>
                 </template>
               </template>
             </a-table>
@@ -71,18 +71,16 @@
   </template>
 </template>
 <script lang="ts" setup>
-  import { ref, reactive, watch, onMounted } from 'vue';
+  import { ref, watch, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
   import {
     Descriptions as ADescriptions,
     DescriptionsItem as ADescriptionsItem,
     Table as ATable,
-    Tag as ATag,
   } from 'ant-design-vue';
 
   import { useBusinessDialog } from '../hooks/useBusinessDialog';
 
-  import { getHostMangeList } from '@/api/resourceManage/infrastructure/hostManage';
   import {
     getAppsBusinessDetails,
     getCMDBAppsList,
@@ -101,7 +99,7 @@
   const businessLodding = ref(false);
   // 获取所属业务
   const businessInfo = ref({
-    id: null,
+    id: '',
     children: [],
     creator: {},
     kind: {
@@ -158,6 +156,9 @@
   const appsList = ref([]);
   // 获取应用列表
   async function getCMDBAppsListRequest() {
+    if (JSON.stringify(currentBusinessId.value) == '{}') {
+      return;
+    }
     try {
       if (appsLoading.value) {
         return;
@@ -167,7 +168,7 @@
         search: '',
         page: 1,
         page_size: 100,
-        business: currentBusinessId.value,
+        business: currentBusinessId.value.toString(),
       };
       const data = await getCMDBAppsList(params);
       appsLoading.value = false;
@@ -186,11 +187,4 @@
     getCMDBAppsListRequest();
   });
 </script>
-<style lang="less" scoped>
-  :deep(.ant-descriptions-item-label) {
-    width: 120px;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 2px;
-  }
-</style>
+<style lang="less" scoped></style>

@@ -21,36 +21,43 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="hierarchy" name="hierarchy">
-                <a-input v-model:value="form.hierarchy" placeholder="请输入" />
+              <a-form-item label="应用层级" name="hierarchy">
+                <a-select v-model:value="form.hierarchy" placeholder="请选择应用层级">
+                  <a-select-option
+                    v-for="(item, index) in hierarchyOption"
+                    :key="index"
+                    :value="item.id"
+                    >{{ item.name }}</a-select-option
+                  >
+                </a-select>
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="vcs" name="vcs">
-                <a-input v-model:value="form.vcs" placeholder="请输入址" />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-item label="Git 地址" name="repository">
-                <a-input v-model:value="form.repository" placeholder="请输入Git 地址" />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-item label="framework" name="framework">
-                <a-input v-model:value="form.framework" placeholder="请输入" />
+              <a-form-item label="应用框架" name="framework">
+                <a-select v-model:value="form.framework" placeholder="请选择应用框架">
+                  <a-select-option
+                    v-for="(item, index) in frameworkOption"
+                    :key="index"
+                    :value="item.id"
+                    >{{ item.name }}</a-select-option
+                  >
+                </a-select>
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="开发语言" name="language">
-                <a-input v-model:value="form.language" placeholder="请输入开发语言" />
+                <a-select v-model:value="form.language" placeholder="请选择开发语言">
+                  <a-select-option
+                    v-for="(item, index) in languageOption"
+                    :key="index"
+                    :value="item.id"
+                    >{{ item.name }}</a-select-option
+                  >
+                </a-select>
               </a-form-item>
             </a-col>
           </a-row>
@@ -70,8 +77,8 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="owner" name="owner">
-                <a-select v-model:value="form.owner" mode="multiple" placeholder="请选择">
+              <a-form-item label="运维负责人">
+                <a-select v-model:value="form.owner" mode="multiple" placeholder="请选择运维负责人">
                   <a-select-option
                     v-for="(item, index) in personOption"
                     :key="index"
@@ -84,8 +91,12 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="研发负责人" name="developer">
-                <a-select v-model:value="form.developer" mode="multiple" placeholder="请选择">
+              <a-form-item label="开发负责人">
+                <a-select
+                  v-model:value="form.developer"
+                  mode="multiple"
+                  placeholder="请选择开发负责人"
+                >
                   <a-select-option
                     v-for="(item, index) in personOption"
                     :key="index"
@@ -98,8 +109,12 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="测试负责人" name="tester">
-                <a-select v-model:value="form.tester" mode="multiple" placeholder="请选择">
+              <a-form-item label="测试负责人">
+                <a-select
+                  v-model:value="form.tester"
+                  mode="multiple"
+                  placeholder="请选择测试负责人"
+                >
                   <a-select-option
                     v-for="(item, index) in personOption"
                     :key="index"
@@ -163,6 +178,80 @@
       id: 4,
     },
   ];
+  const hierarchyOption = [
+    {
+      name: '接入层',
+      id: 'web',
+    },
+    {
+      name: '聚合层',
+      id: 'composite',
+    },
+    {
+      name: '原子层',
+      id: 'atomic',
+    },
+    {
+      name: '其它层级',
+      id: 'other',
+    },
+  ];
+  const frameworkOption = [
+    {
+      name: 'Dubbo',
+      id: 'dubbo',
+    },
+    {
+      name: 'Django',
+      id: 'django',
+    },
+    {
+      name: 'Spring Boot',
+      id: 'sprint_boot',
+    },
+    {
+      name: 'Ssm',
+      id: 'ssm',
+    },
+    {
+      name: 'Vue',
+      id: 'vue',
+    },
+    {
+      name: 'Angular',
+      id: 'angular',
+    },
+    {
+      name: 'React',
+      id: 'react',
+    },
+    {
+      name: 'Other',
+      id: 'other',
+    },
+  ];
+  const languageOption = [
+    {
+      name: 'Java',
+      id: 'java',
+    },
+    {
+      name: 'PHP',
+      id: 'php',
+    },
+    {
+      name: 'Python',
+      id: 'py',
+    },
+    {
+      name: 'Golang',
+      id: 'go',
+    },
+    {
+      name: 'Other',
+      id: 'other',
+    },
+  ];
   const businessOption = ref<any>([]);
   // 获取业务列表
   async function getCMDBBusinessListRequest() {
@@ -184,11 +273,9 @@
   const form = ref({
     name: '',
     alias_name: '',
-    hierarchy: '',
-    vcs: '',
-    repository: '',
-    framework: '',
-    language: '',
+    hierarchy: [],
+    framework: [],
+    language: [],
     owner: [],
     tester: [],
     developer: [],
@@ -198,12 +285,6 @@
   const loading = ref(false);
   const rules: Record<string, Rule[]> = {
     name: [{ required: true, message: '请输入' }],
-    kind: [{ required: true, message: '请输入' }],
-    description: [{ required: true, message: '请输入备注' }],
-    parent: [{ required: true, message: '请输入' }],
-    tester: [{ required: true, message: '请选择测试人员' }],
-    pm: [{ required: true, message: '请选择产品经理' }],
-    developer: [{ required: true, message: '请选择研发人员' }],
   };
   function onSubmit() {
     formRef.value &&
@@ -260,11 +341,12 @@
         developer.push(item.id);
       });
       data.developer = developer;
-      const business: any = [];
-      data.business.forEach((item: any) => {
-        business.push(String(item.id));
-      });
-      data.business = business;
+      if (data.business.length > 0) {
+        data.business = [String(data.business[data.business.length - 1].id)];
+      } else {
+        data.business = [];
+      }
+      data.hierarchy = data.hierarchy && data.hierarchy.id;
       form.value = data;
       appsLoading.value = false;
     } catch (error) {

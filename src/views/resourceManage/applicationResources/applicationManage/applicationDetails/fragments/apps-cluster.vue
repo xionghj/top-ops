@@ -42,7 +42,7 @@
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'ip'">
             <template v-if="record.is_auto === false || record.is_auto === true">
-              {{ record.name }}
+              {{ record.name }} - {{ envMap[record.env] }}
             </template>
             <template v-else>
               {{ record.ip }}
@@ -76,7 +76,7 @@
                       <div class="cursor-pointer" @click="onEditCluster(record)">编辑集群</div>
                     </a-menu-item>
                     <a-menu-item>
-                      <div class="text-red-500 cursor-pointer" @click="onDeleteHost(record)"
+                      <div class="text-[#FFA235] cursor-pointer" @click="onDeleteHost(record)"
                         >移除主机</div
                       >
                     </a-menu-item>
@@ -151,6 +151,12 @@
     normal: 'bg-[#52c41a]',
     abnormal: 'bg-[#e38306]',
     not_install: 'bg-[#73818f]',
+  };
+  const envMap: any = {
+    dev: '开发',
+    fat: '测试',
+    uat: '预发布',
+    pro: '生产',
   };
   const environmentArr = [
     {

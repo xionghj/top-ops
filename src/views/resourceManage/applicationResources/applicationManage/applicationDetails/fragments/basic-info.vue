@@ -3,19 +3,13 @@
   <div class="px-4">
     <div>
       <div class="my-4">基本信息</div>
-      <div class="px-[15px]">
+      <div>
         <a-descriptions :column="2">
           <a-descriptions-item label="应用名称"> {{ basicInfo.name }}</a-descriptions-item>
           <a-descriptions-item label="中文别名">{{ basicInfo.alias_name }}</a-descriptions-item>
           <a-descriptions-item label="应用层级">{{
             basicInfo.hierarchy && basicInfo.hierarchy.name
           }}</a-descriptions-item>
-          <a-descriptions-item label="备注">{{ basicInfo.description }}</a-descriptions-item>
-          <a-descriptions-item label="所属业务">
-            <span v-for="(item, index) in basicInfo.business" :key="index">
-              {{ item.name }}{{ basicInfo.business.length - 1 != index ? '/' : '' }}
-            </span>
-          </a-descriptions-item>
           <a-descriptions-item label="运维负责人">
             <span
               v-for="(item, index) in basicInfo.owner"
@@ -25,7 +19,11 @@
               {{ item.username }}
             </span>
           </a-descriptions-item>
-          <a-descriptions-item label="Git 地址">{{ basicInfo.repository }}</a-descriptions-item>
+          <a-descriptions-item label="所属业务">
+            <span v-for="(item, index) in basicInfo.business" :key="index">
+              {{ item.name }}{{ basicInfo.business.length - 1 != index ? '/' : '' }}
+            </span>
+          </a-descriptions-item>
           <a-descriptions-item label="开发负责人">
             <span
               v-for="(item, index) in basicInfo.developer"
@@ -45,6 +43,7 @@
               {{ item.username }}
             </span>
           </a-descriptions-item>
+          <a-descriptions-item label="备注">{{ basicInfo.description }}</a-descriptions-item>
         </a-descriptions>
       </div>
     </div>
@@ -129,7 +128,6 @@
     owner: [] as any,
     developer: [] as any,
     tester: [] as any,
-    repository: '',
     language: '',
   });
   const basicInfoLoading = ref(false);

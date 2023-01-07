@@ -127,6 +127,11 @@
       dataIndex: 'parent',
       key: 'parent',
     },
+    {
+      title: '最近更新',
+      dataIndex: 'updated_at',
+      key: 'updated_at',
+    },
   ];
   const loading = ref(false);
   const pagination = computed(() => ({

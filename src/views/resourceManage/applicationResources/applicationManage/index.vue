@@ -29,7 +29,7 @@
           <a-input
             v-model:value="listQuery.search"
             placeholder="根据关键词搜索"
-            @change="getCMDBAppsListRequest()"
+            @change="onQuery()"
           />
         </div>
       </div>
@@ -84,6 +84,7 @@
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
   import { useRouter } from 'vue-router';
+  import { debounce } from 'lodash-es';
   import {
     Table as ATable,
     Input as AInput,
@@ -127,6 +128,11 @@
       dataIndex: 'tester',
       key: 'tester',
     },
+    {
+      title: '最近更新',
+      dataIndex: 'updated_at',
+      key: 'updated_at',
+    },
   ];
   const loading = ref(false);
   const pagination = computed(() => ({
@@ -139,6 +145,7 @@
     showQuickJumper: true, // 是否显示跳转窗
   }));
 
+  const onQuery = debounce(getCMDBAppsListRequest, 500);
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;

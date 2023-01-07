@@ -17,7 +17,7 @@
           <a-input
             v-model:value="listQuery.search"
             placeholder="根据关键词搜索"
-            @change="getAppsOwnerListRequest()"
+            @change="onQuery()"
           />
         </div>
       </div>
@@ -47,12 +47,12 @@
 </template>
 <script lang="ts" setup>
   import { ref, reactive, computed } from 'vue';
-  import { useRouter, useRoute } from 'vue-router';
+  import { useRoute } from 'vue-router';
+  import { debounce } from 'lodash-es';
   import { Table as ATable, Input as AInput, Tag as ATag } from 'ant-design-vue';
   import { getAppsOwnerList } from '@/api/resourceManage/applicationResources/applicationManage';
 
   type Key = string | number;
-  const router = useRouter();
   const route = useRoute();
   const currentPrincipal = ref('developer');
   const menus = [
@@ -116,6 +116,7 @@
     showQuickJumper: true, // 是否显示跳转窗
   }));
 
+  const onQuery = debounce(getAppsOwnerListRequest, 500);
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
@@ -135,6 +136,7 @@
       loading.value = false;
       list.value = data.results;
       total.value = data.count;
+      selectPrincipal.value = [];
     } catch (error) {
       loading.value = false;
       console.error(error);
@@ -145,5 +147,5 @@
   const onSelectChange = (selectedRowKeys: Key[]) => {
     selectPrincipal.value = selectedRowKeys;
   };
-  defineExpose({ selectPrincipal, getAppsOwnerListRequest });
+  defineExpose({ selectPrincipal, currentPrincipal, getAppsOwnerListRequest });
 </script>

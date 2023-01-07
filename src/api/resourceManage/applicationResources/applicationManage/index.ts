@@ -43,9 +43,17 @@ export function getAppsOwnerList(id: number, query: API.PageParams) {
 // 应用管理-详情-设置负责人
 export function setAppsOwner(id: number, data: API.PageParams) {
   return request({
-    url: `/cmdb/apps/${id}/owner/list/`,
+    url: `/cmdb/apps/${id}/owner/`,
     method: 'post',
     data,
+  });
+}
+// 应用管理-详情-获取添加负责人列表
+export function getUsersUsersList(query: API.PageParams) {
+  return request({
+    url: `/users/users/`,
+    method: 'get',
+    params: query,
   });
 }
 
@@ -70,12 +78,5 @@ export function setAppsBusiness(id: number, data: API.PageParams) {
     url: `/cmdb/apps/${id}/business/`,
     method: 'post',
     data,
-  });
-}
-// 应用管理-详情-删除设置业务
-export function deleteAppsBusiness(id: number) {
-  return request({
-    url: `/cmdb/apps/${id}/business/`,
-    method: 'delete',
   });
 }

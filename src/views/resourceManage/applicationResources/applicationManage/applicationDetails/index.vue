@@ -22,14 +22,14 @@
           >
         </div>
         <div v-if="activeKey == '3'" class="flex">
-          <div class="mr-5 cursor-pointer hover:text-blue-500" @click="addOwnerShowDialog = true"
+          <div class="mr-5 cursor-pointer hover:text-blue-500" @click="openAddOwnerDialog()"
             >添加负责人</div
           >
           <div class="cursor-pointer text-red-500" @click="deletHostOwnerRequest()">移除负责人</div>
         </div>
         <div v-if="activeKey == '4'" class="flex">
           <div class="mr-5 cursor-pointer hover:text-blue-500" @click="onBusiness">设置业务</div>
-          <div class="cursor-pointer hover:text-blue-500" @click="onDeleteBusiness">移除业务</div>
+          <div class="cursor-pointer text-red-500" @click="onDeleteBusiness">移除业务</div>
         </div>
       </template>
     </Breadcrumb>
@@ -45,10 +45,7 @@
         <a-tab-pane key="4" tab="所属业务"><Business v-if="activeKey === '4'" /></a-tab-pane>
       </a-tabs>
     </div>
-    <AddOwnerDialog
-      :add-owner-show-dialog="addOwnerShowDialog"
-      @on-close-add-owner-show-dialog="closeAddOwnerShowDialog"
-    />
+    <AddOwnerDialog ref="addOwnerDialogRef" @on-add-owner-confirm="addOwnerConfirm" />
     <AddBusinessDialog />
     <AppsClusterDialog ref="appsClusterDialogRef" @on-apps-cluster-confirm="appsClusterConfirm" />
   </div>
@@ -79,12 +76,12 @@
   import { idcRacksSettings } from '@/api/resourceManage/infrastructure/idcManage';
   import {
     setAppsOwner,
-    deleteAppsBusiness,
+    setAppsBusiness,
   } from '@/api/resourceManage/applicationResources/applicationManage';
 
   const router = useRouter();
   const route = useRoute();
-  const { showAddBusinessDialogChange, currentBusinessId } = useBusinessDialog();
+  const { showAddBusinessDialogChange, refresh, currentBusinessId } = useBusinessDialog();
 
   function onBack() {
     router.go(-1);
@@ -138,9 +135,12 @@
   }
 
   // 打开添加负责人弹出框
-  const addOwnerShowDialog = ref(false);
-  function closeAddOwnerShowDialog() {
-    addOwnerShowDialog.value = false;
+  const addOwnerDialogRef = ref();
+  function openAddOwnerDialog() {
+    const role = principalRef.value && principalRef.value.currentPrincipal;
+    addOwnerDialogRef.value && addOwnerDialogRef.value.openDialog(role);
+  }
+  function addOwnerConfirm() {
     principalRef.value && principalRef.value.getAppsOwnerListRequest();
   }
   const deletePrincipalLoading = ref(false);
@@ -164,14 +164,15 @@
           }
           deletePrincipalLoading.value = true;
           const id: any = route.query && route.query.id;
+          const role = principalRef.value && principalRef.value.currentPrincipal;
           const params = {
             action: 'remove',
-            role: 'developer',
+            role,
             related_ids: selectPrincipal,
           };
           const data = await setAppsOwner(id, params);
           message.success(data.detail);
-          principalRef.value && principalRef.value.getHostOwnerRequest();
+          principalRef.value && principalRef.value.getAppsOwnerListRequest();
           deletePrincipalLoading.value = false;
         } catch (error) {
           deletePrincipalLoading.value = false;
@@ -197,10 +198,15 @@
             return;
           }
           deletePrincipalLoading.value = true;
-          const id = parseInt(currentBusinessId.value);
-          const data = await deleteAppsBusiness(id);
+          const id: any = route.query && route.query.id;
+          const params = {
+            action: 'remove',
+            related_id: String(currentBusinessId.value),
+          };
+          const data = await setAppsBusiness(id, params);
           message.success(data.detail);
           deletePrincipalLoading.value = false;
+          refresh();
         } catch (error) {
           deletePrincipalLoading.value = false;
           console.error(error);

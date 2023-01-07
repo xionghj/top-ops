@@ -1,3 +1,4 @@
+<!-- 应用管理-列表详情-负责人-添加负责人弹出框-->
 <template>
   <div>
     <a-modal
@@ -13,7 +14,7 @@
             <a-input
               v-model:value="listQuery.search"
               placeholder="根据关键词搜索"
-              @change="getHostOwnerRequest()"
+              @change="onQuery()"
             />
           </div>
         </div>
@@ -30,13 +31,6 @@
           :loading="loading"
           @change="handleTableChange"
         >
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'agent_status'">
-              <a-tag :color="'green'">
-                {{ record.agent_status }}
-              </a-tag>
-            </template>
-          </template>
         </a-table>
       </div>
       <template #footer>
@@ -44,7 +38,9 @@
           <div>已选择 {{ state.selectedRowKeys.length }} 项</div>
           <div>
             <a-button key="back" @click="handleCancel">取消</a-button>
-            <a-button key="submit" type="primary" @click="handleOk">确定</a-button>
+            <a-button key="submit" type="primary" :loading="state.addLoading" @click="handleOk"
+              >确定</a-button
+            >
           </div>
         </div>
       </template>
@@ -52,44 +48,46 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { ref, toRefs, reactive, computed, onMounted, watch } from 'vue';
+  import { ref, reactive, computed, watch } from 'vue';
   import { useRoute } from 'vue-router';
+  import { debounce } from 'lodash-es';
   import {
     Modal as AModal,
     Table as ATable,
     Input as AInput,
-    Tag as ATag,
     Button as AButton,
     message,
   } from 'ant-design-vue';
-  import { getHostOwner, hostOwner } from '@/api/resourceManage/infrastructure/hostManage';
-  import { setAppsOwner } from '@/api/resourceManage/applicationResources/applicationManage';
+  import {
+    setAppsOwner,
+    getUsersUsersList,
+  } from '@/api/resourceManage/applicationResources/applicationManage';
   type Key = string | number;
-  const props = defineProps({
-    addOwnerShowDialog: Boolean,
-  });
-  const { addOwnerShowDialog } = toRefs(props);
+  const addOwnerShowDialog = ref(false);
   watch(addOwnerShowDialog, (bol) => {
     if (bol) {
       state.selectedRowKeys = [];
       getHostOwnerRequest();
     }
   });
-  const emit = defineEmits(['onCloseAddOwnerShowDialog']);
+  const emit = defineEmits(['onAddOwnerConfirm']);
+  function openDialog(role: string) {
+    addOwnerRole.value = role;
+    addOwnerShowDialog.value = true;
+  }
   const handleOk = () => {
     addAppsOwnerRequest();
   };
   const handleCancel = () => {
-    emit('onCloseAddOwnerShowDialog');
+    addOwnerShowDialog.value = false;
   };
   const route = useRoute();
-  const list = ref<API.HostManageListItem[]>([]);
+  const list = ref([]);
+  const addOwnerRole = ref('');
   const listQuery = reactive({
     search: '',
     page: 1,
-    pageSize: 10,
-    person: '',
-    role: 'first_owner',
+    page_size: 10,
   });
   const total = ref(0);
   const columns = [
@@ -109,11 +107,6 @@
       key: 'email',
     },
     {
-      title: '状态',
-      dataIndex: 'mem_size',
-      key: 'mem_size',
-    },
-    {
       title: '联系电话',
       dataIndex: 'telephone',
       key: 'telephone',
@@ -128,17 +121,18 @@
   const pagination = computed(() => ({
     total: total.value,
     current: listQuery.page,
-    pageSize: listQuery.pageSize,
+    pageSize: listQuery.page_size,
     showTotal: (total: number) => `总共 ${total} 项`,
     defaultPageSize: 10,
     showSizeChanger: true, // 是否显示pagesize选择
     showQuickJumper: true, // 是否显示跳转窗
   }));
 
+  const onQuery = debounce(getHostOwnerRequest, 500);
   // 列表当前页更改
   const handleTableChange: any = (pag: { pageSize: number; current: number }) => {
     listQuery.page = pag.current;
-    listQuery.pageSize = pag.pageSize;
+    listQuery.page_size = pag.pageSize;
     getHostOwnerRequest();
   };
   // 获取负责人列表
@@ -148,10 +142,9 @@
         return;
       }
       loading.value = true;
-      const id: any = route.query && route.query.id;
-      const data = await getHostOwner(id, listQuery);
+      const data = await getUsersUsersList(listQuery);
       loading.value = false;
-      list.value = data;
+      list.value = data.results;
       total.value = data.count;
     } catch (error) {
       loading.value = false;
@@ -168,7 +161,7 @@
   });
   async function addAppsOwnerRequest() {
     if (state.selectedRowKeys.length == 0) {
-      message.warning('请至少勾选一个负责');
+      message.warning('请至少勾选一个负责人');
       return;
     }
     try {
@@ -179,12 +172,13 @@
       const id: any = route.query && route.query.id;
       const params = {
         action: 'add',
-        role: 'developer',
+        role: addOwnerRole.value,
         related_ids: state.selectedRowKeys,
       };
       const data = await setAppsOwner(id, params);
       message.success(data.detail);
-      handleCancel();
+      addOwnerShowDialog.value = false;
+      emit('onAddOwnerConfirm');
       state.addLoading = false;
     } catch (error) {
       state.addLoading = false;
@@ -194,4 +188,5 @@
   const onSelectChange = (selectedRowKeys: Key[]) => {
     state.selectedRowKeys = selectedRowKeys;
   };
+  defineExpose({ openDialog });
 </script>
